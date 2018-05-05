@@ -1,8 +1,3 @@
-"""
-Simple example to demonstrate initalising a
-square exponential kernel and then fitting a Gaussian process
-object
-"""
 from pydygp.kernels import Kernel
 from pydygp.gaussianprocesses import GaussianProcess
 
