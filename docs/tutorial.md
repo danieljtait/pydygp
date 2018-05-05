@@ -1,18 +1,60 @@
 # Tutorial
 
+## Complete Gaussian Process Example
+
 ```python
-import autograd.numpy as np   # Thinly-wrapped version of Numpy
-from autograd import grad
+"""
+Simple example to demonstrate initalising a
+square exponential kernel and then fitting a Gaussian process
+object
+"""
+from pydygp.kernels import Kernel
+from pydygp.gaussianprocesses import GaussianProcess
 
-def taylor_sine(x):  # Taylor approximation to sine function
-    ans = currterm = x
-    i = 0
-    while np.abs(currterm) > 0.001:
-        currterm = -currterm * x**2 / ((2 * i + 3) * (2 * i + 2))
-        ans = ans + currterm
-        i += 1
-    return ans
+# Additional imports
+import numpy as np
+import matplotlib.pyplot as plt
 
-grad_sine = grad(taylor_sine)
-print "Gradient of sin(pi) is", grad_sine(np.pi)
+
+# Initialises a default square exponential kernel: k(s, t) = exp(-(s-t)**2)
+kse1 = Kernel.SquareExponKernel()
+
+# Choose kernel parameters
+kpar = [.25, 2.5]
+
+# initalise a square exponential kernel with given parameters
+kse2 = Kernel.SquareExponKernel(kpar)
+
+# create a Gaussian processes from the kernels
+# and then fit it to the simulated data
+gp1 = GaussianProcess(kse1)
+gp2 = GaussianProcess(kse2)
+
+# create some data
+xx = np.linspace(0, 2*np.pi, 9)
+Y = np.sin(xx)
+
+# fit the Gaussian processes
+for gp in [gp1, gp2]:
+    gp.fit(xx[:, None], y=Y)
+
+# predict values at new points and plot results 
+xnew = np.linspace(-1, 7, 150)
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.set_title(r"GP prediction with kernel $k(s, t) = \theta_1e^{-\theta_2(s-t)^2}$")
+for gp in [gp1, gp2]:
+    pred_mean, pred_cov = gp.pred(xnew[:, None], return_var=True)
+    sd = np.sqrt(np.diag(pred_cov))
+
+    ax.fill_between(xnew, pred_mean + 2*sd, pred_mean - 2*sd, alpha=0.5)
+
+    lab = r"$\theta$ = ({}, {})".format(*gp.kernel.kpar)
+    ax.plot(xnew, pred_mean, label=lab)
+    ax.legend(loc='upper right')
+
+ax.plot(xx, Y, 'ks')
+
+plt.show()
 ```
