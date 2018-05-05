@@ -17,14 +17,11 @@ from pydygp.gaussianprocesses import GaussianProcess
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 # Initialises a default square exponential kernel: k(s, t) = exp(-(s-t)**2)
 kse1 = Kernel.SquareExponKernel()
 
-# Choose kernel parameters
-kpar = [.25, 2.5]
-
 # initalise a square exponential kernel with given parameters
+kpar = [.25, 2.5]
 kse2 = Kernel.SquareExponKernel(kpar)
 
 # create a Gaussian processes from the kernels
