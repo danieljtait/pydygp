@@ -1,6 +1,6 @@
 # Tutorial
 
-## Complete Gaussian Process Example
+## Complete Gaussian process example
 
 This is a simple example to demonstrate the creation of a simple GaussianProcess object from a Kernel object and then demonstrate the fit and prediction intervals for a simple sin curve.
 
