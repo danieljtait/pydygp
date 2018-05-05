@@ -41,14 +41,11 @@ ax.set_title(r"GP prediction with kernel $k(s, t) = \theta_1e^{-\theta_2(s-t)^2}
 for gp in [gp1, gp2]:
     pred_mean, pred_cov = gp.pred(xnew[:, None], return_var=True)
     sd = np.sqrt(np.diag(pred_cov))
-
     ax.fill_between(xnew, pred_mean + 2*sd, pred_mean - 2*sd, alpha=0.5)
-
     lab = r"$\theta$ = ({}, {})".format(*gp.kernel.kpar)
     ax.plot(xnew, pred_mean, label=lab)
     ax.legend(loc='upper right')
 
 ax.plot(xx, Y, 'ks')
-
 plt.show()
 ```
