@@ -1,0 +1,6 @@
+pydygp/__init__.py
+pydygp.egg-info/PKG-INFO
+pydygp.egg-info/SOURCES.txt
+pydygp.egg-info/dependency_links.txt
+pydygp.egg-info/not-zip-safe
+pydygp.egg-info/top_level.txt
