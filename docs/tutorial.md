@@ -2,6 +2,8 @@
 
 ## Complete Gaussian Process Example
 
+This is a simple example to demonstrate the creation of a simple GaussianProcess object from a Kernel object and then demonstrate the fit and prediction intervals for a simple sin curve.
+
 ```python
 """
 Simple example to demonstrate initalising a
