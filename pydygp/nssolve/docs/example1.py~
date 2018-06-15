@@ -1,0 +1,9 @@
+"""
+Heya!
+"""
+
+def func():
+    """
+    I do stuff!
+    """
+    print("You found me!")

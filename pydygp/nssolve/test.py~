@@ -1,0 +1,13 @@
+
+A0 = np.random.normal(size=4).reshape(2, 2)
+A1 = np.random.normal(size=4).reshape(2, 2)
+A2 = np.random.normal(size=4).reshape(2, 2)
+
+g = np.random.normal(size=2)
+
+F = A0 + A1*g[0] + A2*g[1]
+
+print(F)
+
+v = np.row_stack([A1, A2])
+print(np.kron(v, g))

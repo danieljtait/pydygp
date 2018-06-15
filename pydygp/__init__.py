@@ -6,3 +6,4 @@ from . import kernels
 from . import gaussianprocesses
 from . import linlatentforcemodels
 from . import probdist
+from . import nssolve
