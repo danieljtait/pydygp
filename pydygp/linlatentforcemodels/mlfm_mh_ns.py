@@ -9,7 +9,7 @@ from pydygp.gaussianprocesses import GaussianProcess
 from pydygp.kernels import Kernel
 
 # Local imports
-import nssolve
+from pydygp import nssolve
 
 Dimensions = namedtuple('Dimensions', 'N K R')
 

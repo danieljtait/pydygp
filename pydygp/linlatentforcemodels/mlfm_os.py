@@ -1,5 +1,5 @@
 import numpy as np
-import nssolve
+from pydygp import nssolve
 
 from collections import namedtuple
 from scipy.stats import invgamma, gamma, multivariate_normal, wishart
