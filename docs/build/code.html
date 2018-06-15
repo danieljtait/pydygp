@@ -1,0 +1,278 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Documentation for the Code &mdash; pydygp  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pydygp
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user/index.html">PydyGp User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/index.html">PydyGp Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pydygp</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Documentation for the Code</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/code.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-pydygp">
+<span id="documentation-for-the-code"></span><h1>Documentation for the Code<a class="headerlink" href="#module-pydygp" title="Permalink to this headline">¶</a></h1>
+<p>pydygp - a python package for dynamic systems with latent Gaussian processes</p>
+<span class="target" id="module-pydygp.kernels"></span><p>kernel objects</p>
+<span class="target" id="module-pydygp.linlatentforcemodels"></span><hr class="docutils" />
+<dl class="class">
+<dt id="pydygp.kernels.Kernel">
+<em class="property">class </em><code class="descclassname">pydygp.kernels.</code><code class="descname">Kernel</code><span class="sig-paren">(</span><em>kfunc</em>, <em>kpar</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydygp/kernels/kernels.html#Kernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydygp.kernels.Kernel" title="Permalink to this definition">¶</a></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">An example of intersphinx is this: you <strong>cannot</strong> use <a class="reference external" href="https://docs.python.org/3/library/pickle.html#module-pickle" title="(in Python v3.6)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pickle</span></code></a> on this class.</p>
+</div>
+<dl class="classmethod">
+<dt id="pydygp.kernels.Kernel.SquareExponKernel">
+<em class="property">classmethod </em><code class="descname">SquareExponKernel</code><span class="sig-paren">(</span><em>kpar=None</em>, <em>dim=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydygp/kernels/kernels.html#Kernel.SquareExponKernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydygp.kernels.Kernel.SquareExponKernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a square exponential kernel</p>
+<div class="math notranslate nohighlight">
+\[x^2 + y^2 = z^2\]</div>
+</dd></dl>
+
+</dd></dl>
+
+<div class="math notranslate nohighlight" id="equation-xpostprob">
+<span class="eqno">(1)<a class="headerlink" href="#equation-xpostprob" title="Permalink to this equation">¶</a></span>\[p(x) = \prod_{k=1}^{K}\exp\left\{-\frac{1}{2} \mathbf{x}^T\mathbf{C}_{xx}^{-1}\mathbf{x} - \frac{1}{2}(\mathbf{f}_k-\mathbf{M}_k\mathbf{x}_k)\mathbf{S}_k^{-1}(\mathbf{f_k}-\mathbf{M}_k\mathbf{x}_k) \right\}\]</div>
+<dl class="class">
+<dt id="pydygp.linlatentforcemodels.MLFM_MH_AdapGrad">
+<em class="property">class </em><code class="descclassname">pydygp.linlatentforcemodels.</code><code class="descname">MLFM_MH_AdapGrad</code><span class="sig-paren">(</span><em>structure_matrices</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydygp/linlatentforcemodels/mlfm_mh_adapgrad.html#MLFM_MH_AdapGrad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydygp.linlatentforcemodels.MLFM_MH_AdapGrad" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class does something related to this equation</p>
+<div class="math notranslate nohighlight">
+\[p(x) = ?\]</div>
+<p>default initalisation requires only the specification of the
+structure matrices <span class="math notranslate nohighlight">\(\mathbf{A}_{r}\)</span> which make up the evolution
+equation</p>
+<div class="math notranslate nohighlight">
+\[\dot{x}(t) = \left( A_0 + \sum_{r=1}^{R} g_r(t) A_r \right) x(t)\]</div>
+<p>Read more in the <span class="xref std std-ref">User guide</span>.</p>
+</dd></dl>
+
+<p>Utility functions</p>
+<p>Utility function which gets called to return the matrices <span class="math notranslate nohighlight">\(\mathbf{A}, \mathbf{B}, \mathbf{C}\)</span> in equation <a class="reference internal" href="#equation-xpostprob">(1)</a></p>
+<dl class="function">
+<dt id="pydygp.linlatentforcemodels.mlfm_mh_adapgrad.gpdx">
+<code class="descclassname">pydygp.linlatentforcemodels.mlfm_mh_adapgrad.</code><code class="descname">gpdx</code><span class="sig-paren">(</span><em>tt</em>, <em>kern</em>, <em>kpar=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydygp/linlatentforcemodels/mlfm_mh_adapgrad.html#gpdx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydygp.linlatentforcemodels.mlfm_mh_adapgrad.gpdx" title="Permalink to this definition">¶</a></dt>
+<dd><p>I return some values from <a class="reference internal" href="automod.html#equation-myeq">(1)</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tt</strong> – array of input times</li>
+<li><strong>kern</strong> – kernel object</li>
+<li><strong>kpar</strong> – option parameters for the kernel</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">three matrics</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pydygp.linlatentforcemodels.mlfm_mh_adapgrad.dx_gp_condmats">
+<code class="descclassname">pydygp.linlatentforcemodels.mlfm_mh_adapgrad.</code><code class="descname">dx_gp_condmats</code><span class="sig-paren">(</span><em>tt</em>, <em>kern</em>, <em>gamma</em>, <em>kpar=None</em>, <em>Cxx_return=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydygp/linlatentforcemodels/mlfm_mh_adapgrad.html#dx_gp_condmats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydygp.linlatentforcemodels.mlfm_mh_adapgrad.dx_gp_condmats" title="Permalink to this definition">¶</a></dt>
+<dd><p>reference to <code class="xref py py-class docutils literal notranslate"><span class="pre">GradientKernel</span></code></p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Daniel Tait.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

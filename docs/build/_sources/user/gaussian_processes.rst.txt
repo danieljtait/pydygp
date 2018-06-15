@@ -1,0 +1,3 @@
+.. toctree::
+
+   modules/gaussian_process

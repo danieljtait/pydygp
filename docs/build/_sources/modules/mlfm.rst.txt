@@ -1,0 +1,49 @@
+=================================
+Multiplicative Latent Force Model
+=================================
+
+Adaptive Gradient Matching
+==========================
+
+.. currentmodule:: pydygp.linlatentforcemodels
+
+The :class:`MLFM_MH_AdapGrad` method does something
+		   
+Gaussian Processes
+==================
+
+.. currentmodule:: sklearn.gaussian_process
+
+**Gaussian Processes (GP)** are a generic supervised learning method designed
+to solve *regression* and *probabilistic classification* problems.
+
+The advantages of Gaussian processes are:
+
+    - The prediction interpolates the observations (at least for regular
+      kernels).
+
+    - The prediction is probabilistic (Gaussian) so that one can compute
+      empirical confidence intervals and decide based on those if one should
+      refit (online fitting, adaptive fitting) the prediction in some
+      region of interest.
+
+    - Versatile: different :ref:`kernels
+      <gp_kernels>` can be specified. Common kernels are provided, but
+      it is also possible to specify custom kernels.
+
+The disadvantages of Gaussian processes include:
+
+    - They are not sparse, i.e., they use the whole samples/features information to
+      perform the prediction.
+
+    - They lose efficiency in high dimensional spaces -- namely when the number
+      of features exceeds a few dozens.
+
+
+Gaussian Process Regression (GPR)
+=================================
+
+.. currentmodule:: sklearn.gaussian_process
+
+The :class:`GaussianProcessRegressor` implements Gaussian processes (GP) for
+regression purposes.

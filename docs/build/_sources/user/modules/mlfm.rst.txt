@@ -1,0 +1,22 @@
+
+.. _mlfm
+
+====================================
+Multiplicative Latent Forces Modules
+====================================
+
+Multiplicative latent force models are a class of non-autonomous ordinary differential equations defined by evolution equations of the form
+
+.. math::
+
+   \dot{\mathbf{x}}(t) = \left( \mathbf{A}_0 + \sum_{r=1}^R g_r(t)\mathbf{A}_r\right)\mathbf{x}(t),
+
+where :math:`\{ \mathbf{A}_r \}` for :math:`r=0,1,\ldots, R` are a set of constant "structure matrices" which determine the geometric structure of the space of possible solutions, and the models flexibility arises from the set of latent Gaussian processes :math:`\{ g_r(t) \}`.
+
+We provide two methods for carrying out inference in this class of methods
+
+.. toctree::
+   :numbered:
+      
+   mlfm_adapgrad
+   mlfm_ns

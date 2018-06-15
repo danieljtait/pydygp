@@ -1,0 +1,14 @@
+.. title:: User guide: contents
+
+.. _user_guide:
+
+==========
+User Guide
+==========
+
+.. toctree::
+   :numbered:
+
+   mlfm.rst
+   automod.rst
+   

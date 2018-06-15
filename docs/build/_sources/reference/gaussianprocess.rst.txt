@@ -1,0 +1,12 @@
+.. _gaussianprocess
+
+******************
+Gaussian Processes
+******************
+
+.. currentmodule:: pydygp.gaussianprocesses
+
+The main classes
+
+.. autoclass:: GaussianProcess
+   :members:

@@ -1,0 +1,18 @@
+import numpy as np
+import scipy.stats
+
+
+class BaseProbabilityDistribution:
+    def __init__(self, pdf=None, logpdf=None, rvs=None):
+        self._pdf = pdf
+        self._logpdf = logpdf
+        self._rvs = rvs
+
+    def pdf(self, x, *args, **kwargs):
+        return self._pdf(x, *args, **kwargs)
+
+    def logpdf(self, x, *args, **kwargs):
+        return self._logpdf(x, *args, **kwargs)
+
+    def rvs(self, size, *args, **kwargs):
+        return self._rvs(size, *args, **kwargs)

@@ -1,0 +1,463 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>MLFM Adaptive Gradient Matching &mdash; pydygp  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pydygp
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user/index.html">PydyGp User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/index.html">PydyGp Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pydygp</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>MLFM Adaptive Gradient Matching</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/automod.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="mlfm-adaptive-gradient-matching">
+<h1>MLFM Adaptive Gradient Matching<a class="headerlink" href="#mlfm-adaptive-gradient-matching" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<dl class="class">
+<dt id="pydygp.linlatentforcemodels.MLFM_MH_AdapGrad">
+<em class="property">class </em><code class="descclassname">pydygp.linlatentforcemodels.</code><code class="descname">MLFM_MH_AdapGrad</code><span class="sig-paren">(</span><em>structure_matrices</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydygp/linlatentforcemodels/mlfm_mh_adapgrad.html#MLFM_MH_AdapGrad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydygp.linlatentforcemodels.MLFM_MH_AdapGrad" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class does something related to this equation</p>
+<div class="math notranslate nohighlight" id="equation-myeq">
+<span class="eqno">(1)<a class="headerlink" href="#equation-myeq" title="Permalink to this equation">¶</a></span>\[p(x) = ?\]</div>
+<p>default initalisation requires only the specification of the
+structure matrices <span class="math notranslate nohighlight">\(\mathbf{A}_{r}\)</span> which make up the evolution
+equation</p>
+<div class="math notranslate nohighlight">
+\[\dot{x}(t) = \left( A_0 + \sum_{r=1}^{R} g_r(t) A_r \right) x(t)\]</div>
+<p>Read more in the <span class="xref std std-ref">User guide</span>.</p>
+<p class="rubric">Model Parameters Setup</p>
+<dl class="method">
+<dt id="pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.phi_setup">
+<code class="descname">phi_setup</code><span class="sig-paren">(</span><em>phi_priors=None</em>, <em>phi_proposals=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydygp/linlatentforcemodels/mlfm_mh_adapgrad.html#MLFM_MH_AdapGrad.phi_setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.phi_setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows the option to specify a prior and proposal distribution for the
+hyper-parameters, <span class="math notranslate nohighlight">\(\mathbf{\phi}_k\)</span> for each of the <span class="math notranslate nohighlight">\(K\)</span> Gaussian
+processes modelling the latent trajectories.</p>
+<dl class="docutils">
+<dt>phi_priors <span class="classifier-delimiter">:</span> <span class="classifier">list, optional</span></dt>
+<dd><p class="first">A list of the prior distribution objects for the collection of model
+parameters <span class="math notranslate nohighlight">\(\boldsymbol{\phi}_k\)</span> parameterising the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">pydygp.kernels.GradientKernel</span></code> objects governing the prior
+covariance of the latent trajectories. Each list element has methods:</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>logpdf <span class="classifier-delimiter">:</span> <span class="classifier">callable</span></dt>
+<dd>Returns the logpdf of the parameter <span class="math notranslate nohighlight">\(\mathbf{\phi}_k\)</span> under
+the prior distribution.</dd>
+<dt>rvs <span class="classifier-delimiter">:</span> <span class="classifier">callable, optional</span></dt>
+<dd>Returns a random sample of <span class="math notranslate nohighlight">\(\mathbf{\phi}_k\)</span> from the prior
+distribution.</dd>
+</dl>
+</div></blockquote>
+</dd>
+<dt>phi_proposals <span class="classifier-delimiter">:</span> <span class="classifier">list, optional</span></dt>
+<dd><p class="first">A list of the proposal distribution objects for the collection of model
+parameters <span class="math notranslate nohighlight">\(\boldsymbol{\psi}_k\)</span> parameterising the
+<a class="reference internal" href="reference/pydygp.kernels.Kernel.html#pydygp.kernels.Kernel" title="pydygp.kernels.Kernel"><code class="xref py py-class docutils literal notranslate"><span class="pre">pydygp.kernels.Kernel</span></code></a> of the latent forces. Each list element
+has methods:</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>rvs <span class="classifier-delimiter">:</span> <span class="classifier">callable</span></dt>
+<dd>Returns a tuple (xnew, q_ration) where xnew is a</dd>
+</dl>
+</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.psi_setup">
+<code class="descname">psi_setup</code><span class="sig-paren">(</span><em>psi_priors=None</em>, <em>psi_proposals=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydygp/linlatentforcemodels/mlfm_mh_adapgrad.html#MLFM_MH_AdapGrad.psi_setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.psi_setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows the option to specify a prior and proposal distribution for the
+hyper-parameters, <span class="math notranslate nohighlight">\(\mathbf{\psi}_k\)</span> for each of the <span class="math notranslate nohighlight">\(R\)</span> latent
+Gaussian forces</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.x_gp_setup">
+<code class="descname">x_gp_setup</code><span class="sig-paren">(</span><em>kern_type='sqexp'</em>, <em>x_kernels=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydygp/linlatentforcemodels/mlfm_mh_adapgrad.html#MLFM_MH_AdapGrad.x_gp_setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.x_gp_setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handles the initalisation of the latent Gaussian Processes. This involves
+constructing the <code class="xref py py-class docutils literal notranslate"><span class="pre">GradientKernel</span></code></p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">While this initalises a list of <code class="xref py py-class docutils literal notranslate"><span class="pre">GradientGaussianProcess</span></code> objects
+they are essentially just containers for the <code class="xref py py-class docutils literal notranslate"><span class="pre">GradientKernel</span></code>
+because of the additional <span class="math notranslate nohighlight">\(\gamma\)</span> parameters. Once the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Kernel</span></code> is updated to include a ‘nugget’ variable this
+will be updated.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.g_gp_setup">
+<code class="descname">g_gp_setup</code><span class="sig-paren">(</span><em>kern_type='sqexp'</em>, <em>g_kernels=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydygp/linlatentforcemodels/mlfm_mh_adapgrad.html#MLFM_MH_AdapGrad.g_gp_setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.g_gp_setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Model Initalisation</p>
+<dl class="method">
+<dt id="pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.psi_init">
+<code class="descname">psi_init</code><span class="sig-paren">(</span><em>method=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydygp/linlatentforcemodels/mlfm_mh_adapgrad.html#MLFM_MH_AdapGrad.psi_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.psi_init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.g_gp_init">
+<code class="descname">g_gp_init</code><span class="sig-paren">(</span><em>method='prior_rv'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydygp/linlatentforcemodels/mlfm_mh_adapgrad.html#MLFM_MH_AdapGrad.g_gp_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.g_gp_init" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>method <span class="classifier-delimiter">:</span> <span class="classifier">string (default is prior_rv)</span></dt>
+<dd>One of ‘prior_rv’, ‘val’</dd>
+</dl>
+<p>Initalisation of the latent forces.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Under the default simulation strategy the latent force ‘g’ are
+updated first so that it is not necessary to call this method
+before fitting</p>
+</div>
+</dd></dl>
+
+<p class="rubric">Model Fitting</p>
+<dl class="attribute">
+<dt id="pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.dim">
+<code class="descname">dim</code><em class="property"> = None</em><a class="headerlink" href="#pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.dim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initalise the container for mhparameters</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.g_gibbs_update">
+<code class="descname">g_gibbs_update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydygp/linlatentforcemodels/mlfm_mh_adapgrad.html#MLFM_MH_AdapGrad.g_gibbs_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.g_gibbs_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>updates the latent force variables using gibbs sampling from the
+Gaussian posterior</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">g_gp_init</code><span class="sig-paren">(</span><em>method='prior_rv'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydygp/linlatentforcemodels/mlfm_mh_adapgrad.html#MLFM_MH_AdapGrad.g_gp_init"><span class="viewcode-link">[source]</span></a></dt>
+<dd><dl class="docutils">
+<dt>method <span class="classifier-delimiter">:</span> <span class="classifier">string (default is prior_rv)</span></dt>
+<dd>One of ‘prior_rv’, ‘val’</dd>
+</dl>
+<p>Initalisation of the latent forces.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Under the default simulation strategy the latent force ‘g’ are
+updated first so that it is not necessary to call this method
+before fitting</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.g_inv_scale_update">
+<code class="descname">g_inv_scale_update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydygp/linlatentforcemodels/mlfm_mh_adapgrad.html#MLFM_MH_AdapGrad.g_inv_scale_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.g_inv_scale_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>The variables <span class="math notranslate nohighlight">\(\psi_{r0}\)</span> is given a conjugate gamma
+prior</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.init_latent_vars">
+<code class="descname">init_latent_vars</code><span class="sig-paren">(</span><em>x0s=None</em>, <em>g0s='prior'</em>, <em>x_gps_kpar='None'</em>, <em>g_gps_kpar='None'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydygp/linlatentforcemodels/mlfm_mh_adapgrad.html#MLFM_MH_AdapGrad.init_latent_vars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.init_latent_vars" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initalises the latent variables in a way
+that respects the model hierarchy</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.mh_pars">
+<code class="descname">mh_pars</code><em class="property"> = None</em><a class="headerlink" href="#pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.mh_pars" title="Permalink to this definition">¶</a></dt>
+<dd><p>various flags for model customisation</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">phi_setup</code><span class="sig-paren">(</span><em>phi_priors=None</em>, <em>phi_proposals=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydygp/linlatentforcemodels/mlfm_mh_adapgrad.html#MLFM_MH_AdapGrad.phi_setup"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Allows the option to specify a prior and proposal distribution for the
+hyper-parameters, <span class="math notranslate nohighlight">\(\mathbf{\phi}_k\)</span> for each of the <span class="math notranslate nohighlight">\(K\)</span> Gaussian
+processes modelling the latent trajectories.</p>
+<dl class="docutils">
+<dt>phi_priors <span class="classifier-delimiter">:</span> <span class="classifier">list, optional</span></dt>
+<dd><p class="first">A list of the prior distribution objects for the collection of model
+parameters <span class="math notranslate nohighlight">\(\boldsymbol{\phi}_k\)</span> parameterising the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">pydygp.kernels.GradientKernel</span></code> objects governing the prior
+covariance of the latent trajectories. Each list element has methods:</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>logpdf <span class="classifier-delimiter">:</span> <span class="classifier">callable</span></dt>
+<dd>Returns the logpdf of the parameter <span class="math notranslate nohighlight">\(\mathbf{\phi}_k\)</span> under
+the prior distribution.</dd>
+<dt>rvs <span class="classifier-delimiter">:</span> <span class="classifier">callable, optional</span></dt>
+<dd>Returns a random sample of <span class="math notranslate nohighlight">\(\mathbf{\phi}_k\)</span> from the prior
+distribution.</dd>
+</dl>
+</div></blockquote>
+</dd>
+<dt>phi_proposals <span class="classifier-delimiter">:</span> <span class="classifier">list, optional</span></dt>
+<dd><p class="first">A list of the proposal distribution objects for the collection of model
+parameters <span class="math notranslate nohighlight">\(\boldsymbol{\psi}_k\)</span> parameterising the
+<a class="reference internal" href="reference/pydygp.kernels.Kernel.html#pydygp.kernels.Kernel" title="pydygp.kernels.Kernel"><code class="xref py py-class docutils literal notranslate"><span class="pre">pydygp.kernels.Kernel</span></code></a> of the latent forces. Each list element
+has methods:</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>rvs <span class="classifier-delimiter">:</span> <span class="classifier">callable</span></dt>
+<dd>Returns a tuple (xnew, q_ration) where xnew is a</dd>
+</dl>
+</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">psi_setup</code><span class="sig-paren">(</span><em>psi_priors=None</em>, <em>psi_proposals=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydygp/linlatentforcemodels/mlfm_mh_adapgrad.html#MLFM_MH_AdapGrad.psi_setup"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Allows the option to specify a prior and proposal distribution for the
+hyper-parameters, <span class="math notranslate nohighlight">\(\mathbf{\psi}_k\)</span> for each of the <span class="math notranslate nohighlight">\(R\)</span> latent
+Gaussian forces</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.time_input_setup">
+<code class="descname">time_input_setup</code><span class="sig-paren">(</span><em>data_times</em>, <em>aug_times=None</em>, <em>nspace=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydygp/linlatentforcemodels/mlfm_mh_adapgrad.html#MLFM_MH_AdapGrad.time_input_setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.time_input_setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handles the specification of the ‘data_times’ for which fitting will occur
+as well as an augmented time set ‘aug_times’ for prediction and complete data
+modelling</p>
+<dl class="docutils">
+<dt>data_times <span class="classifier-delimiter">:</span> <span class="classifier">double array_like</span></dt>
+<dd>An array with shape (n_data, ) with the input times at which
+observations were made</dd>
+<dt>aug_times <span class="classifier-delimiter">:</span> <span class="classifier">double array_like or string, optional (default: None)</span></dt>
+<dd>Either an array of additional latent variables at which model
+fitting is to be carried out. Or else a string specifying a
+method to automatically generate additional latent inputs</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.x_gibbs_update">
+<code class="descname">x_gibbs_update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydygp/linlatentforcemodels/mlfm_mh_adapgrad.html#MLFM_MH_AdapGrad.x_gibbs_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.x_gibbs_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>updates the latent trajectory using gibbs sampling from the Gaussian posterior</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">x_gp_setup</code><span class="sig-paren">(</span><em>kern_type='sqexp'</em>, <em>x_kernels=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydygp/linlatentforcemodels/mlfm_mh_adapgrad.html#MLFM_MH_AdapGrad.x_gp_setup"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Handles the initalisation of the latent Gaussian Processes. This involves
+constructing the <code class="xref py py-class docutils literal notranslate"><span class="pre">GradientKernel</span></code></p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">While this initalises a list of <code class="xref py py-class docutils literal notranslate"><span class="pre">GradientGaussianProcess</span></code> objects
+they are essentially just containers for the <code class="xref py py-class docutils literal notranslate"><span class="pre">GradientKernel</span></code>
+because of the additional <span class="math notranslate nohighlight">\(\gamma\)</span> parameters. Once the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Kernel</span></code> is updated to include a ‘nugget’ variable this
+will be updated.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.x_gps_kpar_init">
+<code class="descname">x_gps_kpar_init</code><span class="sig-paren">(</span><em>kpar=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydygp/linlatentforcemodels/mlfm_mh_adapgrad.html#MLFM_MH_AdapGrad.x_gps_kpar_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.x_gps_kpar_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initalise the values of the latent GP hyperparameters</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.x_mod_cond_logpdf">
+<code class="descname">x_mod_cond_logpdf</code><span class="sig-paren">(</span><em>x</em>, <em>g</em>, <em>gammas</em>, <em>phi</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydygp/linlatentforcemodels/mlfm_mh_adapgrad.html#MLFM_MH_AdapGrad.x_mod_cond_logpdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydygp.linlatentforcemodels.MLFM_MH_AdapGrad.x_mod_cond_logpdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>The log of the conditional pdf of the ‘model’</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Daniel Tait.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

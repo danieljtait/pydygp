@@ -1,0 +1,7 @@
+
+Multiplicative Latent Force Model
+---------------------------------
+
+.. toctree::
+
+   modules/mlfm

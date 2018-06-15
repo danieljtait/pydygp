@@ -1,0 +1,14 @@
+.. _kernels:
+
+*******
+Kernels
+*******
+
+.. currentmodule:: pydygp.kernels
+
+Some text
+		   
+.. autosummary::
+   :toctree:
+
+   Kernel

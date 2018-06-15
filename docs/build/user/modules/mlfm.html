@@ -1,0 +1,249 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>3. Multiplicative Latent Forces Modules &mdash; pydygp  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="1. MLFM Adaptive Gradient Matching" href="mlfm_adapgrad.html" />
+    <link rel="prev" title="2. Gaussian Processes" href="gaussian_process.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydygp
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">PydyGp User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="kernels.html">1. Kernels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gaussian_process.html">2. Gaussian Processes</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">3. Multiplicative Latent Forces Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mlfm_adapgrad.html">1. MLFM Adaptive Gradient Matching</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mlfm_ns.html">2. MLFM Neumann Series Methods</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">PydyGp Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydygp</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">PydyGp User Guide</a> &raquo;</li>
+        
+      <li>3. Multiplicative Latent Forces Modules</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/user/modules/mlfm.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="multiplicative-latent-forces-modules">
+<h1>Multiplicative Latent Forces Modules<a class="headerlink" href="#multiplicative-latent-forces-modules" title="Permalink to this headline">¶</a></h1>
+<p>Multiplicative latent force models are a class of non-autonomous ordinary differential equations defined by evolution equations of the form</p>
+<div class="math notranslate nohighlight">
+\[\dot{\mathbf{x}}(t) = \left( \mathbf{A}_0 + \sum_{r=1}^R g_r(t)\mathbf{A}_r\right)\mathbf{x}(t),\]</div>
+<p>where <span class="math notranslate nohighlight">\(\{ \mathbf{A}_r \}\)</span> for <span class="math notranslate nohighlight">\(r=0,1,\ldots, R\)</span> are a set of constant “structure matrices” which determine the geometric structure of the space of possible solutions, and the models flexibility arises from the set of latent Gaussian processes <span class="math notranslate nohighlight">\(\{ g_r(t) \}\)</span>.</p>
+<p>We provide two methods for carrying out inference in this class of methods</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mlfm_adapgrad.html">1. MLFM Adaptive Gradient Matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mlfm_ns.html">2. MLFM Neumann Series Methods</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mlfm_ns.html#simulation">2.1. Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mlfm_ns.html#em-estimation">2.2. EM Estimation</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="mlfm_adapgrad.html" class="btn btn-neutral float-right" title="1. MLFM Adaptive Gradient Matching" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="gaussian_process.html" class="btn btn-neutral" title="2. Gaussian Processes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Daniel Tait.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

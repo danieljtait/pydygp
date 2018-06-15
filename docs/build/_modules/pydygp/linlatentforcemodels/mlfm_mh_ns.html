@@ -1,0 +1,469 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pydygp.linlatentforcemodels.mlfm_mh_ns &mdash; pydygp  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> pydygp
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/index.html">PydyGp User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../reference/index.html">PydyGp Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pydygp</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>pydygp.linlatentforcemodels.mlfm_mh_ns</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pydygp.linlatentforcemodels.mlfm_mh_ns</h1><div class="highlight"><pre>
+<span></span><span class="c1"># External imports</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="k">import</span> <span class="n">block_diag</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="k">import</span> <span class="n">gamma</span>
+
+<span class="c1"># Package imports</span>
+<span class="kn">from</span> <span class="nn">pydygp.gaussianprocesses</span> <span class="k">import</span> <span class="n">GaussianProcess</span>
+<span class="kn">from</span> <span class="nn">pydygp.kernels</span> <span class="k">import</span> <span class="n">Kernel</span>
+
+<span class="c1"># Local imports</span>
+<span class="kn">import</span> <span class="nn">nssolve</span>
+
+<span class="n">Dimensions</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Dimensions&#39;</span><span class="p">,</span> <span class="s1">&#39;N K R&#39;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">MLFM_MH_NS</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_matrices</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">struct_mats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">structure_matrices</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">Dimensions</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                              <span class="n">K</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">struct_mats</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                              <span class="n">R</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">struct_mats</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># various model flags</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_phi_inv_scale</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># For each k, 1/phi_k[0] follows a Gamma(a, b) (default)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_psi_inv_scale</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># For each k, 1/psi_k[0] follows a Gamma(a, b) (default)</span>
+        
+    
+<div class="viewcode-block" id="MLFM_MH_NS.operator_setup"><a class="viewcode-back" href="../../../reference/pydygp.linlatentforcemodels.mlfm_mh_ns.MLFM_MH_NS.operator_setup.html#pydygp.linlatentforcemodels.mlfm_mh_ns.MLFM_MH_NS.operator_setup">[docs]</a>    <span class="k">def</span> <span class="nf">operator_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets up the NS quadrature operator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+    <span class="k">def</span> <span class="nf">time_interval_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_times</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets up the intervals and handles the number of time points in</span>
+<span class="sd">        each interval</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">intervals</span> <span class="o">=</span> <span class="p">[</span><span class="n">nssolve</span><span class="o">.</span><span class="n">ns_util</span><span class="o">.</span><span class="n">Interval</span><span class="p">(</span><span class="n">ta</span><span class="p">,</span> <span class="n">tb</span><span class="p">)</span>
+                     <span class="k">for</span> <span class="n">ta</span><span class="p">,</span> <span class="n">tb</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">data_times</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">data_times</span><span class="p">[</span><span class="mi">1</span><span class="p">:])]</span>
+        <span class="n">data_inds</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">I</span> <span class="ow">in</span> <span class="n">intervals</span><span class="p">:</span>
+            <span class="n">I</span><span class="o">.</span><span class="n">set_quad_style</span><span class="p">(</span><span class="n">h</span><span class="o">=</span><span class="n">h</span><span class="p">)</span>
+            <span class="n">data_inds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data_inds</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">I</span><span class="o">.</span><span class="n">tt</span><span class="o">.</span><span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">intervals</span> <span class="o">=</span> <span class="n">intervals</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comp_times</span> <span class="o">=</span> <span class="n">nssolve</span><span class="o">.</span><span class="n">ns_util</span><span class="o">.</span><span class="n">get_times</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">intervals</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_inds</span> <span class="o">=</span> <span class="n">data_inds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">Dimensions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comp_times</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">K</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">R</span><span class="p">)</span>
+        
+
+<div class="viewcode-block" id="MLFM_MH_NS.phi_setup"><a class="viewcode-back" href="../../../reference/pydygp.linlatentforcemodels.mlfm_mh_ns.MLFM_MH_NS.phi_setup.html#pydygp.linlatentforcemodels.mlfm_mh_ns.MLFM_MH_NS.phi_setup">[docs]</a>    <span class="k">def</span> <span class="nf">phi_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phi_inv_scale_abs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">phi_priors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">phi_proposals</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets up the x gp hyperparameters</span>
+<span class="sd">        </span>
+<span class="sd">        Allows the option to specify a prior and proposal distribution for the</span>
+<span class="sd">        hyper parameters, :math:`\mathbf{\phi}_k` for each of the :math:`K` Gaussian</span>
+<span class="sd">        processes modelling the latent trajectories</span>
+
+<span class="sd">        The model also assumes the :math:`\phi_{k0}` parameter is a &#39;scale&#39; parameter</span>
+<span class="sd">        and therefore its inverse may be given a conjugate Gamma(a, b) prior. This</span>
+<span class="sd">        defauls to a Gamma(1, 1) prior for each dimension although may be customised</span>
+<span class="sd">        by providing a list of length K</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">phi_inv_scale_abs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">phi_inv_scale_abs</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">K</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">phi_priors</span> <span class="o">=</span> <span class="n">phi_priors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">phi_proposals</span> <span class="o">=</span> <span class="n">phi_proposals</span></div>
+
+<div class="viewcode-block" id="MLFM_MH_NS.psi_setup"><a class="viewcode-back" href="../../../reference/pydygp.linlatentforcemodels.mlfm_mh_ns.MLFM_MH_NS.psi_setup.html#pydygp.linlatentforcemodels.mlfm_mh_ns.MLFM_MH_NS.psi_setup">[docs]</a>    <span class="k">def</span> <span class="nf">psi_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psi_inv_scale_abs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">psi_priors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">psi_proposals</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+    
+
+<div class="viewcode-block" id="MLFM_MH_NS.x_gp_setup"><a class="viewcode-back" href="../../../reference/pydygp.linlatentforcemodels.mlfm_mh_ns.MLFM_MH_NS.x_gp_setup.html#pydygp.linlatentforcemodels.mlfm_mh_ns.MLFM_MH_NS.x_gp_setup">[docs]</a>    <span class="k">def</span> <span class="nf">x_gp_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                   <span class="n">kern_type</span><span class="o">=</span><span class="s1">&#39;sqexp&#39;</span><span class="p">,</span>
+                   <span class="n">x_kernels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">x_kernels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># do some checks on what has been supplied</span>
+            <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_kernels</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">K</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">x_kernels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">kern_type</span> <span class="o">==</span> <span class="s1">&#39;sqexp&#39;</span><span class="p">:</span>
+                <span class="n">x_kernels</span> <span class="o">=</span> <span class="p">[</span><span class="n">Kernel</span><span class="o">.</span><span class="n">SquareExponKernel</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">K</span><span class="p">)]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unrecognised kernel type&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_gps</span> <span class="o">=</span> <span class="p">[</span><span class="n">GaussianProcess</span><span class="p">(</span><span class="n">kern</span><span class="p">)</span> <span class="k">for</span> <span class="n">kern</span> <span class="ow">in</span> <span class="n">x_kernels</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="MLFM_MH_NS.g_gp_setup"><a class="viewcode-back" href="../../../reference/pydygp.linlatentforcemodels.mlfm_mh_ns.MLFM_MH_NS.g_gp_setup.html#pydygp.linlatentforcemodels.mlfm_mh_ns.MLFM_MH_NS.g_gp_setup">[docs]</a>    <span class="k">def</span> <span class="nf">g_gp_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kern_type</span><span class="o">=</span><span class="s1">&#39;sqexp&#39;</span><span class="p">,</span> <span class="n">g_kernels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">g_kernels</span> <span class="o">=</span> <span class="p">[</span><span class="n">Kernel</span><span class="o">.</span><span class="n">SquareExponKernel</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                     <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">R</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g_gps</span> <span class="o">=</span> <span class="p">[</span><span class="n">GaussianProcess</span><span class="p">(</span><span class="n">kern</span><span class="p">)</span> <span class="k">for</span> <span class="n">kern</span> <span class="ow">in</span> <span class="n">g_kernels</span><span class="p">]</span></div>
+
+    <span class="k">def</span> <span class="nf">Lambda_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Lambda_scale</span> <span class="o">=</span> <span class="n">scale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Lambda_df</span> <span class="o">=</span> <span class="n">df</span>
+
+
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Initialisation functions</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">variables_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initalises the model after setup has been completed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;phi&#39;</span><span class="p">,</span> <span class="s1">&#39;psi&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;is_</span><span class="si">{}</span><span class="s2">_init&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="p">):</span>
+                <span class="n">var_init_method</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_init&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var</span><span class="p">))</span>
+                <span class="n">var_init_method</span><span class="p">()</span>
+
+    
+    <span class="k">def</span> <span class="nf">phi_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phi_val</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prior_rv</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">prior_rv</span><span class="p">:</span>
+            <span class="c1"># make sure the prior methods have a random variable method</span>
+            <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">rvs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">phi_priors</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Prior.rvs method must be specified for initalisation </span><span class="se">\&quot;</span><span class="s2">prior_rv</span><span class="se">\&quot;</span><span class="s2">&quot;</span><span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">phi_cur</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">rvs</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">phi_priors</span><span class="p">]</span>
+
+        <span class="k">elif</span> <span class="n">phi_val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">phi_val</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">K</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">phi_cur</span> <span class="o">=</span> <span class="n">phi_val</span>
+
+        <span class="c1"># Add catches</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_phi_init</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Conditional distribution functions</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">x_cond_meanvar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">tt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comp_times</span>
+
+        <span class="c1"># get the prior covariance for each component</span>
+        <span class="n">Cx</span> <span class="o">=</span> <span class="p">[</span><span class="n">gp</span><span class="o">.</span><span class="n">kernel</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">tt</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">kpar</span><span class="o">=</span><span class="n">phi</span><span class="p">)</span> <span class="k">for</span> <span class="n">gp</span><span class="p">,</span> <span class="n">phi</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_gps</span><span class="p">,</span>
+                                                        <span class="bp">self</span><span class="o">.</span><span class="n">phi_cur</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">Cx</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="mf">1e-3</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">Cx_inv</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">Cx</span><span class="p">]</span>
+
+        <span class="n">Cx_inv</span> <span class="o">=</span> <span class="n">block_diag</span><span class="p">(</span><span class="o">*</span><span class="n">Cx_inv</span><span class="p">)</span>
+
+        <span class="n">K</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">myop</span><span class="o">.</span><span class="n">x_transform</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g_cur</span><span class="p">),</span>
+                                  <span class="n">is_x_input_vec</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                  <span class="n">is_x_output_vec</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">vec_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_Y</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+
+        <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">row_stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">ind</span><span class="p">)</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_inds</span><span class="p">])</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">block_diag</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">A</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">K</span><span class="p">)</span>
+        <span class="n">AK</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">K</span><span class="p">)</span>
+        <span class="n">inv_cov</span> <span class="o">=</span> <span class="n">Cx_inv</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">AK</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Lambda_cur</span><span class="p">,</span> <span class="n">AK</span><span class="p">))</span>
+        <span class="n">pre_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">K</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Lambda_cur</span><span class="p">,</span> <span class="n">vec_y</span><span class="p">)))</span>
+        <span class="n">cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">inv_cov</span><span class="p">)</span>
+
+
+        <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">inv_cov</span><span class="p">,</span> <span class="n">pre_mean</span><span class="p">)</span>
+        <span class="n">Kmean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">mean</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mean</span><span class="p">,</span> <span class="n">cov</span>
+
+    <span class="k">def</span> <span class="nf">g_cond_meanvar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jitter</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+        <span class="n">tt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comp_times</span>
+
+        <span class="c1"># get the prior covariance for each latent force</span>
+        <span class="n">Cg</span> <span class="o">=</span> <span class="p">[</span><span class="n">gp</span><span class="o">.</span><span class="n">kernel</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">tt</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">kpar</span><span class="o">=</span><span class="n">psi</span><span class="p">)</span>
+              <span class="k">for</span> <span class="n">gp</span><span class="p">,</span> <span class="n">psi</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g_gps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi_cur</span><span class="p">)]</span>
+
+        <span class="c1"># Optional add jitter matrix for stability</span>
+        <span class="k">if</span> <span class="n">jitter</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">Cg</span><span class="p">:</span>
+                <span class="n">c</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="mf">1e-5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            
+        <span class="n">Cg_inv</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">Cg</span><span class="p">]</span>
+        <span class="n">Cg_inv</span> <span class="o">=</span> <span class="n">block_diag</span><span class="p">(</span><span class="o">*</span><span class="n">Cg_inv</span><span class="p">)</span>
+
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_cur</span><span class="p">)</span>
+        <span class="n">L</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">myop</span><span class="o">.</span><span class="n">g_transform</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">is_x_input_vec</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_x_output_vec</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">vec_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_Y</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+
+        <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">row_stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">ind</span><span class="p">)</span>
+                          <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_inds</span><span class="p">])</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">block_diag</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">A</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">K</span><span class="p">)</span>
+
+        <span class="n">eta</span> <span class="o">=</span> <span class="n">vec_y</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+        <span class="n">AL</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+
+        <span class="n">inv_cov</span> <span class="o">=</span> <span class="n">Cg_inv</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">AL</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Lambda_cur</span><span class="p">,</span> <span class="n">AL</span><span class="p">))</span>
+        <span class="n">pre_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Lambda_cur</span><span class="p">,</span> <span class="n">eta</span><span class="p">)))</span>
+
+        <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">inv_cov</span><span class="p">,</span> <span class="n">pre_mean</span><span class="p">)</span>
+        <span class="n">cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">inv_cov</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">mean</span><span class="p">,</span> <span class="n">cov</span>
+
+    <span class="k">def</span> <span class="nf">gibbs_inv_phi_scale_ab</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of parameters a, b corresponding to the</span>
+<span class="sd">        posterior of the scale parameter of the absolute scale</span>
+<span class="sd">        parameter of the x gp covariance matrices.</span>
+
+<span class="sd">        Each of the parameters :math:`phi_{k0}` is an absolute</span>
+<span class="sd">        scale constant for the covariance matrix of the trajectory</span>
+<span class="sd">        Gaussian processes and so the precision may be given a</span>
+<span class="sd">        conjugate gamma prior</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_phi_inv_scale</span><span class="p">)</span>
+        
+        <span class="n">alist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">blist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">x_gp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_gps</span><span class="p">):</span>
+
+            <span class="n">xk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_curs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+
+            <span class="n">a0</span><span class="p">,</span> <span class="n">b0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">phi_inv_scale_abs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="n">aN</span> <span class="o">=</span> <span class="n">a0</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">N</span>
+            <span class="n">bN</span> <span class="o">=</span> <span class="n">b0</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">xk</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x_gp</span><span class="o">.</span><span class="n">inv_cov</span><span class="p">,</span> <span class="n">xk</span><span class="p">))</span>
+
+            <span class="n">alist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">aN</span><span class="p">)</span>
+            <span class="n">blist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bN</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">alist</span><span class="p">,</span> <span class="n">blist</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Initalisation Utility functions</span>
+<span class="sd">-------------------------------</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">x_init_from_data</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    </span>
+<span class="sd">    slightly hacky but allows x_gp_init_from_data to be</span>
+<span class="sd">    called before data has been passed through fit</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># First make sure there is some data to use</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;data_Y&#39;</span><span class="p">):</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">data_Y</span>
+    <span class="k">elif</span> <span class="s1">&#39;data_Y&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;data_Y&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Initalisation of </span><span class="se">\&#39;</span><span class="s2">x</span><span class="se">\&#39;</span><span class="s2"> from data requires the data to be specified&quot;</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">aug_latent_vars</span><span class="p">:</span>
+        <span class="n">tt</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">comp_times</span>
+        <span class="c1"># lazy interpolation</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">x_cur</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">data_times</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">Y</span><span class="o">.</span><span class="n">T</span><span class="p">]</span>
+        
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># initalise the latent var x at the columns of y</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">x_cur</span> <span class="o">=</span> <span class="p">[</span><span class="n">y</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">Y</span><span class="o">.</span><span class="n">T</span><span class="p">]</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Daniel Tait.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
