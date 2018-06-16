@@ -4,4 +4,3 @@ scipy >= 1.0.0
 matplotlib >= 2.2.0
 pydygp >= 0.1.14
 sphinx-gallery
-basemap
