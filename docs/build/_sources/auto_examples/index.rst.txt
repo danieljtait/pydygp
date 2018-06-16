@@ -46,6 +46,26 @@ Gallery of Examples
    :hidden:
 
    /auto_examples/plot_gaussianprocess
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Example using Basemap">
+
+.. only:: html
+
+    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_map_thumb.png
+
+        :ref:`sphx_glr_auto_examples_plot_map.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_map
 .. raw:: html
 
     <div style='clear:both'></div>

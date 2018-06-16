@@ -204,7 +204,8 @@ sphinx_gallery_conf = {
 
     # Modules for which function level galleries are created.  In
     # this case sphinx_gallery and numpy in a tuple of strings.
-    'doc_module'          : ('sphinx_gallery', 'numpy', 'pydygp.gaussianprocesses'),
+    'doc_module'          : ('sphinx_gallery', 'numpy', 'pydygp.gaussianprocesses',
+                             'mpl_toolkits.basemap'),
 }
 
 
