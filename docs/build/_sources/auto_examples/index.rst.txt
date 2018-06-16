@@ -7,6 +7,8 @@ Gallery of Examples
 
 
 
+
+
 .. raw:: html
 
     <div class="sphx-glr-thumbcontainer" tooltip="Plotting the exponential function">
@@ -49,13 +51,13 @@ Gallery of Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Example using Basemap">
+    <div class="sphx-glr-thumbcontainer" tooltip="Simulates the model">
 
 .. only:: html
 
-    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_map_thumb.png
+    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_mlfm_sim_thumb.png
 
-        :ref:`sphx_glr_auto_examples_plot_map.py`
+        :ref:`sphx_glr_auto_examples_plot_mlfm_sim.py`
 
 .. raw:: html
 
@@ -65,7 +67,7 @@ Gallery of Examples
 .. toctree::
    :hidden:
 
-   /auto_examples/plot_map
+   /auto_examples/plot_mlfm_sim
 .. raw:: html
 
     <div style='clear:both'></div>

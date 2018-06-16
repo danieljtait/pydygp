@@ -199,13 +199,18 @@ sphinx_gallery_conf = {
      # path where to save gallery generated examples
      'gallery_dirs': 'auto_examples',
 
-     # directory where function granular galleries are stored
-    'backreferences_dir'  : 'gen_modules/backreferences',
+     # ignore pattern
+     'ignore_pattern': '\.#plot_exp\.py',
 
-    # Modules for which function level galleries are created.  In
-    # this case sphinx_gallery and numpy in a tuple of strings.
-    'doc_module'          : ('sphinx_gallery', 'numpy', 'pydygp.gaussianprocesses',
-                             'mpl_toolkits.basemap'),
+     # directory where function granular galleries are stored
+     'backreferences_dir'  : 'gen_modules/backreferences',
+
+     # Modules for which function level galleries are created.  In
+     # this case sphinx_gallery and numpy in a tuple of strings.
+     'doc_module'          : ('sphinx_gallery',
+                              'pydygp.linlatentforcemodels',
+                              'pydygp.gaussianprocesses',
+                              ),
 }
 
 

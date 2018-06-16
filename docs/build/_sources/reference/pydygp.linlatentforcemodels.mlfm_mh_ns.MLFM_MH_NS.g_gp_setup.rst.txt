@@ -1,6 +1,0 @@
-pydygp.linlatentforcemodels.mlfm\_mh\_ns.MLFM\_MH\_NS.g\_gp\_setup
-==================================================================
-
-.. currentmodule:: pydygp.linlatentforcemodels.mlfm_mh_ns
-
-.. automethod:: MLFM_MH_NS.g_gp_setup

@@ -1,7 +1,0 @@
-.. _addlatentforcemodels:
-
-*******************************
-The Additive Latent Force Model
-*******************************
-
-Describes the additive latent force models.

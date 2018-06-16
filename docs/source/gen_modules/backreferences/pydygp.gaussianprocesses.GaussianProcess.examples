@@ -20,3 +20,21 @@ Examples using ``pydygp.gaussianprocesses.GaussianProcess``
 .. only:: not html
 
     * :ref:`sphx_glr_auto_examples_plot_gaussianprocess.py`
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Simulates the model">
+
+.. only:: html
+
+    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_mlfm_sim_thumb.png
+
+        :ref:`sphx_glr_auto_examples_plot_mlfm_sim.py`
+
+.. raw:: html
+
+    </div>
+
+.. only:: not html
+
+    * :ref:`sphx_glr_auto_examples_plot_mlfm_sim.py`

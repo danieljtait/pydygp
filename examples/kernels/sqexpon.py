@@ -21,4 +21,3 @@ dCdp = kse.cov_par_grad(kse.kpar, tt[:, None])
 print(dCdp[0])
 
 
-

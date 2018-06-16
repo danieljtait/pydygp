@@ -8,10 +8,8 @@ Using Sphinx Gallery
 
     <div style='clear:both'></div>
 
-
-.. include:: ../../gen_modules/backreferences/mpl_toolkits.basemap.Basemap.examples
+.. include:: ../../gen_modules/backreferences/pydygp.linlatentforcemodels.MLFM.examples
 .. raw:: html
 
-    <div style='clear:both'></div>
-
+    <div style='clear:both'></div>    
     
