@@ -16,7 +16,6 @@ class MLFM:
     def __init__(self, struct_mats):
         self.struct_mats = np.asarray(struct_mats)
 
-
     def vec_flow(self, x_list, g_list):
         """
         Arguments should be list types where each entry is the
@@ -50,6 +49,9 @@ class MLFM:
         from scipy.integrate import odeint
 
         struct_mats = self.struct_mats
+
+        if gs is None and gps is None:
+            raise ValueError("Either a function or Gaussian Process is required for simulating")
         
         # dimensional rationality checks
         if gs is not None:
@@ -57,8 +59,8 @@ class MLFM:
             assert(len(gs) == len(struct_mats)-1)
 
         if gs is None and gps is not None:
-            gs, gval, ttd = _sim_gp_interpolators(tt, gps, return_gp)
-
+            gs, gval, ttd, data_inds = _sim_gp_interpolators(tt, gps, return_gp)
+        
         def dXdt(X, t):
             # constant part of flow
             A0 = struct_mats[0]
@@ -69,11 +71,25 @@ class MLFM:
             return np.dot(A0 + At, X)
 
         sol = odeint(dXdt, x0, tt)
-
+        print(len(tt), len(data_inds))
         if return_gp:
-            return sol, gval, ttd
+            # dense solution
+            sold = odeint(dXdt, x0, ttd)
+            sol = sold[data_inds, :]
+            return sol, gval, ttd, sold
         else:
             return sol
+
+    @staticmethod
+    def ns(struct_mats, order=1):
+        return MLFM_NS(struct_mats, order=1)
+
+
+class MLFM_NS(MLFM):
+
+    def __init__(self, struct_mats, order=1):
+        super(MLFM_NS, self).__init__(struct_mats)
+        self.order = order
 
 
 class MLFM_MH_NS(MLFM):
@@ -88,16 +104,28 @@ def _sim_gp_interpolators(tt, gps, return_gp):
     functions
     """
     from scipy import interpolate
-    
-    ttdense = np.concatenate([[ta, 0.5*(ta+tb)]
-                              for ta, tb in zip(tt[:-1], tt[1:])])
+
+    data_inds = [0]
+    ttdense = []
+    for ta, tb in zip(tt[:-1], tt[1:]):
+        ttdense = np.concatenate((ttdense, np.linspace(ta, tb, 5)[:-1]))
+        data_inds.append(ttdense.size)
+
     ttdense = np.concatenate((ttdense, [tt[-1]]))
 
-    rvs = [gp.sim(ttdense[:, None]) for gp in gps]
 
+    # simulate at the sparse values
+    rvs = [gp.sim(tt[:, None]) for gp in gps]
+
+    # predict at the dense values
+    for rv, gp in zip(rvs, gps):
+        gp.fit(tt[:, None], rv)
+    rvs = [gp.pred(ttdense[:, None]) for gp in gps]
+
+    # return the linear interpolator
     gs = [interpolate.interp1d(ttdense, rv, fill_value='extrapolate') for rv in rvs]
 
     if return_gp:
-        return gs, np.column_stack(rvs), ttdense
+        return gs, np.column_stack(rvs), ttdense, data_inds
     else:
-        return gs, None, None
+        return gs, None, None, None

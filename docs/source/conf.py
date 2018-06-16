@@ -46,6 +46,7 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
+    'sphinx_gallery.gen_gallery',
 ]
 
 
@@ -189,6 +190,22 @@ texinfo_documents = [
 
 autodoc_default_flags = ['members']
 autosummary_generate = True
+
+
+# -- Options for sphinx-gallery
+sphinx_gallery_conf = {
+     # path to your examples scripts
+     'examples_dirs': '../../example',
+     # path where to save gallery generated examples
+     'gallery_dirs': 'auto_examples',
+
+     # directory where function granular galleries are stored
+    'backreferences_dir'  : 'gen_modules/backreferences',
+
+    # Modules for which function level galleries are created.  In
+    # this case sphinx_gallery and numpy in a tuple of strings.
+    'doc_module'          : ('sphinx_gallery', 'numpy', 'pydygp.gaussianprocesses'),
+}
 
 
 # -- Options for intersphinx extension ---------------------------------------

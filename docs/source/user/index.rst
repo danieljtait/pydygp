@@ -14,3 +14,5 @@ the package, see the :ref:`reference`.
 
    modules/kernels
    modules/gaussian_process
+   modules/mlfm
+   modules/example
