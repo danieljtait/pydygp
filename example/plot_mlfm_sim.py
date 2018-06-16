@@ -71,7 +71,7 @@ def main():
                                 return_gp=True)    
 
     # plot colors
-    fill_col = '#2096BA'
+    fill_col = '#AED9DA'
     linecol = '#DF6E21'
     
     # set up orthographic map projection with
