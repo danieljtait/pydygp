@@ -26,24 +26,13 @@ standard basis of the Lie algebra :math:`\mathfrak{so}(3)` of the rotation group
     :class: sphx-glr-single-img
 
 
-.. rst-class:: sphx-glr-script-out
 
- Out:
-
- .. code-block:: none
-
-    (100, 2) (100,)
-
-
-
-
-|
 
 
 .. code-block:: python
 
-    import matplotlib.pyplot as plt
     from mpl_toolkits.basemap import Basemap
+    import matplotlib.pyplot as plt
     import numpy as np
     from pydygp.gaussianprocesses import GaussianProcess
     from pydygp.linlatentforcemodels import MLFM
@@ -101,7 +90,7 @@ standard basis of the Lie algebra :math:`\mathfrak{so}(3)` of the rotation group
                                     return_gp=True)    
 
         # plot colors
-        fill_col = '#2096BA'
+        fill_col = '#AED9DA'
         linecol = '#DF6E21'
     
         # set up orthographic map projection with
@@ -137,7 +126,7 @@ standard basis of the Lie algebra :math:`\mathfrak{so}(3)` of the rotation group
     if __name__ == '__main__':
         main()
 
-**Total running time of the script:** ( 0 minutes  3.164 seconds)
+**Total running time of the script:** ( 0 minutes  3.220 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_mlfm_sim.py:

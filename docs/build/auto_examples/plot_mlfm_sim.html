@@ -160,15 +160,8 @@
 <p>where <span class="math notranslate nohighlight">\(g_1(t)\)</span> and <span class="math notranslate nohighlight">\(g_2(t)\)</span> are independent Gaussian processes, and <span class="math notranslate nohighlight">\(\mathbf{L}_i\)</span> are the
 standard basis of the Lie algebra <span class="math notranslate nohighlight">\(\mathfrak{so}(3)\)</span> of the rotation group <span class="math notranslate nohighlight">\(SO(3)\)</span>.</p>
 <img alt="../_images/sphx_glr_plot_mlfm_sim_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_mlfm_sim_001.png" />
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(100, 2) (100,)
-</pre></div>
-</div>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">mpl_toolkits.basemap</span> <span class="kn">import</span> <span class="n">Basemap</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpl_toolkits.basemap</span> <span class="kn">import</span> <span class="n">Basemap</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">pydygp.gaussianprocesses</span> <span class="kn">import</span> <span class="n">GaussianProcess</span>
 <span class="kn">from</span> <span class="nn">pydygp.linlatentforcemodels</span> <span class="kn">import</span> <span class="n">MLFM</span>
@@ -226,7 +219,7 @@ standard basis of the Lie algebra <span class="math notranslate nohighlight">\(\
                                 <span class="n">return_gp</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
     <span class="c1"># plot colors</span>
-    <span class="n">fill_col</span> <span class="o">=</span> <span class="s1">&#39;#2096BA&#39;</span>
+    <span class="n">fill_col</span> <span class="o">=</span> <span class="s1">&#39;#AED9DA&#39;</span>
     <span class="n">linecol</span> <span class="o">=</span> <span class="s1">&#39;#DF6E21&#39;</span>
 
     <span class="c1"># set up orthographic map projection with</span>
@@ -263,7 +256,7 @@ standard basis of the Lie algebra <span class="math notranslate nohighlight">\(\
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  3.164 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  3.220 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-mlfm-sim-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" href="../_downloads/plot_mlfm_sim.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_mlfm_sim.py</span></code></a></div>

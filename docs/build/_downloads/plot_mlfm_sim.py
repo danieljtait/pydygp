@@ -12,8 +12,8 @@ Simulates the model
 where :math:`g_1(t)` and :math:`g_2(t)` are independent Gaussian processes, and :math:`\mathbf{L}_i` are the
 standard basis of the Lie algebra :math:`\mathfrak{so}(3)` of the rotation group :math:`SO(3)`.
 """
-import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
+import matplotlib.pyplot as plt
 import numpy as np
 from pydygp.gaussianprocesses import GaussianProcess
 from pydygp.linlatentforcemodels import MLFM
@@ -71,7 +71,7 @@ def main():
                                 return_gp=True)    
 
     # plot colors
-    fill_col = '#2096BA'
+    fill_col = '#AED9DA'
     linecol = '#DF6E21'
     
     # set up orthographic map projection with
