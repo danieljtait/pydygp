@@ -86,7 +86,12 @@
 <li class="toctree-l2"><a class="reference internal" href="kernels.html">1. Kernels</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gaussian_process.html">2. Gaussian Processes</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">3. Multiplicative Latent Force Models</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#simulating-the-mlfm">3.1. Simulating the MLFM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#simulating-the-mlfm">3.1. Simulating the MLFM</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#model-setup">3.1.1. Model Setup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#simulation-with-odeint">3.1.2. Simulation with <code class="docutils literal notranslate"><span class="pre">odeint</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#simulation">3.1.3. Simulation</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="example.html">4. Using Sphinx Gallery</a></li>
@@ -163,7 +168,9 @@
 <h1>3. Multiplicative Latent Force Models<a class="headerlink" href="#multiplicative-latent-force-models" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="simulating-the-mlfm">
 <h2>3.1. Simulating the MLFM<a class="headerlink" href="#simulating-the-mlfm" title="Permalink to this headline">¶</a></h2>
-<p>We consider an example on the sphere and so we first create the infinitesimal rotation matrices</p>
+<div class="section" id="model-setup">
+<h3>3.1.1. Model Setup<a class="headerlink" href="#model-setup" title="Permalink to this headline">¶</a></h3>
+<p>We consider an example on the sphere and so we first create a set of <a class="reference external" href="https://en.wikipedia.org/wiki/Rotation_group_SO(3)#Lie_algebra">infinitesimal rotation</a> matrices, by choosing the evolution equation to be linear combinations of these matrices we will ensure that the trajectories of our model evolve on the surface of a sphere with radius determined by the initial conditions.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydygp.gaussianprocesses</span> <span class="k">import</span> <span class="n">GaussianProcess</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydygp.linlatentforcemodels</span> <span class="k">import</span> <span class="n">MLFM</span>
@@ -173,20 +180,62 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Lz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.</span><span class="p">,</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]])</span>
 </pre></div>
 </div>
-<p>Lets consider a simple model involing a constant rotation around the north pole of the shere along with a random fluctation</p>
+<p>If we now consider the model with two independent latent forces defined by</p>
 <blockquote>
 <div><div class="math notranslate nohighlight">
-\[\dot{\mathbf{x}}(t) = \left[\mathbf{L}_z + g(t)\cdot(\mathbf{L}_x + \mathbf{L}_y)\right]\mathbf{x}(t)\]</div>
+\[\dot{\mathbf{x}}(t) = \left(\mathbf{L}_x + g_1(t)\cdot \mathbf{L}_y + g_2(t)\cdot\mathbf{L}_z\right)\mathbf{x}(t)\]</div>
 </div></blockquote>
-<p>We then make the model by passing a list of the structure matrices to MLFM</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">gp</span> <span class="o">=</span> <span class="n">GaussianProcess</span><span class="p">(</span><span class="s2">&quot;sqexp&quot;</span><span class="p">,</span> <span class="n">kpar</span><span class="o">=</span><span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">mlfm</span> <span class="o">=</span> <span class="n">MLFM</span><span class="p">([</span><span class="n">Lz</span><span class="p">,</span> <span class="n">Lx</span><span class="o">+</span><span class="n">Ly</span><span class="p">])</span>
+<p>then we can make this model by passing the list of the structure matrices to the <code class="xref py py-class docutils literal notranslate"><span class="pre">pydygp.linlatentforcemodels.MLFM</span></code> object as a list such that <code class="code docutils literal notranslate"><span class="pre">struct_mats[0]</span></code> corresponds to the constant term and <code class="code docutils literal notranslate"><span class="pre">struct_mats[i]</span></code> is the coefficient matrix of <span class="math notranslate nohighlight">\(g_i(t)\)</span></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">struct_mats</span> <span class="o">=</span> <span class="p">[</span><span class="n">Lx</span><span class="p">,</span> <span class="n">Ly</span><span class="p">,</span> <span class="n">Lz</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mlfm</span> <span class="o">=</span> <span class="n">MLFM</span><span class="p">(</span><span class="n">struct_mats</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The results are displayed</p>
-<p>(<a class="reference external" href="../../user/modules/mlfm-1.py">Source code</a>, <a class="reference external" href="../../user/modules/mlfm-1.png">png</a>, <a class="reference external" href="../../user/modules/mlfm-1.hires.png">hires.png</a>, <a class="reference external" href="../../user/modules/mlfm-1.pdf">pdf</a>)</p>
-<div class="figure">
-<img alt="../../_images/mlfm-1.png" src="../../_images/mlfm-1.png" />
+<p>Now we need to create the latent forces using <a class="reference internal" href="../../reference/pydygp.gaussianprocesses.GaussianProcess.html#pydygp.gaussianprocesses.GaussianProcess" title="pydygp.gaussianprocesses.GaussianProcess"><code class="xref py py-class docutils literal notranslate"><span class="pre">pydygp.gaussianprocesses.GaussianProcess</span></code></a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create two GPs with square exponential kernels</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g_gps</span> <span class="o">=</span> <span class="p">[</span><span class="n">GaussianProcess</span><span class="p">(</span><span class="s1">&#39;sqexp&#39;</span><span class="p">,</span> <span class="n">kpar</span><span class="o">=</span><span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">])</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>We now have the main objects required to simulate the model but the simulation process itself is deserving of some additional comments.</p>
+</div>
+<div class="section" id="simulation-with-odeint">
+<h3>3.1.2. Simulation with <code class="xref py py-class docutils literal notranslate"><span class="pre">odeint</span></code><a class="headerlink" href="#simulation-with-odeint" title="Permalink to this headline">¶</a></h3>
+<p>Simulation is done by passing the Gaussian processes and then simulating a set of outputs from them at a suitably high sampling density, where suitable will depend on the kernel parameters and the time span, so that we can treat the discrete samples of the Gaussian process as good approximations to the continuous functions. The simulated outputs are then converted into simple interpolating functions which can then be passed to the <code class="xref py py-class docutils literal notranslate"><span class="pre">odeint</span></code> solver in scipy. The interpolating step is necessary because the <code class="xref py py-class docutils literal notranslate"><span class="pre">odeint</span></code> method contain adaptive steps and therefore evaluate the evolution equation at additional time points to those supplied as arguments to the solver, it would of course be possible to use the <code class="xref py py-func docutils literal notranslate"><span class="pre">pred()</span></code> method the Gaussian process itself, but this is inefficient for many point wise evaluations of the function and it is much cheaper to use a simple linear interpolant between points and the difference will be neglible so long as the set of points over which the GP is simulated it suitable dense. Of course this step would be unnecessary if we were to write our own solver, but wherever possible we would like to take advantage of existing libraries.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="79%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>tt</td>
+<td>time vector of simulated outputs</td>
+</tr>
+<tr class="row-even"><td>tt_dense</td>
+<td>time points at which the ode is solved</td>
+</tr>
+<tr class="row-odd"><td>tt_gp_sim</td>
+<td>time points at which the gp is simulated</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="simulation">
+<h3>3.1.3. Simulation<a class="headerlink" href="#simulation" title="Permalink to this headline">¶</a></h3>
+<p>We are now ready to simulate the model so lets do so</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># dense set of times for simulating the trajectory</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tt_d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># set of times for simulating the latent force</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tt_gp_sim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">tt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">tt</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">25</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># start at the North pole</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x0</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># returns y(tt), y(tt_dense), np.column_stack([g_1(tt_dense), g_2(tt_dense)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span><span class="p">,</span> <span class="n">y_dense</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">mlfm</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">tt</span><span class="p">,</span> <span class="n">gps</span><span class="o">=</span><span class="n">g_gps</span><span class="p">,</span> <span class="n">tt_dense</span><span class="o">=</span><span class="n">tt_d</span><span class="p">,</span> <span class="n">tt_gp_sim</span><span class="o">=</span><span class="n">tt_gp_sim</span><span class="p">,</span> <span class="n">return_gp</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>An example trajectory is displayed below</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../../_images/sphx_glr_plot_mlfm_sim_0011.png"><img alt="../../_images/sphx_glr_plot_mlfm_sim_0011.png" src="../../_images/sphx_glr_plot_mlfm_sim_0011.png" style="width: 480.0px; height: 360.0px;" /></a>
+</div>
 </div>
 </div>
 </div>

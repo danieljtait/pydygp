@@ -79,7 +79,7 @@ standard basis of the Lie algebra :math:`\mathfrak{so}(3)` of the rotation group
         # dense set of times for solving the ODE
         tt_d = np.linspace(0., T, 100)
 
-        # set of times for simulating the latent trajectory
+        # set of times for simulating the latent force
         tt_gp_sim = np.linspace(tt[0], tt[-1], 25)
 
         y, y_dense, g, _ = mlfm.sim([0., 0., 1.],
@@ -126,7 +126,7 @@ standard basis of the Lie algebra :math:`\mathfrak{so}(3)` of the rotation group
     if __name__ == '__main__':
         main()
 
-**Total running time of the script:** ( 0 minutes  3.220 seconds)
+**Total running time of the script:** ( 0 minutes  3.005 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_mlfm_sim.py:

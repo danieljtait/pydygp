@@ -60,7 +60,7 @@ def main():
     # dense set of times for solving the ODE
     tt_d = np.linspace(0., T, 100)
 
-    # set of times for simulating the latent trajectory
+    # set of times for simulating the latent force
     tt_gp_sim = np.linspace(tt[0], tt[-1], 25)
 
     y, y_dense, g, _ = mlfm.sim([0., 0., 1.],

@@ -51,6 +51,26 @@ Gallery of Examples
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="The gallery is capable of transforming Python files into reStructuredText files with a notebook...">
+
+.. only:: html
+
+    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_notebook_thumb.png
+
+        :ref:`sphx_glr_auto_examples_plot_notebook.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_notebook
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Simulates the model">
 
 .. only:: html
@@ -68,6 +88,26 @@ Gallery of Examples
    :hidden:
 
    /auto_examples/plot_mlfm_sim
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Uses the EM algorithm to fit estimates of the latent forces for the model">
+
+.. only:: html
+
+    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_mlfm_em_thumb.png
+
+        :ref:`sphx_glr_auto_examples_plot_mlfm_em.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_mlfm_em
 .. raw:: html
 
     <div style='clear:both'></div>

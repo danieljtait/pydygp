@@ -38,3 +38,21 @@ Examples using ``pydygp.gaussianprocesses.GaussianProcess``
 .. only:: not html
 
     * :ref:`sphx_glr_auto_examples_plot_mlfm_sim.py`
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Uses the EM algorithm to fit estimates of the latent forces for the model">
+
+.. only:: html
+
+    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_mlfm_em_thumb.png
+
+        :ref:`sphx_glr_auto_examples_plot_mlfm_em.py`
+
+.. raw:: html
+
+    </div>
+
+.. only:: not html
+
+    * :ref:`sphx_glr_auto_examples_plot_mlfm_em.py`

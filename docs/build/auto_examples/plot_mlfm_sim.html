@@ -208,7 +208,7 @@ standard basis of the Lie algebra <span class="math notranslate nohighlight">\(\
     <span class="c1"># dense set of times for solving the ODE</span>
     <span class="n">tt_d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
 
-    <span class="c1"># set of times for simulating the latent trajectory</span>
+    <span class="c1"># set of times for simulating the latent force</span>
     <span class="n">tt_gp_sim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">tt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">tt</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">25</span><span class="p">)</span>
 
     <span class="n">y</span><span class="p">,</span> <span class="n">y_dense</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">mlfm</span><span class="o">.</span><span class="n">sim</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">],</span>
@@ -256,7 +256,7 @@ standard basis of the Lie algebra <span class="math notranslate nohighlight">\(\
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  3.220 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  3.005 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-mlfm-sim-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" href="../_downloads/plot_mlfm_sim.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_mlfm_sim.py</span></code></a></div>
