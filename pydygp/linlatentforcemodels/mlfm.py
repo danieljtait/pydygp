@@ -121,7 +121,7 @@ class MLFM:
                       for y in sol_dense.T]
         sol = np.column_stack([u(tt) for u in sol_interp])
         
-        return sol, sol_dense, gval, ttd
+        return sol, sol_dense, gval, gs
 
     """
     if return_gp:
@@ -136,6 +136,10 @@ class MLFM:
     @staticmethod
     def ns(struct_mats, order=1):
         return MLFM_NS(struct_mats, order=order)
+
+    @staticmethod
+    def adapgrad(struct_mats):
+        return MLFM_AdapGrad(struct_mats)
 
 
 class MLFM_NS(MLFM):
@@ -168,9 +172,22 @@ class MLFM_NS(MLFM):
 
         self.em = em
 
-class MLFM_MH_NS(MLFM):
-    def __init__(self, structure_matrices):
-        super(MLFM_MH_AdapGrad, self).__init__(structure_matrices)
 
+class MLFM_AdapGrad(MLFM):
+    """
+    An approach to fitting the :class:`MLFM` using the
+    'adaptive gradient' matching approach.
 
+    The underlying approximation is a product of experts approximation
+    to the density of the force variables
+
+    .. math::
+    
+       p(\dot{\mathbf{x}}(t)) \approx p()\cdot p()
+
+    For more information see :ref:`useful_link`
+    """
+    def __init__(self, struct_mats):
+        super(MLFM_AdapGrad, self).__init__(struct_mats)
+        
 
