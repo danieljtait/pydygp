@@ -43,7 +43,7 @@ class GaussianProcess:
 
     def fit(self, x, y=None, kpar=None, store_inv_cov=False):
         """
-        
+        (copied from numpy - learning syntax)
         Computes and stores the covariance matrix at input points x
 
         Parameters

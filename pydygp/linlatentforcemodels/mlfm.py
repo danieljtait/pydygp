@@ -1,6 +1,7 @@
 import numpy as np
 from .mlfm_os import MLFM_NS_SS
 from .mlfm_em_fit import MLFM_NS_EM
+from .mlfm_em_fit_adapgrad import MLFM_AdapGrad_EM
 
 class MLFMFactory:
     """
@@ -137,8 +138,8 @@ class MLFM:
     def ns(struct_mats, order=1):
         return MLFM_NS(struct_mats, order=order)
 
-    @staticmethod
-    def adapgrad(struct_mats):
+    @classmethod
+    def adapgrad(cls, struct_mats):
         return MLFM_AdapGrad(struct_mats)
 
 
@@ -189,5 +190,9 @@ class MLFM_AdapGrad(MLFM):
     """
     def __init__(self, struct_mats):
         super(MLFM_AdapGrad, self).__init__(struct_mats)
-        
+
+    def em_fit(self, x_gps, g_gps):
+
+        em = MLFM_AdapGrad_EM(self.struct_mats, x_gps, g_gps)
+        self.em = em
 
