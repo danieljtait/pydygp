@@ -33,7 +33,7 @@ def main():
                    [ 0., 0., 0.]])
 
     # make the basic mlfm model, using the adaptive gradient matching
-    mlfm = MLFM.adapgrad([Lx, Ly, Lz])
+    mlfm = MLFM().adapgrad([Lx, Ly, Lz])
 
     # latent force gaussian processes
     g_gps = [GaussianProcess('sqexp', kpar=[1., 1.])
