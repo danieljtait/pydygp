@@ -52,3 +52,4 @@ class ProbabilityDistribution:
         self._pdf = _pdf
         self._logpdf = _logpdf
         self._rvs = _rvs
+

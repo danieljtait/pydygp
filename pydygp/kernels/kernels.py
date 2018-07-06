@@ -193,7 +193,7 @@ class GradientKernel(Kernel):
             if x2 is None:
                 x2 = x1.copy()
             else:
-                raise ValueError("x2 input should be ... {}")
+                raise ValueError("x2 input should be array-like")
 
         # Optionally supplied cov method takes precedence
         try:
@@ -263,9 +263,9 @@ class GradientKernel(Kernel):
                 expr *= (xs[i][1]-xs[i][0])*(xs[j][1]-xs[j][0])
                 return expr*_k
             else:
-                expr1 = 2*par[i+1]*par[0]*_k
-                expr2 = 2*par[i+1]*par[0]*(xs[i][1]-xs[i][0])
-                expr2 *= -2*kpar[i+1]*kpar[0]*(xs[i][1]-xs[i][0])*_k
+                expr1 = 2*par[i+1]*_k
+                expr2 = 2*par[i+1]*(xs[i][1]-xs[i][0])
+                expr2 *= -2*par[i+1]*(xs[i][1]-xs[i][0])*_k
                 return expr1 + expr2
 
         def cov_method(xx1, xx2, par, i=None, j=None, comp='x'):
