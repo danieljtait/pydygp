@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='pydygp',
-      version='0.1.014',
+      version='0.2.0.dev1',
       author='Daniel Tait',
       author_email='tait.djk@gmail.com',
       url='http://github.com/danieljtait/pydygp',

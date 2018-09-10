@@ -1,93 +1,155 @@
+""" Base class definition for the Multiplicative Latent Force Model
+"""
 import numpy as np
+from collections import namedtuple
+from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process import kernels as sklearn_kernels
 
-
-class MLFM:
-
-    def __init__(self, struct_mats):
-        self.struct_mats = np.asarray(struct_mats)
-
-
-    def vec_flow(self, x_list, g_list):
-        """
-        Arguments should be list types where each entry is the
-        kth dimension of X and rth latent force respectively
-        """
-        pass
-        # column stack the variables
-        #X = column_stack(x_list)        
-        #G = column_stack(g_list)
-        #
-        #gAs = [struct_mats[0] + sum([gt_k*struct_mats[1:]) for gt_k in grow)
-        #       for grow in G]
-
-        # F(t, x) = [A0 + sum(g(t)*Ar)]x(t)
-        #F = np.array([np.dot(At, x) for At, x in zip(gAs, X)])
-        #return F
-
-
-    def sim(self, x0, tt, gs=None, gps=None, return_gp=False):
-        """
-        Simulates a realisation of the mlfm using either a supplied
-        collection of forces or else by simulating from a provided set
-        of latent Gaussian processes
-
-        .. note::
-
-           None of the attributes of the :class:`MLFM` are altered and only
-           the model structure matrices provided to :classmethod:`MLFM.__init__`
-           are required
-        """
-        from scipy.integrate import odeint
-
-        struct_mats = self.struct_mats
-        
-        # dimensional rationality checks
-        if gs is not None:
-            assert(isinstance(gs, (tuple, list)))
-            assert(len(gs) == len(struct_mats)-1)
-
-        if gs is None and gps is not None:
-            gs, gval, ttd = _sim_gp_interpolators(tt, gps, return_gp)
-
-        def dXdt(X, t):
-            # constant part of flow
-            A0 = struct_mats[0]
-
-            # time dependent part
-            At = sum([Ar*gr(t) for Ar, gr in zip(struct_mats[1:], gs)])
-
-            return np.dot(A0 + At, X)
-
-        sol = odeint(dXdt, x0, tt)
-
-        if return_gp:
-            return sol, gval, ttd
-        else:
-            return sol
-
-
-class MLFM_MH_NS(MLFM):
-    def __init__(self, structure_matrices):
-        super(MLFM_MH_AdapGrad, self).__init__(structure_matrices)
-
-
-def _sim_gp_interpolators(tt, gps, return_gp):
+def _check_struct_mats(struct_mats, offset):
+    """ Checks that struct_mats is a list of square matrices
+    of the same size
     """
-    simulates values from the latent Gaussian process objects
-    over a dense grid and returns the a collection of numpy interpolating
-    functions
-    """
-    from scipy import interpolate
+    try:
+        assert(len(struct_mats) >= 1)
+    except:
+        raise ValueError("struct_mats must be a list with at least one square array")
+    # ... do more checks
     
-    ttdense = np.concatenate([[ta, 0.5*(ta+tb)]
-                              for ta, tb in zip(tt[:-1], tt[1:])])
-    ttdense = np.concatenate((ttdense, [tt[-1]]))
+    if isinstance(struct_mats, tuple):
+        # unpack the tuple to a list
+        struct_mats = [*struct_mats]
+    
+    if offset == 'zero':
+        K = struct_mats[0].shape[0]
+        struct_mats = [np.zeros((K, K))] + struct_mats
 
-    rvs = [gp.sim(ttdense[:, None]) for gp in gps]
+    return np.asarray(struct_mats)
 
-    gs = [interpolate.interp1d(ttdense, rv, fill_value='extrapolate') for rv in rvs]
+def _make_tt_dense(tt, dt_max):
+    # utility function for BaseMLFM.sim(...)
+    res, inds = ([tt[0]], [0])
+    for ta, tb in zip(tt[:-1], tt[1:]):
+        N = int(np.ceil((tb - ta) / dt_max + 1))
+        _tt = np.linspace(ta, tb, N)
+        res = np.concatenate((res, _tt[1:]))
+        inds.append(inds[-1] + N - 1)
+    return res, inds
 
-    if return_gp:
-        return gs, np.column_stack(rvs), ttdense
-    else:
-        return gs, None, None
+def _sim_gp(tt, gp):
+    """Simulates values from a sklearn GPR object
+    """
+    K = gp.kernel(tt[:, None])
+    K[np.diag_indices_from(K)] += gp.alpha
+    L = np.linalg.cholesky(K)
+    return L.dot(np.random.normal(size=tt.size))
+
+# keep track of the dimensions in the MLFM
+Dimensions = namedtuple('Dimensions', 'N K R')
+
+class BaseMLFM:
+    """
+    Base class for the Multiplicative Latent Force Model.
+
+    Parameters
+    ----------
+
+    struct_mats : list
+        A set of [A0,...,AR] square numpy array_like
+
+    lf_kernels : list, optional
+        Kernels of the latent force Gaussian process objects
+    
+    """
+    def __init__(self, struct_mats, offset='zero', lf_kernels=None):
+
+        struct_mats = _check_struct_mats(struct_mats, offset)
+        self.struct_mats = struct_mats
+
+        # store the model dimensions
+        K = struct_mats[0].shape[0]
+        R = len(struct_mats) - 1
+        self.dim = Dimensions(None, K, R)
+
+        # setup the latent forces
+        self.setup_latentforces(lf_kernels)
+
+    def setup_latentforces(self, kernels=None):
+        """Initalises the latent force GPs
+
+        Parameters
+        ----------
+
+        kernels : list, optional
+            Kernels of the latent force Gaussian process objects
+
+        """
+        if kernels is None:
+            # Default is for kernels 1 * exp(-0.5 * (s-t)**2 )
+            kernels = [sklearn_kernels.ConstantKernel(1.) *
+                       sklearn_kernels.RBF(1.) for r in range(self.dim.R)]
+
+        if len(kernels) != self.dim.R or \
+           not all(isinstance(k, sklearn_kernels.Kernel) for k in kernels):
+            _msg = "kernels should be a list of {} kernel objects".format(self.dim.R)
+            raise ValueError(_msg)
+
+        self.latentforces = [GaussianProcessRegressor(kern) for kern in kernels]
+
+    def sim(self, x0, tt, dt_max=0.1):
+        """Simulate the process along a set of points
+
+        Parameters
+        ----------
+
+        x0 : array_like, shape(K, )
+            initial condition for the ode
+
+        tt : array_like
+            Ordered sequence of time points for the model to be simulated at
+
+        dt_max : float, optional
+            Maximum spacing of dense time points used for simulating the model.
+
+        Returns
+        -------
+
+        Y : array, shape(len(tt), K)
+            Values of the MLFM simulated at tt
+
+        gs : list
+            List of functions [g_1(t),...,g_R(t)] used to simulated the model.
+
+
+        Examples
+        --------
+    
+        >>> import numpy as np
+        >>> from pydygp.linlatentforcemodels import BaseMLFM
+        >>> struct_mats = [np.zeros((2, 2))] + [*pydygp.liealgebras.so2()]
+        >>> tt = np.linspace(0., 5., 15)
+        >>> mlfm = BaseMLFM(struct_mats)
+        >>> Y, g = mlfm.sim([1., 0], tt)
+
+        """
+        from scipy.interpolate import interp1d
+        from scipy.integrate import odeint
+        # create a dense set of time points
+        # so that max(np.diff(ttdense)) <= dt_max
+        ttdense, inds = _make_tt_dense(tt, dt_max)
+
+        ginterp = [interp1d(ttdense,
+                            _sim_gp(ttdense, lf),
+                            kind='cubic',
+                            fill_value='extrapolate')
+                   for lf in self.latentforces]
+
+        # the evolution equation
+        def dXdt(X, t):
+            At = self.struct_mats[0] + \
+                 sum(Ar*ur(t) for Ar, ur in zip(self.struct_mats[1:],
+                                                ginterp))
+            return At.dot(X)
+
+        sol = odeint(dXdt, x0, ttdense)
+
+        return sol[inds, :], ginterp

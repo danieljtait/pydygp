@@ -1,6 +1,22 @@
+"""
+==========================
+Linear Latent Force Models
+==========================
 
-from .mlfm_adapgrad import MLFM_AdapGrad
-from .mlfm_mh_adapgrad import MLFM_MH_AdapGrad
-from .mlfm_mh_ns import MLFM_MH_NS
-from .mlfm_os import MLFM_NS_SS
-from .mlfm import MLFM, MLFMFactory
+.. module:: pydygp.linlatentforcemodels
+
+Linear ordinary differential equations driven by smooth Gaussian processes.
+
+
+Multiplicative Forces
+=====================
+
+.. autosummary::
+   :toctree:
+
+   BaseMLFM     -- Base class for the MLFM.
+   MLFMAdapGrad -- MLFM using adaptive gradient matching. 
+
+"""
+from .mlfm import BaseMLFM
+from .mlfmadapgrad import MLFMAdapGrad

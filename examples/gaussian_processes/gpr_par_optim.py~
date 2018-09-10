@@ -1,4 +1,0 @@
-import numpy as np
-from gaussianprocesses import GaussianProcess
-
-gp = GaussianProcess('sqexp', kpar=[1., .5])

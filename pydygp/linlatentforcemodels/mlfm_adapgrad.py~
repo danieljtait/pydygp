@@ -1,8 +1,0 @@
-
-
-class MLFM_AdapGrad:
-    """
-    The underlying class for the Multiplicative Latent Force Model
-    where the model fitting is done using the Adaptive Gradient Matching
-    approach
-    """

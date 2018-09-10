@@ -1,5 +1,0 @@
-import numpy as np
-from pydygp.kernels import Kernel
-
-
-kse = Kernel.SquareExponKernel(kpar=[.5, 1.2])
