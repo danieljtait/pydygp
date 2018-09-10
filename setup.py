@@ -11,5 +11,6 @@ setup(name='pydygp',
           'numpy',
           'scipy',
           'matplotlib>=2.2.0',
+          'scikit-learn',
       ],
       zip_safe=False)      
