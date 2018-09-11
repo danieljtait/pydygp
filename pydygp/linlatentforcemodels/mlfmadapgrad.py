@@ -678,9 +678,9 @@ def _fit_init(mlfm, is_fixed_vars, **kwargs):
         if mlfm.is_beta_fixed:
             beta0 = mlfm.beta
         else:
-            msg = "".join("If MLFMAdapGrad model initalised ",
-                          "with 'beta_is_fixed = False' ",
-                          "then beta0 must be passed to fit.")
+            msg = "".join(("If MLFMAdapGrad model initalised ",
+                           "with 'beta_is_fixed = False' ",
+                           "then beta0 must be passed to fit."))
             raise ValueError(msg)
 
     vbeta0 = beta0.ravel()  # vec. beta as [br1,...,brD]
