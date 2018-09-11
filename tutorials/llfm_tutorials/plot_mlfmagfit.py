@@ -49,7 +49,7 @@ Y, gtrue = mlfm.sim([1., 0], tt)    # Simulation result
 ##############################################################################
 # Model Fit
 # ~~~~~~~~~
-# The API is designed to be as simple as possible and so for reasonably simple
+# The API is designed to be as simple as possible and so for simple enough
 # models we should get reasonable results by simply calling
 
 res0 = mlfm.fit(tt, Y)
@@ -68,7 +68,7 @@ ax.plot(tt, res0.g, '+')
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # The adaptive gradient matching processes depend on the use of GP
 # interpolators of the unknown state trajectories, and therefore
-# we might express the accuracy of these methods to decreae not with the
+# we might expect the accuracy of these methods to decrease not with the
 # sample size but with the space between samples.
 # 
 # Dense Predictions
