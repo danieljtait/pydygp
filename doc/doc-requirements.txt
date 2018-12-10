@@ -4,4 +4,5 @@ scipy >= 1.0.0
 matplotlib >= 2.2.0
 pydygp >= 0.2.0
 sphinx-gallery
+autograd
 numpydoc
