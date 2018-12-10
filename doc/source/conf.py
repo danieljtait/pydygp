@@ -60,7 +60,7 @@ extensions = [
     'numpydoc',
     'sphinx_gallery.gen_gallery',
     #'matplotlib.sphinxext.mathmpl',
-    'matplotlib.sphinxext.only_directives',
+    #'matplotlib.sphinxext.only_directives',
     'matplotlib.sphinxext.plot_directive',
 ]
 

@@ -76,7 +76,7 @@ Introduction to the LFM Mix Model
 
     plt.show()
 
-**Total running time of the script:** ( 0 minutes  0.065 seconds)
+**Total running time of the script:** ( 0 minutes  0.068 seconds)
 
 
 .. _sphx_glr_download_tutorials_llfm_tutorials_plot_mlfmmixsa_intro.py:

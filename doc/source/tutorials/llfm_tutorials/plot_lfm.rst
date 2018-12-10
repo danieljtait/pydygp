@@ -140,7 +140,7 @@ Fitting the LFM Using the MLFM
     ax2.plot(ttdense, Eg.T, '--')
     plt.show()
 
-**Total running time of the script:** ( 0 minutes  1.343 seconds)
+**Total running time of the script:** ( 0 minutes  1.272 seconds)
 
 
 .. _sphx_glr_download_tutorials_llfm_tutorials_plot_lfm.py:

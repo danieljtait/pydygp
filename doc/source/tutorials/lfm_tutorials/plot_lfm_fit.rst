@@ -70,7 +70,7 @@ Latent Force Models
 
 
 
-**Total running time of the script:** ( 0 minutes  0.236 seconds)
+**Total running time of the script:** ( 0 minutes  0.213 seconds)
 
 
 .. _sphx_glr_download_tutorials_lfm_tutorials_plot_lfm_fit.py:

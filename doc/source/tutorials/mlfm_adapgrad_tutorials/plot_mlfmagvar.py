@@ -19,7 +19,8 @@ fixed as well as defining priors
 import matplotlib.pyplot as plt
 import numpy as np
 from pydygp.probabilitydistributions import (GeneralisedInverseGaussian,
-                                             InverseGamma)
+                                             InverseGamma,
+                                             Normal)
 from sklearn.gaussian_process.kernels import RBF
 from pydygp.liealgebras import so
 from pydygp.linlatentforcemodels import (MLFMAdapGrad,
@@ -64,14 +65,18 @@ Y = np.column_stack((y.T.ravel() for y in Data))
 logpsi_prior = GeneralisedInverseGaussian(a=5, b=5, p=-1).logtransform()
 loggamma_prior = [InverseGamma(a=0.001, b=0.001).logtransform(),]*vmlfm.dim.K
 
+beta_prior = Normal(scale=1.) * beta.size
+
+fitopts = {'logpsi_is_fixed': True, 'logpsi_prior': logpsi_prior,
+           'loggamma_is_fixed': False, 'loggamma_prior': loggamma_prior,
+           'beta_is_fixed': True, 'beta_prior': beta_prior,
+           'beta0': beta,
+           }
+
 # Fit the model
-res, Eg, Covg = vmlfm.varfit(tt, Y,
-                             logtau_is_fixed=False,
-                             logpsi_is_fixed=False, logpsi_prior=logpsi_prior,
-                             loggamma_is_fixed=False, loggamma_prior=loggamma_prior,
-                             beta_is_fixed=True, beta0=beta)
-print(res.logtau)
-Grv = gmlfm.gibbsfit(tt, Y, mapres=res)
+res, Eg, Covg = vmlfm.varfit(tt, Y, **fitopts)
+
+Grv = gmlfm.gibbsfit(tt, Y, **fitopts, mapres=res)
 
 Lapcov = res.optimres.hess_inv[:vmlfm.dim.N*vmlfm.dim.R,
                                :vmlfm.dim.N*vmlfm.dim.R]

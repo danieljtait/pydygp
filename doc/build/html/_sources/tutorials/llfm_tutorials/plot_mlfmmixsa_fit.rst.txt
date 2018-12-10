@@ -206,7 +206,7 @@ Fitting of the MLFM-MixSA Model
 
     plt.show()
 
-**Total running time of the script:** ( 0 minutes  54.798 seconds)
+**Total running time of the script:** ( 0 minutes  52.220 seconds)
 
 
 .. _sphx_glr_download_tutorials_llfm_tutorials_plot_mlfmmixsa_fit.py:

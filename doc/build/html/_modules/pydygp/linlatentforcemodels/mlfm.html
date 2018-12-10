@@ -337,7 +337,25 @@
             <span class="k">return</span> <span class="n">struct_mats</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="n">Ar</span><span class="o">*</span><span class="n">gr</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
                                         <span class="k">for</span> <span class="n">Ar</span><span class="p">,</span> <span class="n">gr</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">struct_mats</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">glist</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="n">odeint</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">A</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">x0</span><span class="p">,</span> <span class="n">tt</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">odeint</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">A</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">x0</span><span class="p">,</span> <span class="n">tt</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_component_functions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">N</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">N</span>
+
+        <span class="n">g</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">R</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">row_stack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N</span><span class="p">),</span> <span class="n">g</span><span class="p">))</span>
+
+        <span class="n">struct_mats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+            <span class="nb">sum</span><span class="p">(</span><span class="n">brd</span><span class="o">*</span><span class="n">Ld</span> <span class="k">for</span> <span class="n">brd</span><span class="p">,</span> <span class="n">Ld</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">br</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis_mats</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">br</span> <span class="ow">in</span> <span class="n">beta</span><span class="p">])</span>
+
+        <span class="c1"># match struct mats and G on r=0,...,R</span>
+        <span class="n">comp_funcs</span> <span class="o">=</span> <span class="n">struct_mats</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">g</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+
+        <span class="c1"># sum over r</span>
+        <span class="k">return</span> <span class="n">comp_funcs</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

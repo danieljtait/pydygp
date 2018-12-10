@@ -29,8 +29,8 @@
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Basic MAP Estimation" href="plot_mlfmag.html" />
-    <link rel="prev" title="Adaptive Gradient Matching Methods" href="index.html" /> 
+    <link rel="next" title="Successive Approximations" href="../mlfm_sa_tutorials/index.html" />
+    <link rel="prev" title="Variational Inference" href="plot_mlfmagvar.html" /> 
 
   
   <script src="../../_static/js/modernizr.min.js"></script>
@@ -182,6 +182,36 @@
 <div class="math notranslate nohighlight">
 \[\dot{\mathbf{x}}(t)\]</div>
 <p>We do the usual imports and generate some simulated data</p>
+<ul class="sphx-glr-horizontal">
+<li><img alt="../../_images/sphx_glr_plot_mlfmaggibbs_001.png" class="sphx-glr-multi-img first" src="../../_images/sphx_glr_plot_mlfmaggibbs_001.png" />
+</li>
+<li><img alt="../../_images/sphx_glr_plot_mlfmaggibbs_002.png" class="sphx-glr-multi-img first" src="../../_images/sphx_glr_plot_mlfmaggibbs_002.png" />
+</li>
+<li><img alt="../../_images/sphx_glr_plot_mlfmaggibbs_003.png" class="sphx-glr-multi-img first" src="../../_images/sphx_glr_plot_mlfmaggibbs_003.png" />
+</li>
+<li><img alt="../../_images/sphx_glr_plot_mlfmaggibbs_004.png" class="sphx-glr-multi-img first" src="../../_images/sphx_glr_plot_mlfmaggibbs_004.png" />
+</li>
+<li><img alt="../../_images/sphx_glr_plot_mlfmaggibbs_005.png" class="sphx-glr-multi-img first" src="../../_images/sphx_glr_plot_mlfmaggibbs_005.png" />
+</li>
+<li><img alt="../../_images/sphx_glr_plot_mlfmaggibbs_006.png" class="sphx-glr-multi-img first" src="../../_images/sphx_glr_plot_mlfmaggibbs_006.png" />
+</li>
+<li><img alt="../../_images/sphx_glr_plot_mlfmaggibbs_007.png" class="sphx-glr-multi-img first" src="../../_images/sphx_glr_plot_mlfmaggibbs_007.png" />
+</li>
+<li><img alt="../../_images/sphx_glr_plot_mlfmaggibbs_008.png" class="sphx-glr-multi-img first" src="../../_images/sphx_glr_plot_mlfmaggibbs_008.png" />
+</li>
+<li><img alt="../../_images/sphx_glr_plot_mlfmaggibbs_009.png" class="sphx-glr-multi-img first" src="../../_images/sphx_glr_plot_mlfmaggibbs_009.png" />
+</li>
+<li><img alt="../../_images/sphx_glr_plot_mlfmaggibbs_010.png" class="sphx-glr-multi-img first" src="../../_images/sphx_glr_plot_mlfmaggibbs_010.png" />
+</li>
+</ul>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[[ 0.09  -0.1    0.045]
+ [-0.797  0.86  -0.396]]
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">pydygp.probabilitydistributions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Normal</span><span class="p">,</span>
@@ -202,7 +232,7 @@
 <span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 
 <span class="c1"># Time points to solve the model at</span>
-<span class="n">tt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">6.</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+<span class="n">tt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">6.</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
 
 <span class="c1"># Data and true forces</span>
 <span class="n">Data</span><span class="p">,</span> <span class="n">lf</span> <span class="o">=</span> <span class="n">gmlfm</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">tt</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
@@ -214,15 +244,94 @@
 <span class="n">loggamma_prior</span> <span class="o">=</span> <span class="n">InverseGamma</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span><span class="o">.</span><span class="n">logtransform</span><span class="p">()</span> <span class="o">*</span> <span class="n">gmlfm</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">K</span>
 <span class="n">beta_prior</span> <span class="o">=</span> <span class="n">Normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mf">1.</span><span class="p">)</span> <span class="o">*</span> <span class="n">beta</span><span class="o">.</span><span class="n">size</span>
 
-<span class="n">fitopts</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;logpsi_is_fixed&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="s1">&#39;logpsi_prior&#39;</span><span class="p">:</span> <span class="n">logpsi_prior</span><span class="p">,</span>
-           <span class="s1">&#39;loggamma_is_fixed&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="s1">&#39;loggamma_prior&#39;</span><span class="p">:</span> <span class="n">loggamma_prior</span><span class="p">,</span>
-           <span class="s1">&#39;beta_is_fixed&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="s1">&#39;beta_prior&#39;</span><span class="p">:</span> <span class="n">beta_prior</span>
+<span class="n">fitopts</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;logpsi_is_fixed&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> <span class="s1">&#39;logpsi_prior&#39;</span><span class="p">:</span> <span class="n">logpsi_prior</span><span class="p">,</span>
+           <span class="s1">&#39;loggamma_is_fixed&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span><span class="c1"># &#39;loggamma_prior&#39;: loggamma_prior,</span>
+           <span class="s1">&#39;beta_is_fixed&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="s1">&#39;beta_prior&#39;</span><span class="p">:</span> <span class="n">beta_prior</span><span class="p">,</span>
+           <span class="s1">&#39;beta0&#39;</span><span class="p">:</span> <span class="n">beta</span><span class="p">,</span>
            <span class="p">}</span>
+<span class="n">gibbsRV</span> <span class="o">=</span> <span class="n">gmlfm</span><span class="o">.</span><span class="n">gibbsfit</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span>
+                         <span class="n">sample</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">),</span>
+                         <span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+                         <span class="o">**</span><span class="n">fitopts</span><span class="p">)</span>
+<span class="n">mapres</span> <span class="o">=</span> <span class="n">gmlfm</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="o">**</span><span class="n">fitopts</span><span class="p">)</span>
 
-<span class="c1">#gibbsRV = gmlfm.gibbsfit(tt, Y, **fitopts)</span>
+<span class="n">A</span> <span class="o">=</span> <span class="p">[</span><span class="nb">sum</span><span class="p">(</span><span class="n">brd</span><span class="o">*</span><span class="n">Ld</span> <span class="k">for</span> <span class="n">brd</span><span class="p">,</span> <span class="n">Ld</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">br</span><span class="p">,</span> <span class="n">gmlfm</span><span class="o">.</span><span class="n">basis_mats</span><span class="p">))</span>
+     <span class="k">for</span> <span class="n">br</span> <span class="ow">in</span> <span class="n">beta</span><span class="p">]</span>
+
+<span class="n">aij</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="n">_aa</span> <span class="o">=</span> <span class="mf">0.</span>
+
+<span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">gibbsRV</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]:</span><span class="c1"># in zip(gibbsRV[&#39;g&#39;]):#, gibbsRV[&#39;beta&#39;]):</span>
+    <span class="n">_beta</span> <span class="o">=</span> <span class="n">mapres</span><span class="o">.</span><span class="n">beta</span> <span class="c1">#b.reshape((2, 3))</span>
+    <span class="n">_A</span> <span class="o">=</span> <span class="p">[</span><span class="nb">sum</span><span class="p">(</span><span class="n">brd</span><span class="o">*</span><span class="n">Ld</span> <span class="k">for</span> <span class="n">brd</span><span class="p">,</span> <span class="n">Ld</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">br</span><span class="p">,</span> <span class="n">gmlfm</span><span class="o">.</span><span class="n">basis_mats</span><span class="p">))</span>
+          <span class="k">for</span> <span class="n">br</span> <span class="ow">in</span> <span class="n">_beta</span><span class="p">]</span>
+    <span class="n">aij</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_A</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">_A</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">g</span><span class="p">)</span>
+    <span class="n">_aa</span> <span class="o">+=</span> <span class="n">gmlfm</span><span class="o">.</span><span class="n">_component_functions</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">_beta</span><span class="p">)</span>
+<span class="n">aij</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">aij</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">_beta</span><span class="p">)</span>
+
+<span class="c1">#print(np.mean(gibbsRV[&#39;beta&#39;], axis=0))</span>
+
+<span class="n">_aa</span> <span class="o">/=</span> <span class="n">gibbsRV</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ttd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="n">tt</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ttd</span><span class="p">,</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">lf</span><span class="p">[</span><span class="mi">0</span><span class="p">](</span><span class="n">ttd</span><span class="p">),</span> <span class="s1">&#39;b-&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">aij</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="s1">&#39;k+&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">aij</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;+&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">_aa</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="s1">&#39;-.&#39;</span><span class="p">)</span>
+
+<span class="n">fig2</span><span class="p">,</span> <span class="n">ax2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ttd</span><span class="p">,</span> <span class="n">lf</span><span class="p">[</span><span class="mi">0</span><span class="p">](</span><span class="n">ttd</span><span class="p">),</span> <span class="s1">&#39;k-&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">gibbsRV</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;+&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">mapres</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">gibbsRV</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="s1">&#39;k+&#39;</span><span class="p">)</span>
+
+<span class="n">fig3</span><span class="p">,</span> <span class="n">ax3</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="c1">#ax3.hist(gibbsRV[&#39;beta&#39;][:, 2], density=True)</span>
+
+<span class="n">aaTrue</span> <span class="o">=</span> <span class="n">gmlfm</span><span class="o">.</span><span class="n">_component_functions</span><span class="p">(</span><span class="n">lf</span><span class="p">[</span><span class="mi">0</span><span class="p">](</span><span class="n">ttd</span><span class="p">),</span> <span class="n">beta</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="n">ttd</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+<span class="n">aaMap</span> <span class="o">=</span> <span class="n">gmlfm</span><span class="o">.</span><span class="n">_component_functions</span><span class="p">(</span><span class="n">mapres</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">mapres</span><span class="o">.</span><span class="n">beta</span><span class="p">)</span>
+
+<span class="n">fig4</span><span class="p">,</span> <span class="n">ax4</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]):</span>
+    <span class="n">ax4</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">_aa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="p">:],</span> <span class="s1">&#39;+-&#39;</span><span class="p">,</span>
+             <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$a{}{}$&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>
+    <span class="n">ax4</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ttd</span><span class="p">,</span> <span class="n">aaTrue</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="p">:],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+    <span class="n">ax4</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">aaMap</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="p">:],</span> <span class="s1">&#39;s&#39;</span><span class="p">)</span>
+<span class="n">ax4</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+<span class="n">xrv</span> <span class="o">=</span> <span class="n">gibbsRV</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+    <span class="n">xm</span> <span class="o">=</span> <span class="n">xrv</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">xrv</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                             <span class="n">gmlfm</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">K</span><span class="p">,</span>
+                             <span class="n">gmlfm</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>
+
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">xm</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="s1">&#39;k+&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">Data</span><span class="p">[</span><span class="n">m</span><span class="p">],</span> <span class="s1">&#39;s&#39;</span><span class="p">)</span>
+
+
+<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">interp1d</span>
+<span class="n">u</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">mapres</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;cubic&#39;</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="s1">&#39;extrapolate&#39;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">x0m</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">x0</span><span class="p">):</span>
+
+    <span class="n">sol</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">gmlfm</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="n">x0m</span><span class="p">,</span> <span class="n">ttd</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">mapres</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="n">latent_forces</span><span class="o">=</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="p">))</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ttd</span><span class="p">,</span> <span class="n">sol</span><span class="p">,</span> <span class="s1">&#39;k-&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">Data</span><span class="p">[</span><span class="n">m</span><span class="p">],</span> <span class="s1">&#39;s&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  0.050 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  32.439 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-mlfm-adapgrad-tutorials-plot-mlfmaggibbs-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" href="../../_downloads/plot_mlfmaggibbs.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_mlfmaggibbs.py</span></code></a></div>
@@ -240,10 +349,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="plot_mlfmag.html" class="btn btn-neutral float-right" title="Basic MAP Estimation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../mlfm_sa_tutorials/index.html" class="btn btn-neutral float-right" title="Successive Approximations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral" title="Adaptive Gradient Matching Methods" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="plot_mlfmagvar.html" class="btn btn-neutral" title="Variational Inference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

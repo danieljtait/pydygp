@@ -117,7 +117,7 @@ Latent Force Models 2
     plt.show()
     
 
-**Total running time of the script:** ( 0 minutes  0.123 seconds)
+**Total running time of the script:** ( 0 minutes  0.121 seconds)
 
 
 .. _sphx_glr_download_tutorials_lfm_tutorials_plot_lfm_fit2.py:

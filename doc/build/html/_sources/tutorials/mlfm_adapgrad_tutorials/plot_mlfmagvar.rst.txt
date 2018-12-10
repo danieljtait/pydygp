@@ -31,7 +31,8 @@ fixed as well as defining priors
     import matplotlib.pyplot as plt
     import numpy as np
     from pydygp.probabilitydistributions import (GeneralisedInverseGaussian,
-                                                 InverseGamma)
+                                                 InverseGamma,
+                                                 Normal)
     from sklearn.gaussian_process.kernels import RBF
     from pydygp.liealgebras import so
     from pydygp.linlatentforcemodels import (MLFMAdapGrad,
@@ -96,14 +97,18 @@ for example there is the class :ref:`ProbabilityDistribution`
     logpsi_prior = GeneralisedInverseGaussian(a=5, b=5, p=-1).logtransform()
     loggamma_prior = [InverseGamma(a=0.001, b=0.001).logtransform(),]*vmlfm.dim.K
 
+    beta_prior = Normal(scale=1.) * beta.size
+
+    fitopts = {'logpsi_is_fixed': True, 'logpsi_prior': logpsi_prior,
+               'loggamma_is_fixed': False, 'loggamma_prior': loggamma_prior,
+               'beta_is_fixed': True, 'beta_prior': beta_prior,
+               'beta0': beta,
+               }
+
     # Fit the model
-    res, Eg, Covg = vmlfm.varfit(tt, Y,
-                                 logtau_is_fixed=False,
-                                 logpsi_is_fixed=False, logpsi_prior=logpsi_prior,
-                                 loggamma_is_fixed=False, loggamma_prior=loggamma_prior,
-                                 beta_is_fixed=True, beta0=beta)
-    print(res.logtau)
-    Grv = gmlfm.gibbsfit(tt, Y, mapres=res)
+    res, Eg, Covg = vmlfm.varfit(tt, Y, **fitopts)
+
+    Grv = gmlfm.gibbsfit(tt, Y, **fitopts, mapres=res)
 
     Lapcov = res.optimres.hess_inv[:vmlfm.dim.N*vmlfm.dim.R,
                                    :vmlfm.dim.N*vmlfm.dim.R]
@@ -148,16 +153,9 @@ for example there is the class :ref:`ProbabilityDistribution`
     :class: sphx-glr-single-img
 
 
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    [20.807 32.228 30.799]
 
 
-**Total running time of the script:** ( 0 minutes  6.798 seconds)
+**Total running time of the script:** ( 0 minutes  6.980 seconds)
 
 
 .. _sphx_glr_download_tutorials_mlfm_adapgrad_tutorials_plot_mlfmagvar.py:

@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Successive Approximations" href="../mlfm_sa_tutorials/index.html" />
+    <link rel="next" title="Gibbs Sampling" href="plot_mlfmaggibbs.html" />
     <link rel="prev" title="Basic MAP Estimation" href="plot_mlfmag.html" /> 
 
   
@@ -188,7 +188,8 @@ fixed as well as defining priors</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">pydygp.probabilitydistributions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">GeneralisedInverseGaussian</span><span class="p">,</span>
-                                             <span class="n">InverseGamma</span><span class="p">)</span>
+                                             <span class="n">InverseGamma</span><span class="p">,</span>
+                                             <span class="n">Normal</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">sklearn.gaussian_process.kernels</span> <span class="kn">import</span> <span class="n">RBF</span>
 <span class="kn">from</span> <span class="nn">pydygp.liealgebras</span> <span class="kn">import</span> <span class="n">so</span>
 <span class="kn">from</span> <span class="nn">pydygp.linlatentforcemodels</span> <span class="kn">import</span> <span class="p">(</span><span class="n">MLFMAdapGrad</span><span class="p">,</span>
@@ -229,14 +230,18 @@ and optionally its gradient.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">logpsi_prior</span> <span class="o">=</span> <span class="n">GeneralisedInverseGaussian</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">p</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">logtransform</span><span class="p">()</span>
 <span class="n">loggamma_prior</span> <span class="o">=</span> <span class="p">[</span><span class="n">InverseGamma</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span><span class="o">.</span><span class="n">logtransform</span><span class="p">(),]</span><span class="o">*</span><span class="n">vmlfm</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">K</span>
 
+<span class="n">beta_prior</span> <span class="o">=</span> <span class="n">Normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mf">1.</span><span class="p">)</span> <span class="o">*</span> <span class="n">beta</span><span class="o">.</span><span class="n">size</span>
+
+<span class="n">fitopts</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;logpsi_is_fixed&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> <span class="s1">&#39;logpsi_prior&#39;</span><span class="p">:</span> <span class="n">logpsi_prior</span><span class="p">,</span>
+           <span class="s1">&#39;loggamma_is_fixed&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="s1">&#39;loggamma_prior&#39;</span><span class="p">:</span> <span class="n">loggamma_prior</span><span class="p">,</span>
+           <span class="s1">&#39;beta_is_fixed&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> <span class="s1">&#39;beta_prior&#39;</span><span class="p">:</span> <span class="n">beta_prior</span><span class="p">,</span>
+           <span class="s1">&#39;beta0&#39;</span><span class="p">:</span> <span class="n">beta</span><span class="p">,</span>
+           <span class="p">}</span>
+
 <span class="c1"># Fit the model</span>
-<span class="n">res</span><span class="p">,</span> <span class="n">Eg</span><span class="p">,</span> <span class="n">Covg</span> <span class="o">=</span> <span class="n">vmlfm</span><span class="o">.</span><span class="n">varfit</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span>
-                             <span class="n">logtau_is_fixed</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-                             <span class="n">logpsi_is_fixed</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">logpsi_prior</span><span class="o">=</span><span class="n">logpsi_prior</span><span class="p">,</span>
-                             <span class="n">loggamma_is_fixed</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">loggamma_prior</span><span class="o">=</span><span class="n">loggamma_prior</span><span class="p">,</span>
-                             <span class="n">beta_is_fixed</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">beta0</span><span class="o">=</span><span class="n">beta</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">logtau</span><span class="p">)</span>
-<span class="n">Grv</span> <span class="o">=</span> <span class="n">gmlfm</span><span class="o">.</span><span class="n">gibbsfit</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">mapres</span><span class="o">=</span><span class="n">res</span><span class="p">)</span>
+<span class="n">res</span><span class="p">,</span> <span class="n">Eg</span><span class="p">,</span> <span class="n">Covg</span> <span class="o">=</span> <span class="n">vmlfm</span><span class="o">.</span><span class="n">varfit</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="o">**</span><span class="n">fitopts</span><span class="p">)</span>
+
+<span class="n">Grv</span> <span class="o">=</span> <span class="n">gmlfm</span><span class="o">.</span><span class="n">gibbsfit</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="o">**</span><span class="n">fitopts</span><span class="p">,</span> <span class="n">mapres</span><span class="o">=</span><span class="n">res</span><span class="p">)</span>
 
 <span class="n">Lapcov</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">optimres</span><span class="o">.</span><span class="n">hess_inv</span><span class="p">[:</span><span class="n">vmlfm</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">N</span><span class="o">*</span><span class="n">vmlfm</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">R</span><span class="p">,</span>
                                <span class="p">:</span><span class="n">vmlfm</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">N</span><span class="o">*</span><span class="n">vmlfm</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">R</span><span class="p">]</span>
@@ -277,11 +282,7 @@ and optionally its gradient.</p>
 </pre></div>
 </div>
 <img alt="../../_images/sphx_glr_plot_mlfmagvar_001.png" class="sphx-glr-single-img" src="../../_images/sphx_glr_plot_mlfmagvar_001.png" />
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[20.807 32.228 30.799]
-</pre></div>
-</div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  6.798 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  6.980 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-mlfm-adapgrad-tutorials-plot-mlfmagvar-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" href="../../_downloads/plot_mlfmagvar.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_mlfmagvar.py</span></code></a></div>
@@ -300,7 +301,7 @@ and optionally its gradient.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../mlfm_sa_tutorials/index.html" class="btn btn-neutral float-right" title="Successive Approximations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="plot_mlfmaggibbs.html" class="btn btn-neutral float-right" title="Gibbs Sampling" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="plot_mlfmag.html" class="btn btn-neutral" title="Basic MAP Estimation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

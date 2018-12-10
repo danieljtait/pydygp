@@ -71,26 +71,6 @@ Examples not loading :'(
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example presents an illustration of the MLFM to learn the model">
-
-.. only:: html
-
-    .. figure:: /tutorials/mlfm_adapgrad_tutorials/images/thumb/sphx_glr_plot_mlfmaggibbs_thumb.png
-
-        :ref:`sphx_glr_tutorials_mlfm_adapgrad_tutorials_plot_mlfmaggibbs.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /tutorials/mlfm_adapgrad_tutorials/plot_mlfmaggibbs
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="This note descibes how to carry out the process of carrying out MAP parameter estimation for th...">
 
 .. only:: html
@@ -128,6 +108,26 @@ Examples not loading :'(
    :hidden:
 
    /tutorials/mlfm_adapgrad_tutorials/plot_mlfmagvar
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example presents an illustration of the MLFM to learn the model">
+
+.. only:: html
+
+    .. figure:: /tutorials/mlfm_adapgrad_tutorials/images/thumb/sphx_glr_plot_mlfmaggibbs_thumb.png
+
+        :ref:`sphx_glr_tutorials_mlfm_adapgrad_tutorials_plot_mlfmaggibbs.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /tutorials/mlfm_adapgrad_tutorials/plot_mlfmaggibbs
 .. raw:: html
 
     <div style='clear:both'></div>
