@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='pydygp',
-      version='0.2.2',
+      version='0.2.2.1',
       author='Daniel Tait',
       author_email='tait.djk@gmail.com',
       url='http://github.com/danieljtait/pydygp',
@@ -12,6 +12,7 @@ setup(name='pydygp',
           'numpy',
           'scipy',
           'matplotlib>=2.2.0',
-          'scikit-learn',
+          'scikit-learn'
+          'autograd',
       ],
       zip_safe=False)      
