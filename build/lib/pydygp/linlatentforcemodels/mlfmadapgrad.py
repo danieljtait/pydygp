@@ -1,17 +1,29 @@
 """
 Class definition for the mlfm with adaptive gradient matching
+
+.. currentmodule:L pydygp.linlatentforcemodels
+
 """
 import numpy as np
+import warnings
+from scipy.stats import multivariate_normal
 from .mlfm import Dimensions, BaseMLFM
-from scipy.linalg import block_diag, cho_solve
+from scipy.linalg import (block_diag, cho_solve, cholesky, solve_triangular)
 from pydygp.gradientkernels import ConstantKernel, RBF
 from sklearn.gaussian_process import GaussianProcessRegressor
 from scipy.optimize import minimize
 from collections import namedtuple
 
-MLFMAdapGradFitResults = namedtuple('MLFMAdapGradFitResults',
-                                    'g, beta, logpsi, logphi, loggamma, logtau, \
-                                    optimres')
+class MLFMAdapGradFitResults(namedtuple('MLFMAdapGradFitResults',
+                                        ('g', 'beta', 'logpsi', 'logphi',
+                                         'loggamma', 'logtau', 'optimres'))):
+    """
+    Results of MLFMAdapGrad MAP fit stored as a named tuple
+    """
+    def __new__(cls, g, beta, logpsi, logphi, loggamma, logtau, optimres):
+        return super(MLFMAdapGradFitResults, cls).__new__(
+            cls, g, beta, logpsi, logphi, loggamma, logtau, optimres)
+
 
 def _unpack_vector(x, xk_shape):
     """
@@ -99,10 +111,10 @@ def _check_Y(Y, mlfm):
         ncol = Y.shape[1]
         nrow = Y.shape[0]
         if ncol == mlfm.dim.K and \
-              nrow == mlfm.Ndata:
+              nrow == mlfm._Ndata:
               # only one output, return vectorised Y
               return Y.T.ravel()
-        elif nrow == mlfm.Ndata*mlfm.dim.K:
+        elif nrow == mlfm._Ndata*mlfm.dim.K:
             # already columns of vectorised outputs
             return Y
         else:
@@ -110,6 +122,16 @@ def _check_Y(Y, mlfm):
     else:
         msg = "Shape of Y is not compatible."
         raise ValueError(msg)
+
+def _sklearn_gp_falsefit(gp, y_train, X_train, kernel):
+    gp.X_train_ = X_train.copy()
+    gp.y_train_ = y_train.copy()
+    gp.kernel_ = kernel
+    K = gp.kernel_(gp.X_train_)
+    K[np.diag_indices_from(K)] += gp.alpha
+    gp.L_ = np.linalg.cholesky(K)
+    gp.alpha_ = cho_solve((gp.L_, True), gp.y_train_)
+    gp._y_train_mean = np.zeros(1)
 
 class MLFMAdapGrad(BaseMLFM):
     """
@@ -130,20 +152,12 @@ class MLFMAdapGrad(BaseMLFM):
     """
     def __init__(self,
                  basis_mats,
-                 is_beta_fixed=True,
                  **kwargs):
 
         super(MLFMAdapGrad, self).__init__(basis_mats, **kwargs)
 
         # flags for fitting function
         self.is_tt_aug = False     # Has the time vector been augmented
-        self.is_beta_fixed = is_beta_fixed
-
-        # default beta behaviour
-        if self.is_beta_fixed:
-            assert(self.dim.R == self.dim.D)
-            self.beta = np.row_stack((np.zeros(self.dim.D),
-                                      np.eye(self.dim.R)))
 
     def _setup_times(self, tt, tt_aug=None, data_inds=None, **kwargs):
         """ Sets up the model time vector, optionally augments the time
@@ -254,32 +268,43 @@ class MLFMAdapGrad(BaseMLFM):
         y_train = _check_Y(Y, self)
 
         # Check for kwarg priors
-        try:
-            beta_prior_logpdf = kwargs.pop('beta_prior')
-        except:
-            beta_prior_logpdf = lambda b: (0, 0)
+        priors = {}
+        for vn in ['logpsi', 'beta', 'logtau']:
+            key = '_'.join((vn, 'prior'))
+            try:
+                priors[vn] = kwargs[key].logpdf
+            except KeyError:
+                pass
 
-        try:
-            logtau_prior_logpdf = kwargs.pop('logtau_prior')
-        except:
-            logtau_prior_logpdf = lambda lt: (0, 0)
+        # optionally fix some of the entries of beta
+        beta_fix_inds = kwargs.pop('beta_fix_inds', None)
 
         # obj function is given by neg. log likelihood + log prior
-        def objfunc(arg, free_vars_shape, fixed_vars):
+        def objfunc(arg, free_vars_shape, fixed_vars, fixed_beta=None):
             g, vbeta, logpsi, logphi, loggamma, logtau = \
                _var_mixer(arg, free_vars_shape, fixed_vars, is_fixed_vars)
             # reshape beta
-            beta = vbeta.reshape(self.dim.R+1, self.dim.D)
+            if beta_fix_inds is None:
+                beta = vbeta.reshape(self.dim.R+1, self.dim.D)
+            else:
+                beta = np.zeros((self.dim.R+1, self.dim.D))
+                beta[np.logical_not(beta_fix_inds)] = vbeta
+                beta[beta_fix_inds] = fixed_beta
+                
             try:
                 ll, ll_g_grad, ll_beta_grad, ll_lphi_grad, ll_lgam_grad, ll_ltau_grad = \
                     self.log_likelihood(y_train, g, beta,
                                         logphi, loggamma, logtau,
                                         eval_gradient=True)
 
+                if beta_fix_inds is not None:
+                    ll_beta_grad = \
+                                 ll_beta_grad[np.logical_not(beta_fix_inds.ravel())]
+
                 lp, lp_g_grad, lp_lpsi_grad = \
-                    self.prior_logpdf(g, logpsi,
-                                      eval_gradient=True,
-                                      **kwargs)  # pass kwargs to logprior
+                    self._prior_logpdf(g, logpsi,
+                                       eval_gradient=True,
+                                       **kwargs)  # pass kwargs to logprior
 
                 grad = [-(ll_g_grad + lp_g_grad),
                         -ll_beta_grad,
@@ -288,17 +313,24 @@ class MLFMAdapGrad(BaseMLFM):
                         -ll_lgam_grad,
                         -ll_ltau_grad]
 
-                # add the contribution from optional kwarg priors
-                lp_beta, lp_beta_grad = beta_prior_logpdf(vbeta)
-                lp += lp_beta
-                grad[1] += -lp_beta_grad
-
                 # possible logtau prior
-                lp_logtau, lp_logtau_grad = logtau_prior_logpdf(logtau)
+                # add contributions from the various priors
+                for vn, indx in zip(['beta', 'logpsi', 'logtau'],
+                                    [(1, vbeta),
+                                     (2, logpsi),
+                                     (5, logtau)]):
+                    try:
+                        prior_logpdf = priors[vn]
+                        ind, x = indx  # unpack the value of var. name
+                        vn_lp, vn_lp_grad = prior_logpdf(x, True)
+                        lp += vn_lp
+    
+                        grad[ind] += -vn_lp_grad
 
-                lp += lp_logtau
-                grad[-1] += -lp_logtau_grad
-                
+                    except KeyError:
+                        # no prior specified for this var.
+                        pass
+
                 grad = np.concatenate([item for item, b in zip(grad, is_fixed_vars)
                                        if not b])
                 return -(ll + lp), grad
@@ -308,21 +340,145 @@ class MLFMAdapGrad(BaseMLFM):
 
         init, free_vars_shape, fixed_vars = \
               self._fit_init(is_fixed_vars, **kwargs)
+        # Handle the possibility that some of the indices of beta
+        # have been kept fixed
+        if beta_fix_inds is not None:
+            beta_size = (self.dim.R+1)*self.dim.D
+            beta_init = init[self.dim.N*self.dim.R:
+                             self.dim.N*self.dim.R + beta_size]
+            beta_free = beta_init[np.logical_not(beta_fix_inds.ravel())]
+            fixed_beta = beta_init[beta_fix_inds.ravel()]
+            init = np.concatenate((init[:self.dim.N*self.dim.R],
+                                   beta_free,
+                                   init[self.dim.N*self.dim.R + beta_size:]))
+            free_vars_shape[1] = len(beta_free)
+        else:
+            fixed_beta = None
+
         res = minimize(objfunc, init,
                        jac=True,
-                       args=(free_vars_shape, fixed_vars),
+                       args=(free_vars_shape, fixed_vars, fixed_beta),
                        options=kwargs.pop('optim_options', None))
 
-        # save a copy of the results from optim
-        self._optim_res = res
-
+        #self._optim_res = res
+        
         g_, vbeta_, logpsi_, logphi_, loggamma_, logtau_ = \
             _var_mixer(res.x, free_vars_shape, fixed_vars, is_fixed_vars)
-        beta_ = vbeta_.reshape(self.dim.R+1, self.dim.D)
+
+        if beta_fix_inds is None:
+            beta_ = vbeta_.reshape(self.dim.R+1, self.dim.D)            
+        else:
+            beta_ = np.zeros((self.dim.R+1, self.dim.D))
+            beta_[np.logical_not(beta_fix_inds)] = vbeta_
+            beta_[beta_fix_inds] = fixed_beta
+        
+
+
+        # Add a kernel_ to the gps to allow them to be used
+        # for prediction
+        _logpsi_shape = _get_gp_theta_shape(self.latentforces)
+        reshape_logpsi = _unpack_vector(logpsi_, _logpsi_shape)
+        for r, gr in enumerate(g_.reshape(self.dim.R, self.dim.N)):
+            gp = self.latentforces[r]
+            gp.kernel_ = gp.kernel.clone_with_theta(reshape_logpsi[r])
+            kern = gp.kernel.clone_with_theta(reshape_logpsi[r])
+            _sklearn_gp_falsefit(gp, gr, self.ttc[:, None], kern)
+
+        # store some variables for later use
+        self.X_train_ = self.ttc[:, None]
+        if not is_fixed_vars[0]:
+            # Optimised g - so get laplace approx to from optim
+            g_laplace_cov = res.hess_inv[:self.dim.N*self.dim.R,
+                                         :self.dim.N*self.dim.R]
+            g_laplace_cov = g_laplace_cov.reshape(self.dim.R,
+                                                  self.dim.R,
+                                                  self.dim.N,
+                                                  self.dim.N)
+            self.g_laplace_cov = g_laplace_cov
+            #Cff = block_diag(*(gp.kernel_(self.X_train_)
+            #                   for gp in self.latentforces))
+            #Cff[np.diag_indices_from(Cff)] += 1e-4
+            #self.g_L_ = cholesky(Cff, lower=True)
+            #self.g_alpha_ = cho_solve((self.g_L_, True), g_)
 
         return MLFMAdapGradFitResults(g_.reshape(self.dim.R, self.dim.N),
                                       beta_, logpsi_, logphi_, loggamma_, logtau_, res)
 
+
+    def predict_lf(self, tt, return_std=False):
+        """
+        Predict the latent force variables using the Laplace approximation.
+
+        Requires that the model has been fitted.
+
+        Parameters
+        ----------
+        tt : array-like, shape = (n, )
+            Time points where the GPs are evaluated
+
+        return_std: bool, default: False
+            If True, the standard deviation of the predictive distribution at
+            the query times is returned, along with the mean.
+
+        Returns
+        -------
+        lf_mean : array, shape = (R, tt.size)
+            Mean of predictive distribution at tt
+
+        lf_std : array, shape = (R, tt.size), optional
+            Standard deviation of the predictive distribution at tt. Only
+            returned when return_std is True
+        """
+
+        Cff_ = [gp.kernel_(tt[:, None], self.X_train_)
+                for gp in self.latentforces]
+        lf_mean = np.concatenate([Cff_[r].dot(gp.alpha_) for
+                                  r, gp in enumerate(self.latentforces)])
+        lf_mean = lf_mean.reshape(self.dim.R, tt.size)
+
+        if return_std:
+            # predict the variance components
+            L_inv = [solve_triangular(gp.L_.T, np.eye(gp.L_.shape[0]))
+                     for gp in self.latentforces]
+            K_inv = [Lr_inv.dot(Lr_inv.T) for Lr_inv in L_inv]
+            y_var = np.concatenate([gp.kernel_.diag(tt[:, None])
+                                    for gp in self.latentforces])
+            y_var += np.concatenate(
+                [np.einsum('ij,ij->i',
+                           np.dot(K_trans,
+                                  self.g_laplace_cov[r, r, ...] - K_inv[r]),
+                           K_trans)
+                for r, K_trans in enumerate(Cff_)])
+
+            # the var. check from sklearn GaussianProcessRegressor
+            # Check if any of the variances is negative because of
+            # numerical issues. If yes: set the variance to 0.
+            y_var_negative = y_var < 0
+            if np.any(y_var_negative):
+                warnings.warn("Predicted variances smaller than 0. "
+                              "Setting those variances to 0.")
+                y_var[y_var_negative] = 0.0
+
+            # reshape the mean and var
+            lf_mean = lf_mean.reshape(self.dim.R, tt.size)
+            lf_sd = np.sqrt(y_var).reshape(self.dim.R, tt.size)
+            
+            return lf_mean, lf_sd
+
+        """
+        Cff_ = block_diag(*Cff_)        
+        A = Cff_.dot(cho_solve((self.g_L_, True), np.eye(self.dim.N*self.dim.R)))
+
+        K = A.dot(self.g_laplace_cov.dot(A.T))
+        Cp = []
+        for gp in self.latentforces:
+            C22 = gp.kernel_(tt[:, None])
+            C21 = gp.kernel_(tt[:, None], self.X_train_)
+            Cp.append(C22 - C21.dot(cho_solve((gp.L_, True), C21.T)))
+        K += block_diag(*Cp)
+        """
+        return lf_mean.reshape(self.dim.R, tt.size)#, np.sqrt(np.diag(K))
+        
 
     def _fit_kwarg_parser(self, **kwargs):
         return _fit_kwarg_parser(self, **kwargs)
@@ -359,10 +515,8 @@ class MLFMAdapGrad(BaseMLFM):
         try:
             beta0 = kwargs['beta0']
         except:
-            if self.is_beta_fixed:
-                beta0 = self.beta
-            else:
-                beta0 = np.eye(N=self.dim.R+1, M=self.dim.D)
+            beta0 = np.eye(N=self.dim.R+1, M=self.dim.D)
+
         vbeta0 = beta0.ravel()  # vec. beta as [br1,...,brD]
 
         full_init = [g0, vbeta0, logpsi0, logphi0, loggamma0, logtau0]
@@ -382,14 +536,39 @@ class MLFMAdapGrad(BaseMLFM):
                        eval_gradient=False, **kwargs):
         """Log-likelihood of the data
 
+        Parameters
+        ----------
+
+        y : array
+
+        g : array
+
+        beta : array
+
+        logphi : array
+
+        loggamma : array
+
+        logtau : array
+
+        eval_gradient : boolean
+
+        Returns
+        -------
+
+        res : float,
+
         Notes
         -----
         Returns the log-likelihood
 
         .. math::
 
-            `\ln p(\mathbf{y} \mid \mathbf{g}, \boldsymbol{\phi},
-            \boldsymbol{\gamma}, \boldsymbol{\tau})
+            \ln p(\mathbf{y} \mid \mathbf{g},
+            \\boldsymbol{\\beta},
+            \ln \\boldsymbol{\phi},
+            \ln \\boldsymbol{\gamma},
+            \ln \\boldsymbol{\\tau})
 
         of the vectorised data :math:`\mathbf{y}`. Although note the
         for the GP hyperparameters, temperature parameter
@@ -406,14 +585,13 @@ class MLFMAdapGrad(BaseMLFM):
 
         else:
             Lam = Lambda(g, beta, logphi, np.exp(loggamma), self, False)
-
         # invert the ODE model covariance matrix
         Lode = np.linalg.cholesky(Lam)
         Kode = cho_solve((Lode, True), np.eye(Lode.shape[0]))
 
         # data covariance
         tau = np.exp(logtau)        
-        Kdat = block_diag(*[1 / tauk * np.eye(self.Ndata)
+        Kdat = block_diag(*[1 / tauk * np.eye(self._Ndata)
                             for tauk in tau])
 
         if self.is_tt_aug:
@@ -481,7 +659,7 @@ class MLFMAdapGrad(BaseMLFM):
             for k in range(self.dim.K):
                 dek[k] = -1/tau[k]**2
                 K_tau_grad.append(np.kron(np.diag(dek),
-                                          np.eye(self.Ndata)))
+                                          np.eye(self._Ndata)))
                 dek[k] = 0.
             K_tau_grad = np.dstack(K_tau_grad)
 
@@ -513,7 +691,7 @@ class MLFMAdapGrad(BaseMLFM):
         else:
             return log_lik
 
-    def prior_logpdf(self, g, logpsi, eval_gradient=False, **kwargs):
+    def _prior_logpdf(self, g, logpsi, eval_gradient=False, **kwargs):
         """Logpdf of the prior
         """
         veclogpsi = logpsi.copy()  # need to keep a copy of the vectorised var.
@@ -542,7 +720,7 @@ class MLFMAdapGrad(BaseMLFM):
             L = np.linalg.cholesky(K)
 
             alpha = cho_solve((L, True), g[r, :])
-            
+
             tmp = -.5 * g[r, :].dot(alpha)
             tmp -= np.log(np.diag(L)).sum()
 
@@ -584,7 +762,7 @@ class MLFMAdapGrad(BaseMLFM):
         return ll
 
     @property
-    def Ndata(self):
+    def _Ndata(self):
         if self.is_tt_aug:
             return len(self.data_inds)
         else:
@@ -610,16 +788,173 @@ class GibbsMLFMAdapGrad(MLFMAdapGrad):
         is passed, the kernel \"1.0 * RBF(1.0)\" is used for the R
         latent forces.
     """
-    def __init__(self,
-                 basis_mats,
-                 R,
-                 is_beta_fixed=True,
+    def __init__(self, *args, **kwargs):
+        super(GibbsMLFMAdapGrad, self).__init__(*args, **kwargs)
+        
+    def gibbsfit(self, times, Y,
+                 sample=('g'),
+                 size=100,
+                 burnin=100,
                  **kwargs):
 
-        super(GibbsMLFMAdapGrad, self).__init__(basis_mats,
-                                                R=R,
-                                                is_beta_fixed=is_beta_fixed,
-                                                **kwargs)
+        N_outputs = Y.shape[1]
+
+        if len(sample) == 0:
+            return {}
+
+        try:
+            mapres = kwargs['mapres']
+            # still need to call false setup
+            self._setup(times, **kwargs)
+        except:
+            # get the results from the MAP fit of the model
+            mapres = self.fit(times, Y, **kwargs)
+
+        samples = {key: [] for key in sample}
+
+        nt = 0  # iteration counter
+
+        # initalise values at the MAP estimates
+        bcur = mapres.beta
+        gcur = mapres.g.ravel()
+
+        # check for a prior on beta
+        try:
+            beta_prior = kwargs['beta_prior']
+            
+        except KeyError:
+            raise ValueError("Gibbs sampling requires specifying a "
+                             "prior on beta")
+            
+        
+        while len(samples[sample[0]]) < size:
+            Ex, Covx = self.x_condpdf(bcur, gcur,
+                                      logphi=mapres.logphi,
+                                      loggamma=mapres.loggamma,
+                                      include_data=True,
+                                      logtau=mapres.logtau,
+                                      vecy=Y,
+                                      same_ic=False)
+            xcur = np.column_stack((
+                multivariate_normal.rvs(ex, Covx) for ex in Ex.T))
+
+            if 'x' in sample:
+                if nt > burnin:
+                    samples['x'].append(xcur)            
+
+            if 'g' in sample:
+                Eg, Covg = self.g_condpdf_mo(xcur, bcur,
+                                             gamma=np.exp(mapres.loggamma),
+                                             logphi=mapres.logphi,
+                                             logpsi=mapres.logpsi)
+                gcur = multivariate_normal.rvs(Eg, Covg)
+                if nt > burnin:
+                    samples['g'].append(gcur)
+
+            if 'beta' in sample:
+                Eb, Covb = self.beta_condpdf_mo(xcur, gcur,
+                                                gamma=np.exp(mapres.loggamma),
+                                                logphi=mapres.logphi)
+                bcur = multivariate_normal.rvs(mean=Eb, cov=Covb)
+                bcur = bcur.reshape((self.dim.D, self.dim.R+1)).T
+                if nt > burnin:
+                    samples['beta'].append(bcur.ravel())
+
+            nt += 1
+
+        # convert sample list to arrays
+        for key, item in samples.items():
+            samples[key] = np.asarray(item)
+
+        return samples
+
+    def g_condpdf_mo(self, vecx, beta, gamma=None, logphi=None, logpsi=None, **kwargs):
+        ## handle parameter construct from arguments
+        if logphi is None and gamma is not None \
+           or logphi is not None and gamma is None:
+            raise ValueError("gamma and logphi must either be set together or both None.")
+
+        elif logphi is None and gamma is None:
+            # if logphi hasn't been passed then
+            try:
+                # the model matrices depending on logphi
+                phi_depmats = kwargs.pop('phi_depmats')
+                Lxx_list, Mdx_list, Schol_list = \
+                          phi_depmat
+            except:
+                raise ValueError
+
+        else:
+            logphi_shape = _get_gp_theta_shape(self.latentstates)
+            logphi = _unpack_vector(logphi, logphi_shape)
+
+        A = np.asarray([sum(brd*Lrd for brd, Lrd in zip(br, self.basis_mats))
+                        for br in beta])
+
+        invcov, premean = ([], [])
+
+        # sum over each dimension
+        for k in range(self.dim.K):
+
+            # Get the covariance matrices which do not depend on
+            # the values of x_k^{(m)}
+            if logphi is None:
+                Lxx, Mdx, Schol = Lxx_list[k], \
+                                  Mdx_list[k], \
+                                  Schol_list[k]
+            else:
+                _phidep_covs = _ls_covar_k_wgrad(logphi[k],
+                                                 gamma[k],
+                                                 self.ttc,
+                                                 self.latentstates[k])
+                Lxx, Mdx, Schol = _phidep_covs[0]
+
+            # sum over all of the outputs
+            for m in range(vecx.shape[1]):
+
+                Xm = vecx[:, m].reshape(self.dim.K, self.dim.N)
+                vk = vk_flow_rep(k,
+                                 Xm,
+                                 A)
+
+                mk = Mdx.dot(Xm[k, :])
+                SkinvVk = np.column_stack(
+                    [cho_solve((Schol, True), np.diag(vkr))
+                     for vkr in vk[1:]])
+
+                Vk = np.row_stack([np.diag(vkr) for vkr in vk[1:]])
+                ic = Vk.dot(SkinvVk)
+
+                premean.append(SkinvVk.T.dot(mk-vk[0]))
+                invcov.append(ic)
+
+        # Add the contribution from the prior
+        prior_ic = []
+
+        if logpsi is None:
+            try:
+                # The model matrices depending on logpsi
+                prior_ic = kwargs.pop('gprior_invcovs')
+            except:
+                raise ValueError("If 'logpsi' is None then the"
+                                 " prior covariance matrix of g"
+                                 " must be provided")
+        else:
+            logpsi_shape = _get_gp_theta_shape(self.latentforces)
+            logpsi = _unpack_vector(logpsi, logpsi_shape)
+            for theta, gp in zip(logpsi, self.latentforces):
+                kern = gp.kernel.clone_with_theta(theta)
+                Cgr = kern(self.ttc[:, None])
+                Cgr[np.diag_indices_from(Cgr)] += gp.alpha
+                L = np.linalg.cholesky(Cgr)
+
+                prior_ic.append(cho_solve((L, True), np.eye(L.shape[0])))
+
+        invcov = sum(invcov) + block_diag(*prior_ic)
+        cov = np.linalg.inv(invcov)
+        mean = cov.dot(sum(premean))
+
+        return mean, cov
 
     def g_condpdf(self, vecx, beta, gamma=None, logphi=None, logpsi=None, **kwargs):
         """
@@ -712,6 +1047,66 @@ class GibbsMLFMAdapGrad(MLFMAdapGrad):
 
         return mean, cov
 
+    def beta_condpdf_mo(self, vecx, vecg, gamma=None, logphi=None, **kwargs):
+        ## handle parameter construct from arguments
+        if logphi is None and gamma is not None \
+           or logphi is not None and gamma is None:
+            raise ValueError("gamma and logphi must either be set together or both None.")
+
+        elif logphi is None and gamma is None:
+            # if logphi hasn't been passed then
+            try:
+                # the model matrices depending on logphi
+                phi_depmats = kwargs.pop('phi_depmats')
+                Lxx_list, Mdx_list, Schol_list = \
+                          phi_depmat
+            except:
+                raise ValueError
+
+        else:
+            logphi_shape = _get_gp_theta_shape(self.latentstates)
+            logphi = _unpack_vector(logphi, logphi_shape)
+
+        invcov, premean = ([], [])
+
+        # sum over each dimension
+        for k in range(self.dim.K):
+            # Get the covariance matrices which do not depend on
+            # the values of x_k^{(m)}
+            if logphi is None:
+                Lxx, Mdx, Schol = Lxx_list[k], \
+                                  Mdx_list[k], \
+                                  Schol_list[k]
+            else:
+                _phidep_covs = _ls_covar_k_wgrad(logphi[k],
+                                                 gamma[k],
+                                                 self.ttc,
+                                                 self.latentstates[k])
+                Lxx, Mdx, Schol = _phidep_covs[0]
+
+            Skinv = cho_solve((Schol, True), np.eye(Schol.shape[0]))
+
+            
+            # sum over all of the outputs
+            for m in range(vecx.shape[1]):
+
+                Xm = vecx[:, m].reshape(self.dim.K, self.dim.N)
+                mk = Mdx.dot(Xm[k, :])
+                Skinvmk = Skinv.dot(mk)
+
+                wk = wk_flow_rep(k, Xm, vecg.reshape(self.dim.R, self.dim.N),
+                                 self.basis_mats)
+                Wk = np.column_stack(wk)
+
+                invcov.append(Wk.T.dot(Skinv.dot(Wk)))
+                premean.append(np.array([w.dot(Skinvmk) for w in wk]))
+
+        invcov = sum(invcov) + \
+                 np.diag(np.ones((self.dim.R+1)*self.dim.D) / 10.**2)
+        cov = np.linalg.inv(invcov)
+        mean = cov.dot(sum(premean))
+        return mean, cov
+
     def beta_condpdf(self, vecx, vecg, gamma=None, logphi=None, **kwargs):
 
         invcov, premean = ([], [])
@@ -751,13 +1146,14 @@ class GibbsMLFMAdapGrad(MLFMAdapGrad):
             invcov.append(Wk.T.dot(Skinv.dot(Wk)))
             premean.append(pm)
 
+        # add the contribution from the prior
         invcov = sum(invcov) + \
                  np.diag(np.ones((self.dim.R+1)*self.dim.D) / 10.**2)
         cov = np.linalg.inv(invcov)
         mean = cov.dot(sum(premean))
         return mean, cov
 
-    def x_condpdf(self, beta, vecg, logphi, loggamma, **kwargs):
+    def x_condpdf(self, beta, vecg, logphi, loggamma, same_ic=True, **kwargs):
         Lam = Lambda(vecg, beta, logphi, np.exp(loggamma), self, False)
 
         include_data = kwargs.pop("include_data", False)
@@ -765,18 +1161,21 @@ class GibbsMLFMAdapGrad(MLFMAdapGrad):
             try:
                 logtau = kwargs.pop("logtau")
                 tau = np.exp(logtau)
-                data_invcov = np.kron(np.diag(tau), np.eye(self.Ndata))
+                data_invcov = np.kron(np.diag(tau), np.eye(self._Ndata))
 
                 try:
-                    cov = np.linalg.inv(Lam + data_invcov)
-                    
-                    y = kwargs.pop("vecy")
-                    premean = data_invcov.dot(y)
 
-                    invcov = Lam + data_invcov
+                    y = kwargs.pop("vecy")
+
+                    if same_ic:
+                        premean = data_invcov.dot(y.sum(-1))
+                        invcov = Lam + y.shape[1]*data_invcov
+                    else:
+                        premean = data_invcov.dot(y)
+                        invcov = Lam + data_invcov
+
                     cov = np.linalg.inv(invcov)
                     mean = cov.dot(premean)
-
                     return mean, cov
                     
                 except KeyError:
@@ -831,6 +1230,64 @@ class VarMLFMAdapGrad(MLFMAdapGrad):
         super(VarMLFMAdapGrad, self).__init__(*args, **kwargs)
         self.basis_mats = np.array(self.basis_mats)
 
+    def predict(self, tt, return_std=False):
+        pass
+
+    def varfit(self, times, Y, gtol=1e-3, max_iter=100, **kwargs):
+
+        # get the results from fitting the MAP model
+        mapres = self.fit(times, Y, **kwargs)
+
+        # initalise the distribution of g at the MAP
+        Eg = mapres.g.ravel()
+        Covg = np.diag([0.1]*Eg.size)
+
+        Eb = mapres.beta.ravel()
+        if kwargs.pop('beta_is_fixed', False):
+            Covb = np.zeros((Eb.size, Eb.size))
+        else:
+            Covb = np.diag([0.1]*Eb.size)
+
+        Deltg = np.inf  # difference between prev and cur g
+
+        nt = 0 # Count number of iterations
+        while True:
+            Ex, Covx = self.x_cond(Eg, Covg, Eb, Covb,
+                                   mapres.logphi, np.exp(mapres.loggamma),
+                                   include_data=True, Y=Y, tau=np.exp(mapres.logtau))
+            Eg_, Covg_ = self.g_cond(Ex, Covx, Eb, Covb,
+                                     mapres.logphi, np.exp(mapres.loggamma),
+                                     mapres.logpsi)
+            # Calculate distance moved
+            Deltg = np.linalg.norm(Eg - Eg_)
+            # Update 
+            Eg = Eg_
+            Covg = Covg_
+            # Check converg. conditions
+            if Deltg < gtol:
+                break
+            nt += 1
+            if nt >= max_iter:
+                break
+
+        # store results
+        self.Ex_train_ = Ex.copy()
+        self.Lx_train_ = np.linalg.cholesky(Covx)
+        
+        # return Ex in a more resonable shape
+        #Ex = Ex.reshape(self.dim.K, self.dim.N, Y.shape[1]).transpose(1, 0, 2)
+
+        #self.g_L_chol_ = cholesky(Covg, lower=True)
+        #self.g_alpha_ = cho_solve((self.g_L_chol_, True), Eg)
+
+        # Sensible reshaping
+        Eg = Eg.reshape(self.dim.R, self.dim.N).T
+        Covg = Covg.reshape(self.dim.N, self.dim.N, self.dim.R, self.dim.R)
+        Covg = Covg.transpose(1, 0, 3, 2)
+        
+        return mapres, Eg, Covg
+
+        
     def g_cond(self, Ex, Covx, Eb, Covb,
                logphi, gamma, logpsi, **kwargs):
 
@@ -898,7 +1355,6 @@ class VarMLFMAdapGrad(MLFMAdapGrad):
 
             invcov[r*self.dim.N:(r+1)*self.dim.N,
                    r*self.dim.N:(r+1)*self.dim.N] += cho_solve((Lr, True), np.eye(self.dim.N))
-
         cov = np.linalg.inv(invcov)
         mean = cov.dot(premean)
 
@@ -922,7 +1378,7 @@ class VarMLFMAdapGrad(MLFMAdapGrad):
                 msg = "If including the data contribution must pass precisions tau"
                 raise ValueError(msg)
 
-            datainv_cov = np.kron(np.diag(tau), np.eye(self.Ndata))
+            datainv_cov = np.kron(np.diag(tau), np.eye(self._Ndata))
 
             try:
                 Y = kwargs.pop('Y')  # assumed to be already shaped
@@ -956,6 +1412,60 @@ class VarMLFMAdapGrad(MLFMAdapGrad):
             mean = np.zeros(self.dim.N*self.dim.K)
 
         return mean, cov
+
+    def beta_cond(self, Ex, Covx, Eg, Covg,
+                  logphi, gamma, **kwargs):
+
+        # reshape logphi
+        logphi = _unpack_vector(logphi, _get_gp_theta_shape(self.latentstates))
+
+        if len(Ex.shape) == 1:
+            Ex = Ex[:, None]
+        ExxTs = [Covx + np.outer(Ex_q, Ex_q) for Ex_q in Ex.T]
+
+        Eg = np.concatenate((np.ones(self.dim.N), Eg))
+        Covg = block_diag(np.zeros((self.dim.N, self.dim.N)),
+                          Covg)
+        EggT = Covg + np.outer(Eg, Eg)
+
+        N, K, R, D = self.dim
+
+        premean = np.zeros(D*(R+1))
+        invcov = np.zeros((D*(R+1), D*(R+1)))
+
+        for k in range(self.dim.K):
+
+            LxxMdxSchol = _ls_covar_k_wgrad(logphi[k], gamma[k],
+                                            self.ttc, self.latentstates[k])
+            Lxx, Mdx, Schol = LxxMdxSchol[0]
+            Skinv = cho_solve((Schol, True), np.eye(self.dim.N))
+            SkinvMk = Skinv.dot(Mdx)
+
+            for ExxT in ExxTs:
+
+                for r1 in range(R+1):
+                    for d1 in range(D):
+                        for r2 in range(R+1):
+                            for d2 in range(D):
+                                wmwk = EwkrwksT(k, r1, r2, d1, d2, ExxT, EggT, self.basis_mats)
+                                # Tr{ wwT Skinv }
+                                invcov[r1*D + d1,
+                                       r2*D + d2] += np.einsum('ij,ji->', wmwk.T, Skinv)
+
+                        sum_ExxT = sum(self.basis_mats[d1, k, j]*ExxT[k*N:(k+1)*N, j*N:(j+1)*N]
+                                       for j in range(K))
+                        sum_ExxT = sum_ExxT * Eg[r1*N:(r1+1)*N][None, :]
+                        premean[r1*D + d1] += np.einsum('ij,ji->', sum_ExxT, SkinvMk)
+
+        invcov[np.diag_indices_from(invcov)] += 1/10**2
+
+        L = np.linalg.cholesky(invcov)
+
+        Covb = cho_solve((L, True), np.eye(L.shape[0]))
+        Eb = Covb.dot(premean)
+
+        return Eb, Covb
+        
 
 """
 Flow Function Representations
@@ -1040,6 +1550,23 @@ def wk_flow_rep(k, x, g, L):
             wkrd = sum(L[d][k, j] * xj for j, xj in enumerate(x)) * gr
             wk.append(wkrd)
     return wk
+
+def EwkrwksT(k, r, s, d1, d2, ExxT, EggT, L):
+    """
+    Slower vesion of this function
+    """
+    K = L.shape[-1]
+    N = ExxT.shape[0] // K
+    D = L.shape[0]
+
+    EgrgsT = EggT[r*N:(r+1)*N, s*N:(s+1)*N]
+
+    wkrwksT = 0.
+    for i in range(K):
+        for j in range(K):
+            wkrwksT += ExxT[i*N:(i+1)*N, j*N:(j+1)*N]*L[d1, k, i]*L[d2, k, j]
+
+    return EgrgsT * wkrwksT
 
 """
 ODE Probability Model
@@ -1284,6 +1811,10 @@ def E_qGqB_Lambdag(Eg, Covg, Eb, Covb,
         # Calculate E[ Lambda_k(G, B) | q(G)q(B) ]
         res += E_qGqB_Lambdag_k(k, Eg, Covg, Eb, Covb,
                                 Skinv, Mdx, mlfm)
+
+        # Add contribution from the prior on latent states
+        res[k*mlfm.dim.N:(k+1)*mlfm.dim.N,
+            k*mlfm.dim.N:(k+1)*mlfm.dim.N] += cho_solve((Lxx, True), np.eye(mlfm.dim.N))
     return res
 
 
@@ -1295,13 +1826,13 @@ var_names = ['g', 'beta', 'logpsi', 'logphi', 'loggamma', 'logtau']
 
 def _fit_kwarg_parser(mlfm, **kwargs):
     # default behaviour
-    #kwargs['beta_is_fixed'] = mlfm.is_beta_fixed
 
     # check **kwargs to see if any variables have been kept fixed
     is_fixed_vars = [kwargs.pop("".join((vn, "_is_fixed")), False)
-                     for vn in var_names[:-1]]
+                     for vn in var_names[:-2]]
 
     # Different default behaviour for logtau
+    is_fixed_vars.append(kwargs.pop('loggamma_is_fixed', True))
     is_fixed_vars.append(kwargs.pop('logtau_is_fixed', True))
 
     return is_fixed_vars

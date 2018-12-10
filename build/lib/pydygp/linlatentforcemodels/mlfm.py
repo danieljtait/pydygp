@@ -80,22 +80,24 @@ class BaseMLFM:
 
         self.latentforces = [GaussianProcessRegressor(kern) for kern in kernels]
 
-    def sim(self, x0, tt, beta=None, dt_max=0.1, glist=None):
+    def sim(self, x0, tt, beta=None, dt_max=0.1, latent_forces=None, size=1):
         """Simulate the process along a set of points
 
         Parameters
         ----------
 
-        x0 : array_like, shape(K, )
+        x0 : array_like, shape (K, )
             initial condition for the ode
 
         tt : array_like
             Ordered sequence of time points for the model to be simulated at
 
-        beta : array_like, shape(R+1, D)
+        beta : array_like, shape (R+1, D)
 
-        dt_max : float, optional
+        dt_max : float, defualt = 0.1
             Maximum spacing of dense time points used for simulating the model.
+
+        latent_forces : Tuple of callables, optional, default = None
 
         Returns
         -------
@@ -103,8 +105,8 @@ class BaseMLFM:
         Y : array, shape(len(tt), K)
             Values of the MLFM simulated at tt
 
-        gs : list
-            List of functions [g_1(t),...,g_R(t)] used to simulated the model.
+        latent_forces : tuple of callables
+            Tuple of functions (g_1(t),...,g_R(t)) used to simulate the model.
 
 
         Examples
@@ -139,15 +141,15 @@ class BaseMLFM:
         ttdense, inds = _make_tt_dense(tt, dt_max)
 
         # allows the passing of pre-defined functions
-        if glist is None:
+        if latent_forces is None:
             ginterp = [interp1d(ttdense,
                                 _sim_gp(ttdense, lf),
                                 kind='cubic',
                                 fill_value='extrapolate')
                        for lf in self.latentforces]
         else:
-            assert(len(glist) == self.dim.R)
-            ginterp = glist
+            assert(len(latent_forces) == self.dim.R)
+            ginterp = latent_forces
 
         # form the coeff. matrices of the evol. equation from
         # the structural parameters
@@ -162,9 +164,11 @@ class BaseMLFM:
                                                 ginterp))
             return At.dot(X)
 
-        sol = odeint(dXdt, x0, ttdense)
-
-        return sol[inds, :], ginterp
+        if size == 1:
+            sol = odeint(dXdt, x0, ttdense)            
+            return sol[inds, :], ginterp
+        else:
+            return [odeint(dXdt, x0i, ttdense)[inds, :] for x0i in x0], ginterp
 
 
     def _odeint(self, x0, tt, beta, glist):
@@ -183,3 +187,21 @@ class BaseMLFM:
                                         for Ar, gr in zip(struct_mats[1:], glist))
 
         return odeint(lambda x, t: A(t).dot(x), x0, tt)
+
+
+    def _component_functions(self, g, beta, N=None):
+        if N is None:
+            N = self.dim.N
+
+        g = g.reshape(self.dim.R, N)
+        g = np.row_stack((np.ones(N), g))
+
+        struct_mats = np.array([
+            sum(brd*Ld for brd, Ld in zip(br, self.basis_mats))
+            for br in beta])
+
+        # match struct mats and G on r=0,...,R
+        comp_funcs = struct_mats[..., None] * g[:, None, None, :]
+
+        # sum over r
+        return comp_funcs.sum(0)

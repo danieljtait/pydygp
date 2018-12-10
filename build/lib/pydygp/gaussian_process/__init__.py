@@ -1,0 +1,1 @@
+from .mogpr import MultioutGaussianProcessRegressor
