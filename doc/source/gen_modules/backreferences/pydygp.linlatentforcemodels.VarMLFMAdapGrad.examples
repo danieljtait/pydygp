@@ -1,0 +1,22 @@
+
+
+Examples using ``pydygp.linlatentforcemodels.VarMLFMAdapGrad``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example presents an illustration of using the MLFM to learn the model">
+
+.. only:: html
+
+    .. figure:: /tutorials/mlfm_adapgrad_tutorials/images/thumb/sphx_glr_plot_mlfmagvar_thumb.png
+
+        :ref:`sphx_glr_tutorials_mlfm_adapgrad_tutorials_plot_mlfmagvar.py`
+
+.. raw:: html
+
+    </div>
+
+.. only:: not html
+
+    * :ref:`sphx_glr_tutorials_mlfm_adapgrad_tutorials_plot_mlfmagvar.py`

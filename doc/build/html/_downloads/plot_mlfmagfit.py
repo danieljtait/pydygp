@@ -6,8 +6,9 @@ MLFM-AG Model Fitting
 
 .. currentmodule:: pydygp.linlatentforcemodels
 
-This note decribes hot to carry out the porcess of carrying out MAP parameter
-estimation for the MLFM model using the Adaptive Gradient matching approximation :class:`MLFMAdapGrad` 
+This note decribes how to carry out the porcess of carrying out MAP parameter
+estimation for the MLFM model using the Adaptive Gradient matching approximation
+:class:`MLFMAdapGrad` 
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -49,7 +50,7 @@ Y, gtrue = mlfm.sim([1., 0], tt)    # Simulation result
 ##############################################################################
 # Model Fit
 # ~~~~~~~~~
-# The API is designed to be as simple as possible and so for reasonably simple
+# The API is designed to be as simple as possible and so for simple enough
 # models we should get reasonable results by simply calling
 
 res0 = mlfm.fit(tt, Y)
@@ -61,14 +62,14 @@ res0 = mlfm.fit(tt, Y)
 ttdense = np.linspace(tt[0], tt[-1], 21)  # make a set of dense times
 fig0, ax = plt.subplots()
 ax.plot(ttdense, gtrue[0](ttdense), 'k-', alpha=0.5)
-ax.plot(tt, res0.g, '+')
+ax.plot(tt, res0.g.T, '+')
 
 ##############################################################################
 # Sample Density Dependenance
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # The adaptive gradient matching processes depend on the use of GP
 # interpolators of the unknown state trajectories, and therefore
-# we might express the accuracy of these methods to decreae not with the
+# we might expect the accuracy of these methods to decrease not with the
 # sample size but with the space between samples.
 # 
 # Dense Predictions
@@ -81,7 +82,7 @@ res_dense = mlfm2.fit(tt, Y, logpsi_is_fixed=True)
 fig, ax = plt.subplots()
 ss = np.linspace(tt[0], tt[-1])
 ax.plot(ss, gtrue[0](ss), 'k-', alpha=0.2)
-ax.plot(mlfm.ttc, res0.g, '+')
-ax.plot(mlfm2.ttc, res_dense.g, 'o')
+ax.plot(mlfm.ttc, res0.g.T, '+')
+ax.plot(mlfm2.ttc, res_dense.g.T, 'o')
 
 plt.show()

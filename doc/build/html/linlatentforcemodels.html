@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Linear Latent Force Models &mdash; pydygp  documentation</title>
+  <title>Linear Latent Force Models (pydygp.linlatentforcemodels) &mdash; pydygp  documentation</title>
   
 
   
@@ -28,9 +28,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="pydygp.linlatentforcemodels.BaseMLFM" href="generated/pydygp.linlatentforcemodels.BaseMLFM.html" />
-    <link rel="prev" title="MLFM Simulation" href="tutorials/llfm_tutorials/plot_mlfmsim.html" /> 
+    <link rel="search" title="Search" href="search.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -81,14 +79,13 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installing PydyGP</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">PydyGP Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Gallery of Examples</a></li>
 </ul>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Linear Latent Force Models</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="generated/pydygp.linlatentforcemodels.BaseMLFM.html"><code class="docutils literal notranslate"><span class="pre">pydygp.linlatentforcemodels</span></code>.BaseMLFM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/pydygp.linlatentforcemodels.MLFMAdapGrad.html"><code class="docutils literal notranslate"><span class="pre">pydygp.linlatentforcemodels</span></code>.MLFMAdapGrad</a></li>
-</ul>
-</li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules/linlatentforcemodels.html">Linear Latent Force Models (<code class="docutils literal notranslate"><span class="pre">pydygp.linlatentforcemodels</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="probabilitydistributions.html">Probability Distributions (<code class="docutils literal notranslate"><span class="pre">pydygp.probabilitydistributions</span></code>)</a></li>
 </ul>
 
             
@@ -134,7 +131,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Linear Latent Force Models</li>
+      <li>Linear Latent Force Models (<code class="docutils literal notranslate"><span class="pre">pydygp.linlatentforcemodels</span></code>)</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -153,22 +150,32 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="linear-latent-force-models">
-<h1>Linear Latent Force Models<a class="headerlink" href="#linear-latent-force-models" title="Permalink to this headline">¶</a></h1>
+  <span class="target" id="module-pydygp.linlatentforcemodels"></span><div class="section" id="linear-latent-force-models-pydygp-linlatentforcemodels">
+<h1>Linear Latent Force Models (<a class="reference internal" href="modules/linlatentforcemodels.html#module-pydygp.linlatentforcemodels" title="pydygp.linlatentforcemodels"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pydygp.linlatentforcemodels</span></code></a>)<a class="headerlink" href="#linear-latent-force-models-pydygp-linlatentforcemodels" title="Permalink to this headline">¶</a></h1>
+<p>Linear ordinary differential equations driven by smooth Gaussian processes.</p>
+<div class="section" id="multiplicative-forces">
+<h2>Multiplicative Forces<a class="headerlink" href="#multiplicative-forces" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="generated/pydygp.linlatentforcemodels.BaseMLFM.html#pydygp.linlatentforcemodels.BaseMLFM" title="pydygp.linlatentforcemodels.BaseMLFM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">linlatentforcemodels.BaseMLFM</span></code></a>(basis_mats[,&nbsp;…])</td>
+<tr class="row-odd"><td><a class="reference internal" href="pydygp.linlatentforcemodels.BaseMLFM.html#pydygp.linlatentforcemodels.BaseMLFM" title="pydygp.linlatentforcemodels.BaseMLFM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BaseMLFM</span></code></a>(basis_mats[,&nbsp;R,&nbsp;lf_kernels])</td>
 <td>Base class for the Multiplicative Latent Force Model.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/pydygp.linlatentforcemodels.MLFMAdapGrad.html#pydygp.linlatentforcemodels.MLFMAdapGrad" title="pydygp.linlatentforcemodels.MLFMAdapGrad"><code class="xref py py-obj docutils literal notranslate"><span class="pre">linlatentforcemodels.MLFMAdapGrad</span></code></a>(basis_mats)</td>
+<tr class="row-even"><td><a class="reference internal" href="pydygp.linlatentforcemodels.MLFMAdapGrad.html#pydygp.linlatentforcemodels.MLFMAdapGrad" title="pydygp.linlatentforcemodels.MLFMAdapGrad"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MLFMAdapGrad</span></code></a>(basis_mats,&nbsp;**kwargs)</td>
 <td>Multiplicative latent force model (MLFM) using the adaptive gradient matching approximation.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="pydygp.linlatentforcemodels.GibbsMLFMAdapGrad.html#pydygp.linlatentforcemodels.GibbsMLFMAdapGrad" title="pydygp.linlatentforcemodels.GibbsMLFMAdapGrad"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GibbsMLFMAdapGrad</span></code></a>(*args,&nbsp;**kwargs)</td>
+<td>Extends the MLFM-AG matching model to implement conditional Gibbs sampling.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="pydygp.linlatentforcemodels.MLFMSuccApprox.html#pydygp.linlatentforcemodels.MLFMSuccApprox" title="pydygp.linlatentforcemodels.MLFMSuccApprox"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MLFMSuccApprox</span></code></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
 </tr>
 </tbody>
 </table>
+</div>
 </div>
 
 
@@ -176,15 +183,6 @@
            
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="generated/pydygp.linlatentforcemodels.BaseMLFM.html" class="btn btn-neutral float-right" title="pydygp.linlatentforcemodels.BaseMLFM" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="tutorials/llfm_tutorials/plot_mlfmsim.html" class="btn btn-neutral" title="MLFM Simulation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>

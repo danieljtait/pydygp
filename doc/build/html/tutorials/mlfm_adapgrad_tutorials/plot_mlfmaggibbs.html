@@ -1,0 +1,301 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Gibbs Sampling &mdash; pydygp  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Basic MAP Estimation" href="plot_mlfmag.html" />
+    <link rel="prev" title="Adaptive Gradient Matching Methods" href="index.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydygp
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installing PydyGP</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">PydyGP Tutorial</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../mlfm.html">Multiplicative Latent Force Models Tutorial</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../mlfm.html#model-description">Model Description</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../mlfm.html#model-fitting">Model Fitting</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="index.html">Adaptive Gradient Matching Methods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mlfm_sa_tutorials/index.html">Successive Approximations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../mlfm.html#adaptive-gradient-matching">Adaptive Gradient Matching</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../lfm_tutorials/index.html">Latent Force Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../llfm_tutorials/index.html">Multiplicative Latent Force Models</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Gallery of Examples</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/linlatentforcemodels.html">Linear Latent Force Models (<code class="docutils literal notranslate"><span class="pre">pydygp.linlatentforcemodels</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../probabilitydistributions.html">Probability Distributions (<code class="docutils literal notranslate"><span class="pre">pydygp.probabilitydistributions</span></code>)</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydygp</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">PydyGP Tutorial</a> &raquo;</li>
+        
+          <li><a href="../mlfm.html">Multiplicative Latent Force Models Tutorial</a> &raquo;</li>
+        
+          <li><a href="index.html">Adaptive Gradient Matching Methods</a> &raquo;</li>
+        
+      <li>Gibbs Sampling</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/tutorials/mlfm_adapgrad_tutorials/plot_mlfmaggibbs.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Click <a class="reference internal" href="#sphx-glr-download-tutorials-mlfm-adapgrad-tutorials-plot-mlfmaggibbs-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="gibbs-sampling">
+<span id="sphx-glr-tutorials-mlfm-adapgrad-tutorials-plot-mlfmaggibbs-py"></span><h1>Gibbs Sampling<a class="headerlink" href="#gibbs-sampling" title="Permalink to this headline">¶</a></h1>
+<p>This example presents an illustration of the MLFM to learn the model</p>
+<div class="math notranslate nohighlight">
+\[\dot{\mathbf{x}}(t)\]</div>
+<p>We do the usual imports and generate some simulated data</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">pydygp.probabilitydistributions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Normal</span><span class="p">,</span>
+                                             <span class="n">GeneralisedInverseGaussian</span><span class="p">,</span>
+                                             <span class="n">InverseGamma</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">sklearn.gaussian_process.kernels</span> <span class="kn">import</span> <span class="n">RBF</span>
+<span class="kn">from</span> <span class="nn">pydygp.liealgebras</span> <span class="kn">import</span> <span class="n">so</span>
+<span class="kn">from</span> <span class="nn">pydygp.linlatentforcemodels</span> <span class="kn">import</span> <span class="n">GibbsMLFMAdapGrad</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+
+
+<span class="n">gmlfm</span> <span class="o">=</span> <span class="n">GibbsMLFMAdapGrad</span><span class="p">(</span><span class="n">so</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">R</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">lf_kernels</span><span class="o">=</span><span class="p">(</span><span class="n">RBF</span><span class="p">(),</span> <span class="p">))</span>
+
+<span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">row_stack</span><span class="p">(([</span><span class="mf">0.</span><span class="p">]</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span>
+                     <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">)))</span>
+
+<span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="c1"># Time points to solve the model at</span>
+<span class="n">tt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">6.</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+
+<span class="c1"># Data and true forces</span>
+<span class="n">Data</span><span class="p">,</span> <span class="n">lf</span> <span class="o">=</span> <span class="n">gmlfm</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">tt</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="c1"># vectorise and stack the data</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">y</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">Data</span><span class="p">))</span>
+
+<span class="n">logpsi_prior</span> <span class="o">=</span> <span class="n">GeneralisedInverseGaussian</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">p</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">logtransform</span><span class="p">()</span>
+<span class="n">loggamma_prior</span> <span class="o">=</span> <span class="n">InverseGamma</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span><span class="o">.</span><span class="n">logtransform</span><span class="p">()</span> <span class="o">*</span> <span class="n">gmlfm</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">K</span>
+<span class="n">beta_prior</span> <span class="o">=</span> <span class="n">Normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mf">1.</span><span class="p">)</span> <span class="o">*</span> <span class="n">beta</span><span class="o">.</span><span class="n">size</span>
+
+<span class="n">fitopts</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;logpsi_is_fixed&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="s1">&#39;logpsi_prior&#39;</span><span class="p">:</span> <span class="n">logpsi_prior</span><span class="p">,</span>
+           <span class="s1">&#39;loggamma_is_fixed&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="s1">&#39;loggamma_prior&#39;</span><span class="p">:</span> <span class="n">loggamma_prior</span><span class="p">,</span>
+           <span class="s1">&#39;beta_is_fixed&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="s1">&#39;beta_prior&#39;</span><span class="p">:</span> <span class="n">beta_prior</span>
+           <span class="p">}</span>
+
+<span class="c1">#gibbsRV = gmlfm.gibbsfit(tt, Y, **fitopts)</span>
+</pre></div>
+</div>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  0.050 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-mlfm-adapgrad-tutorials-plot-mlfmaggibbs-py">
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../../_downloads/plot_mlfmaggibbs.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_mlfmaggibbs.py</span></code></a></div>
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../../_downloads/plot_mlfmaggibbs.ipynb" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_mlfmaggibbs.ipynb</span></code></a></div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="plot_mlfmag.html" class="btn btn-neutral float-right" title="Basic MAP Estimation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Adaptive Gradient Matching Methods" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Daniel Tait.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

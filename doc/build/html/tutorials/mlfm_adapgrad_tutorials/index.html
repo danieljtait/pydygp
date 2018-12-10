@@ -1,0 +1,351 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Adaptive Gradient Matching Methods &mdash; pydygp  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Gibbs Sampling" href="plot_mlfmaggibbs.html" />
+    <link rel="prev" title="Multiplicative Latent Force Models Tutorial" href="../mlfm.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydygp
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installing PydyGP</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">PydyGP Tutorial</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../mlfm.html">Multiplicative Latent Force Models Tutorial</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../mlfm.html#model-description">Model Description</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../mlfm.html#model-fitting">Model Fitting</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Adaptive Gradient Matching Methods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mlfm_sa_tutorials/index.html">Successive Approximations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../mlfm.html#adaptive-gradient-matching">Adaptive Gradient Matching</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../lfm_tutorials/index.html">Latent Force Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../llfm_tutorials/index.html">Multiplicative Latent Force Models</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Gallery of Examples</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/linlatentforcemodels.html">Linear Latent Force Models (<code class="docutils literal notranslate"><span class="pre">pydygp.linlatentforcemodels</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../probabilitydistributions.html">Probability Distributions (<code class="docutils literal notranslate"><span class="pre">pydygp.probabilitydistributions</span></code>)</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydygp</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">PydyGP Tutorial</a> &raquo;</li>
+        
+          <li><a href="../mlfm.html">Multiplicative Latent Force Models Tutorial</a> &raquo;</li>
+        
+      <li>Adaptive Gradient Matching Methods</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/tutorials/mlfm_adapgrad_tutorials/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="adaptive-gradient-matching-methods">
+<h1>Adaptive Gradient Matching Methods<a class="headerlink" href="#adaptive-gradient-matching-methods" title="Permalink to this headline">¶</a></h1>
+<p>For the MLFM AdapGrad model the likelihood of a set of state variables may be written</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{align}
+p(\mathbf{X} \mid \mathbf{g} ) \propto
+\prod_{k=1}^{K} \exp\bigg\{
+&amp;-\frac{1}{2}
+(\mathbf{f}_k - \mathbf{m}_{\dot{x}_k|x_k})^{\top}
+(\mathbf{C}_{\dot{x}_k|\dot{x}} + \gamma I)^{-1}
+(\mathbf{f}_k - \mathbf{m}_{\dot{x}_k|x_k}) \\
+&amp;-\frac{1}{2}\mathbf{x}_k^{\top}\mathbf{C}_{x_k}\mathbf{x}
+\bigg\},
+\end{align}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathbf{f}_k\)</span> is the vector of components of the evolution equation,
+the entries of which are given by</p>
+<div class="math notranslate nohighlight">
+\[f_{kn} =
+\sum_{r=0}^{R} g_{rn} \sum_{d=1}^D \beta_{rd}
+\sum_{j=1}^{K} L_{dkj} x_{jn},\]</div>
+<p>One interesting point from the perspective of identifiability of models of these
+types is that the likelihood-term will remain invariant under choices of
+<span class="math notranslate nohighlight">\(\mathbf{g}, \boldsymbol{\beta}\)</span> such that <span class="math notranslate nohighlight">\(\mathbf{f}_k\)</span> remains
+invariant.</p>
+<p>All of the adative gradient matching methods proceed from this conditional density</p>
+<div class="section" id="model-parameters">
+<h2>Model Parameters<a class="headerlink" href="#model-parameters" title="Permalink to this headline">¶</a></h2>
+<p>The following table gives the complete collection of variables that appear in the adaptive gradient
+matching method for the MLFM, along with a brief description of this variables, how this variable
+is referred to when using the package, along with transformation that is applied to this variable
+to give it a more natural support.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="26%" />
+<col width="26%" />
+<col width="16%" />
+<col width="19%" />
+<col width="13%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Parameter name</td>
+<td>Description</td>
+<td>Variable name</td>
+<td>Transform</td>
+<td>Is Fixed</td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate nohighlight">\(\mathbf{g}\)</span></td>
+<td>The (vectorised) latent GPs</td>
+<td><code class="code docutils literal notranslate"><span class="pre">g</span></code></td>
+<td><span class="math notranslate nohighlight">\(\mathrm{Id}\)</span></td>
+<td><code class="code docutils literal notranslate"><span class="pre">False</span></code></td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate nohighlight">\(\boldsymbol{\psi}\)</span></td>
+<td>latent GP hyperparameters</td>
+<td><code class="code docutils literal notranslate"><span class="pre">logpsi</span></code></td>
+<td><span class="math notranslate nohighlight">\(\log\)</span></td>
+<td><code class="code docutils literal notranslate"><span class="pre">False</span></code></td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate nohighlight">\(\boldsymbol{\beta}\)</span></td>
+<td>Basis coefficients</td>
+<td><code class="code docutils literal notranslate"><span class="pre">beta</span></code></td>
+<td><span class="math notranslate nohighlight">\(\mathrm{Id}\)</span></td>
+<td><code class="code docutils literal notranslate"><span class="pre">False</span></code></td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate nohighlight">\(\boldsymbol{\tau}\)</span></td>
+<td>Observation precisions</td>
+<td><code class="code docutils literal notranslate"><span class="pre">logtau</span></code></td>
+<td><span class="math notranslate nohighlight">\(\log\)</span></td>
+<td><code class="code docutils literal notranslate"><span class="pre">False</span></code></td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate nohighlight">\(\boldsymbol{\gamma}\)</span></td>
+<td>ODE model regularisation</td>
+<td><code class="code docutils literal notranslate"><span class="pre">loggamma</span></code></td>
+<td><span class="math notranslate nohighlight">\(\log\)</span></td>
+<td><code class="code docutils literal notranslate"><span class="pre">True</span></code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="map-estimation">
+<h2>MAP Estimation<a class="headerlink" href="#map-estimation" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><div style='clear:both'></div></div></blockquote>
+<p>Examples not loading :’(</p>
+<div class="sphx-glr-thumbcontainer" tooltip="This example presents an illustration of the MLFM to learn the model"><div class="figure" id="id1">
+<img alt="../../_images/sphx_glr_plot_mlfmaggibbs_thumb.png" src="../../_images/sphx_glr_plot_mlfmaggibbs_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="plot_mlfmaggibbs.html#sphx-glr-tutorials-mlfm-adapgrad-tutorials-plot-mlfmaggibbs-py"><span class="std std-ref">Gibbs Sampling</span></a></span></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="This note descibes how to carry out the process of carrying out MAP parameter estimation for th..."><div class="figure" id="id2">
+<img alt="../../_images/sphx_glr_plot_mlfmag_thumb.png" src="../../_images/sphx_glr_plot_mlfmag_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="plot_mlfmag.html#sphx-glr-tutorials-mlfm-adapgrad-tutorials-plot-mlfmag-py"><span class="std std-ref">Basic MAP Estimation</span></a></span></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="This example presents an illustration of using the MLFM to learn the model"><div class="figure" id="id3">
+<img alt="../../_images/sphx_glr_plot_mlfmagvar_thumb.png" src="../../_images/sphx_glr_plot_mlfmagvar_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="plot_mlfmagvar.html#sphx-glr-tutorials-mlfm-adapgrad-tutorials-plot-mlfmagvar-py"><span class="std std-ref">Variational Inference</span></a></span></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div style='clear:both'></div><div class="sphx-glr-footer class sphx-glr-footer-gallery docutils container">
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../../_downloads/mlfm_adapgrad_tutorials_python.zip" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">all</span> <span class="pre">examples</span> <span class="pre">in</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">mlfm_adapgrad_tutorials_python.zip</span></code></a></div>
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../../_downloads/mlfm_adapgrad_tutorials_jupyter.zip" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">all</span> <span class="pre">examples</span> <span class="pre">in</span> <span class="pre">Jupyter</span> <span class="pre">notebooks:</span> <span class="pre">mlfm_adapgrad_tutorials_jupyter.zip</span></code></a></div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="plot_mlfmaggibbs.html" class="btn btn-neutral float-right" title="Gibbs Sampling" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../mlfm.html" class="btn btn-neutral" title="Multiplicative Latent Force Models Tutorial" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Daniel Tait.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -54,15 +54,21 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
+    #'sphinx.ext.imgmath',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
     'numpydoc',
     'sphinx_gallery.gen_gallery',
+    #'matplotlib.sphinxext.mathmpl',
+    'matplotlib.sphinxext.only_directives',
+    'matplotlib.sphinxext.plot_directive',
 ]
 
 # defaults for autodoc/summary
 autodoc_default_flags = ['members', 'inherited-members']
 autosummary_generate = True
+
+numpydoc_show_class_members = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -199,8 +205,16 @@ intersphinx_mapping = {'https://docs.python.org/': None}
 todo_include_todos = True
 
 # path to example scripts
-examples_dirs = ['../../examples', '../../tutorials/llfm_tutorials']
-gallery_dirs = ['auto_examples', 'tutorials/llfm_tutorials']
+examples_dirs = ['../../examples',
+                 '../../tutorials/lfm_tutorials',
+                 '../../tutorials/llfm_tutorials',
+                 '../../tutorials/mlfm_adapgrad_tutorials',
+                 '../../tutorials/mlfm_sa_tutorials']
+gallery_dirs = ['auto_examples',
+                'tutorials/lfm_tutorials',
+                'tutorials/llfm_tutorials',
+                'tutorials/mlfm_adapgrad_tutorials',
+                'tutorials/mlfm_sa_tutorials']
 
 # -- Options for sphinx-gallery
 sphinx_gallery_conf = {
@@ -208,4 +222,8 @@ sphinx_gallery_conf = {
      'examples_dirs': examples_dirs,
      # path where to save gallery generated examples
      'gallery_dirs': gallery_dirs,
+     # directory where function granular galleries are stored
+     'backreferences_dir' : 'gen_modules/backreferences',
+     # modules for which function level galleries are created.
+     'doc_module' : ('pydygp.linlatentforcemodels',),
 }

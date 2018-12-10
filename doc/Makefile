@@ -19,12 +19,17 @@ help:
 %: Makefile
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
-
+# Also clean Mac OSX sym link files in the examples directories which can corrupt
+# sphinx build, and back up files made by emacs while editing
 clean:
 	rm -rf $(BUILDDIR)/*
 	rm -rf ./source/auto_examples/
+	rm -rf ./source/tutorials/lfm_tutorials/
 	rm -rf ./source/tutorials/llfm_tutorials/
 	rm -rf ./source/generated/
+	rm -rf ../tutorials/lfm_tutorials/.#*
+	rm -rf ../tutorials/llfm_tutorials/.#*
+	rm -rf ./source/*.*~
 
 html-noplot:
 	$(SPHINXBUILD) -D plot_gallery=0 -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html

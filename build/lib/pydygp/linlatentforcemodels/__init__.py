@@ -15,8 +15,9 @@ Multiplicative Forces
    :toctree:
 
    BaseMLFM     -- Base class for the MLFM.
-   MLFMAdapGrad -- MLFM using adaptive gradient matching. 
+   MLFMAdapGrad -- MLFM using adaptive gradient matching.
+   GibbsMLFMAdapGrad -- Gibbs sampling for MLFM using adaptive gradient matching.
 
 """
 from .mlfm import BaseMLFM
-from .mlfmadapgrad import MLFMAdapGrad
+from .mlfmadapgrad import MLFMAdapGrad, GibbsMLFMAdapGrad, VarMLFMAdapGrad

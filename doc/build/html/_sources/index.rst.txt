@@ -10,7 +10,9 @@ Welcome to pydygp's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   install	     
    tutorials/index
+   auto_examples/index
 
 API Reference
 -------------
@@ -18,8 +20,8 @@ API Reference
 .. toctree::
    :maxdepth: 1
 
-   linlatentforcemodels
-
+   modules/linlatentforcemodels
+   probabilitydistributions
 		   
 Indices and tables
 ==================

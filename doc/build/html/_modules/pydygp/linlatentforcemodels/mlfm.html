@@ -79,10 +79,13 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installing PydyGP</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/index.html">PydyGP Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Gallery of Examples</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../linlatentforcemodels.html">Linear Latent Force Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/linlatentforcemodels.html">Linear Latent Force Models (<code class="docutils literal notranslate"><span class="pre">pydygp.linlatentforcemodels</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../probabilitydistributions.html">Probability Distributions (<code class="docutils literal notranslate"><span class="pre">pydygp.probabilitydistributions</span></code>)</a></li>
 </ul>
 
             
@@ -174,7 +177,7 @@
 <span class="c1"># keep track of the dimensions in the MLFM</span>
 <span class="n">Dimensions</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Dimensions&#39;</span><span class="p">,</span> <span class="s1">&#39;N K R D&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="BaseMLFM"><a class="viewcode-back" href="../../../generated/pydygp.linlatentforcemodels.BaseMLFM.html#pydygp.linlatentforcemodels.BaseMLFM">[docs]</a><span class="k">class</span> <span class="nc">BaseMLFM</span><span class="p">:</span>
+<div class="viewcode-block" id="BaseMLFM"><a class="viewcode-back" href="../../../pydygp.linlatentforcemodels.BaseMLFM.html#pydygp.linlatentforcemodels.BaseMLFM">[docs]</a><span class="k">class</span> <span class="nc">BaseMLFM</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class for the Multiplicative Latent Force Model.</span>
 
@@ -188,7 +191,7 @@
 <span class="sd">        Kernels of the latent force Gaussian process objects</span>
 <span class="sd">    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="BaseMLFM.__init__"><a class="viewcode-back" href="../../../generated/pydygp.linlatentforcemodels.BaseMLFM.html#pydygp.linlatentforcemodels.BaseMLFM.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">basis_mats</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lf_kernels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BaseMLFM.__init__"><a class="viewcode-back" href="../../../pydygp.linlatentforcemodels.BaseMLFM.html#pydygp.linlatentforcemodels.BaseMLFM.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">basis_mats</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lf_kernels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">basis_mats</span> <span class="o">=</span> <span class="n">basis_mats</span>
 
@@ -206,7 +209,7 @@
         <span class="c1"># setup the latent forces</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setup_latentforces</span><span class="p">(</span><span class="n">lf_kernels</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BaseMLFM.setup_latentforces"><a class="viewcode-back" href="../../../generated/pydygp.linlatentforcemodels.BaseMLFM.html#pydygp.linlatentforcemodels.BaseMLFM.setup_latentforces">[docs]</a>    <span class="k">def</span> <span class="nf">setup_latentforces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kernels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BaseMLFM.setup_latentforces"><a class="viewcode-back" href="../../../pydygp.linlatentforcemodels.BaseMLFM.html#pydygp.linlatentforcemodels.BaseMLFM.setup_latentforces">[docs]</a>    <span class="k">def</span> <span class="nf">setup_latentforces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kernels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initalises the latent force GPs</span>
 
 <span class="sd">        Parameters</span>
@@ -228,22 +231,24 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">latentforces</span> <span class="o">=</span> <span class="p">[</span><span class="n">GaussianProcessRegressor</span><span class="p">(</span><span class="n">kern</span><span class="p">)</span> <span class="k">for</span> <span class="n">kern</span> <span class="ow">in</span> <span class="n">kernels</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="BaseMLFM.sim"><a class="viewcode-back" href="../../../generated/pydygp.linlatentforcemodels.BaseMLFM.html#pydygp.linlatentforcemodels.BaseMLFM.sim">[docs]</a>    <span class="k">def</span> <span class="nf">sim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">tt</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dt_max</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+<div class="viewcode-block" id="BaseMLFM.sim"><a class="viewcode-back" href="../../../pydygp.linlatentforcemodels.BaseMLFM.html#pydygp.linlatentforcemodels.BaseMLFM.sim">[docs]</a>    <span class="k">def</span> <span class="nf">sim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">tt</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dt_max</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">latent_forces</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Simulate the process along a set of points</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 
-<span class="sd">        x0 : array_like, shape(K, )</span>
+<span class="sd">        x0 : array_like, shape (K, )</span>
 <span class="sd">            initial condition for the ode</span>
 
 <span class="sd">        tt : array_like</span>
 <span class="sd">            Ordered sequence of time points for the model to be simulated at</span>
 
-<span class="sd">        beta : array_like, shape(R+1, D)</span>
+<span class="sd">        beta : array_like, shape (R+1, D)</span>
 
-<span class="sd">        dt_max : float, optional</span>
+<span class="sd">        dt_max : float, defualt = 0.1</span>
 <span class="sd">            Maximum spacing of dense time points used for simulating the model.</span>
+
+<span class="sd">        latent_forces : Tuple of callables, optional, default = None</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -251,8 +256,8 @@
 <span class="sd">        Y : array, shape(len(tt), K)</span>
 <span class="sd">            Values of the MLFM simulated at tt</span>
 
-<span class="sd">        gs : list</span>
-<span class="sd">            List of functions [g_1(t),...,g_R(t)] used to simulated the model.</span>
+<span class="sd">        latent_forces : tuple of callables</span>
+<span class="sd">            Tuple of functions (g_1(t),...,g_R(t)) used to simulate the model.</span>
 
 
 <span class="sd">        Examples</span>
@@ -286,11 +291,16 @@
         <span class="c1"># so that max(np.diff(ttdense)) &lt;= dt_max</span>
         <span class="n">ttdense</span><span class="p">,</span> <span class="n">inds</span> <span class="o">=</span> <span class="n">_make_tt_dense</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">dt_max</span><span class="p">)</span>
 
-        <span class="n">ginterp</span> <span class="o">=</span> <span class="p">[</span><span class="n">interp1d</span><span class="p">(</span><span class="n">ttdense</span><span class="p">,</span>
-                            <span class="n">_sim_gp</span><span class="p">(</span><span class="n">ttdense</span><span class="p">,</span> <span class="n">lf</span><span class="p">),</span>
-                            <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;cubic&#39;</span><span class="p">,</span>
-                            <span class="n">fill_value</span><span class="o">=</span><span class="s1">&#39;extrapolate&#39;</span><span class="p">)</span>
-                   <span class="k">for</span> <span class="n">lf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">latentforces</span><span class="p">]</span>
+        <span class="c1"># allows the passing of pre-defined functions</span>
+        <span class="k">if</span> <span class="n">latent_forces</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ginterp</span> <span class="o">=</span> <span class="p">[</span><span class="n">interp1d</span><span class="p">(</span><span class="n">ttdense</span><span class="p">,</span>
+                                <span class="n">_sim_gp</span><span class="p">(</span><span class="n">ttdense</span><span class="p">,</span> <span class="n">lf</span><span class="p">),</span>
+                                <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;cubic&#39;</span><span class="p">,</span>
+                                <span class="n">fill_value</span><span class="o">=</span><span class="s1">&#39;extrapolate&#39;</span><span class="p">)</span>
+                       <span class="k">for</span> <span class="n">lf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">latentforces</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">latent_forces</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">R</span><span class="p">)</span>
+            <span class="n">ginterp</span> <span class="o">=</span> <span class="n">latent_forces</span>
 
         <span class="c1"># form the coeff. matrices of the evol. equation from</span>
         <span class="c1"># the structural parameters</span>
@@ -305,9 +315,29 @@
                                                 <span class="n">ginterp</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">At</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 
-        <span class="n">sol</span> <span class="o">=</span> <span class="n">odeint</span><span class="p">(</span><span class="n">dXdt</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">ttdense</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">sol</span> <span class="o">=</span> <span class="n">odeint</span><span class="p">(</span><span class="n">dXdt</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">ttdense</span><span class="p">)</span>            
+            <span class="k">return</span> <span class="n">sol</span><span class="p">[</span><span class="n">inds</span><span class="p">,</span> <span class="p">:],</span> <span class="n">ginterp</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">odeint</span><span class="p">(</span><span class="n">dXdt</span><span class="p">,</span> <span class="n">x0i</span><span class="p">,</span> <span class="n">ttdense</span><span class="p">)[</span><span class="n">inds</span><span class="p">,</span> <span class="p">:]</span> <span class="k">for</span> <span class="n">x0i</span> <span class="ow">in</span> <span class="n">x0</span><span class="p">],</span> <span class="n">ginterp</span></div>
 
-        <span class="k">return</span> <span class="n">sol</span><span class="p">[</span><span class="n">inds</span><span class="p">,</span> <span class="p">:],</span> <span class="n">ginterp</span></div></div>
+
+    <span class="k">def</span> <span class="nf">_odeint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">tt</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">glist</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">glist</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">R</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;glist must be a list of </span><span class="si">{}</span><span class="s2"> callable functions.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">R</span><span class="p">))</span>
+
+        <span class="c1"># import odeint for solving</span>
+        <span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="k">import</span> <span class="n">odeint</span>
+        
+        <span class="n">struct_mats</span> <span class="o">=</span> <span class="p">[</span><span class="nb">sum</span><span class="p">(</span><span class="n">brd</span><span class="o">*</span><span class="n">Ld</span>
+                           <span class="k">for</span> <span class="n">brd</span><span class="p">,</span> <span class="n">Ld</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">br</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis_mats</span><span class="p">))</span>
+                       <span class="k">for</span> <span class="n">br</span> <span class="ow">in</span> <span class="n">beta</span><span class="p">]</span>
+
+        <span class="k">def</span> <span class="nf">A</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">struct_mats</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="n">Ar</span><span class="o">*</span><span class="n">gr</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+                                        <span class="k">for</span> <span class="n">Ar</span><span class="p">,</span> <span class="n">gr</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">struct_mats</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">glist</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">odeint</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">A</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">x0</span><span class="p">,</span> <span class="n">tt</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

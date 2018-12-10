@@ -80,7 +80,7 @@ class BaseMLFM:
 
         self.latentforces = [GaussianProcessRegressor(kern) for kern in kernels]
 
-    def sim(self, x0, tt, beta=None, dt_max=0.1):
+    def sim(self, x0, tt, beta=None, dt_max=0.1, glist=None):
         """Simulate the process along a set of points
 
         Parameters
@@ -138,11 +138,16 @@ class BaseMLFM:
         # so that max(np.diff(ttdense)) <= dt_max
         ttdense, inds = _make_tt_dense(tt, dt_max)
 
-        ginterp = [interp1d(ttdense,
-                            _sim_gp(ttdense, lf),
-                            kind='cubic',
-                            fill_value='extrapolate')
-                   for lf in self.latentforces]
+        # allows the passing of pre-defined functions
+        if glist is None:
+            ginterp = [interp1d(ttdense,
+                                _sim_gp(ttdense, lf),
+                                kind='cubic',
+                                fill_value='extrapolate')
+                       for lf in self.latentforces]
+        else:
+            assert(len(glist) == self.dim.R)
+            ginterp = glist
 
         # form the coeff. matrices of the evol. equation from
         # the structural parameters
@@ -160,3 +165,21 @@ class BaseMLFM:
         sol = odeint(dXdt, x0, ttdense)
 
         return sol[inds, :], ginterp
+
+
+    def _odeint(self, x0, tt, beta, glist):
+        if len(glist) != self.dim.R:
+            raise ValueError("glist must be a list of {} callable functions.".format(self.dim.R))
+
+        # import odeint for solving
+        from scipy.integrate import odeint
+        
+        struct_mats = [sum(brd*Ld
+                           for brd, Ld in zip(br, self.basis_mats))
+                       for br in beta]
+
+        def A(t):
+            return struct_mats[0] + sum(Ar*gr(t)
+                                        for Ar, gr in zip(struct_mats[1:], glist))
+
+        return odeint(lambda x, t: A(t).dot(x), x0, tt)

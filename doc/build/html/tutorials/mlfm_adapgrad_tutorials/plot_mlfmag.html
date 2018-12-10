@@ -1,0 +1,371 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Basic MAP Estimation &mdash; pydygp  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Variational Inference" href="plot_mlfmagvar.html" />
+    <link rel="prev" title="Gibbs Sampling" href="plot_mlfmaggibbs.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydygp
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installing PydyGP</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">PydyGP Tutorial</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../mlfm.html">Multiplicative Latent Force Models Tutorial</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../mlfm.html#model-description">Model Description</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../mlfm.html#model-fitting">Model Fitting</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="index.html">Adaptive Gradient Matching Methods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mlfm_sa_tutorials/index.html">Successive Approximations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../mlfm.html#adaptive-gradient-matching">Adaptive Gradient Matching</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../lfm_tutorials/index.html">Latent Force Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../llfm_tutorials/index.html">Multiplicative Latent Force Models</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Gallery of Examples</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/linlatentforcemodels.html">Linear Latent Force Models (<code class="docutils literal notranslate"><span class="pre">pydygp.linlatentforcemodels</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../probabilitydistributions.html">Probability Distributions (<code class="docutils literal notranslate"><span class="pre">pydygp.probabilitydistributions</span></code>)</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydygp</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">PydyGP Tutorial</a> &raquo;</li>
+        
+          <li><a href="../mlfm.html">Multiplicative Latent Force Models Tutorial</a> &raquo;</li>
+        
+          <li><a href="index.html">Adaptive Gradient Matching Methods</a> &raquo;</li>
+        
+      <li>Basic MAP Estimation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/tutorials/mlfm_adapgrad_tutorials/plot_mlfmag.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Click <a class="reference internal" href="#sphx-glr-download-tutorials-mlfm-adapgrad-tutorials-plot-mlfmag-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="basic-map-estimation">
+<span id="tutorials-mlfm-ag"></span><span id="sphx-glr-tutorials-mlfm-adapgrad-tutorials-plot-mlfmag-py"></span><h1>Basic MAP Estimation<a class="headerlink" href="#basic-map-estimation" title="Permalink to this headline">¶</a></h1>
+<p>This note descibes how to carry out the process of carrying out MAP
+parameter estimation for the MLFM using the Adaptive Gradient matching
+approximation. This uses the <a class="reference internal" href="../../pydygp.linlatentforcemodels.MLFMAdapGrad.html#pydygp.linlatentforcemodels.MLFMAdapGrad" title="pydygp.linlatentforcemodels.MLFMAdapGrad"><code class="xref py py-class docutils literal notranslate"><span class="pre">MLFMAdapGrad</span></code></a> object and so our
+first step is to import this object.</p>
+<p>Demonstrates the use of <a class="reference internal" href="../../pydygp.linlatentforcemodels.MLFMAdapGrad.html#pydygp.linlatentforcemodels.MLFMAdapGrad.fit" title="pydygp.linlatentforcemodels.MLFMAdapGrad.fit"><code class="xref py py-func docutils literal notranslate"><span class="pre">pydygp.linlatentforcemodels.MLFMAdapGrad.fit()</span></code></a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">odeint</span>
+<span class="kn">from</span> <span class="nn">pydygp.linlatentforcemodels</span> <span class="kn">import</span> <span class="n">MLFMAdapGrad</span>
+<span class="kn">from</span> <span class="nn">sklearn.gaussian_process.kernels</span> <span class="kn">import</span> <span class="n">RBF</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">17</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="model-setup">
+<h2>Model Setup<a class="headerlink" href="#model-setup" title="Permalink to this headline">¶</a></h2>
+<p>To begin we are going to demonstate the model with an ODE on the unit sphere</p>
+<div class="math notranslate nohighlight">
+\[S^{2} = \{ x \in \mathbb{R}^3 \; : \; \| x \| = 1 \},\]</div>
+<p>which is given by the initial value problem</p>
+<div class="math notranslate nohighlight">
+\[\dot{\mathbf{x}}(t) = \mathbf{A}(t) \mathbf{x}(t),
+\qquad \mathbf{x}_0 \in S^2,\]</div>
+<p>where the coefficient matrix, <span class="math notranslate nohighlight">\(\mathbf{A}(t)\)</span>, is supported on the Lie
+algebra <span class="math notranslate nohighlight">\(\mathfrak{so}(3)\)</span>. We do this by representing the</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{A}(t) = \sum_{d=0}^3 \beta_{0d}\mathbf{L}_d +
+\sum_{r=1}^R g_r(t) \sum_{d=1}^3 \beta_{rd}\mathbf{L}_d,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\{\mathbf{L}_d \}\)</span> is a basis of the Lie algebra
+<span class="math notranslate nohighlight">\(\mathfrak{so}(3)\)</span>. The <code class="xref py py-class docutils literal notranslate"><span class="pre">so</span></code> object returns a tuple
+of basis elements for the Lie algebra, so for our example we will
+be interested in <code class="code docutils literal notranslate"><span class="pre">so(3)</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydygp.liealgebras</span> <span class="kn">import</span> <span class="n">so</span>
+<span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">so</span><span class="p">(</span><span class="mi">3</span><span class="p">)):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;L{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d</span><span class="o">+</span><span class="mi">1</span><span class="p">))))</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>L1
+[[ 0.  0.  0.]
+ [ 0.  0. -1.]
+ [ 0.  1.  0.]]
+
+L2
+[[ 0.  0.  1.]
+ [ 0.  0.  0.]
+ [-1.  0.  0.]]
+
+L3
+[[ 0. -1.  0.]
+ [ 1.  0.  0.]
+ [ 0.  0.  0.]]
+</pre></div>
+</div>
+</div>
+<div class="section" id="simulation">
+<h2>Simulation<a class="headerlink" href="#simulation" title="Permalink to this headline">¶</a></h2>
+<p>To simulate from the model we need to chose the set of coefficients
+<span class="math notranslate nohighlight">\(\beta_{r, d}\)</span>. We will consider the model with a single latent
+forcing function, and randomly generate the variables <span class="math notranslate nohighlight">\(beta\)</span></p>
+<p><a class="reference internal" href="../../pydygp.linlatentforcemodels.MLFMAdapGrad.html#pydygp.linlatentforcemodels.MLFMAdapGrad.sim" title="pydygp.linlatentforcemodels.MLFMAdapGrad.sim"><code class="xref py py-func docutils literal notranslate"><span class="pre">pydygp.linlatentforcemodels.MLFMAdapGrad.sim()</span></code></a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">t</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>  <span class="c1"># single latent force</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+<span class="n">A</span> <span class="o">=</span> <span class="p">[</span><span class="nb">sum</span><span class="p">(</span><span class="n">brd</span><span class="o">*</span><span class="n">Ld</span> <span class="k">for</span> <span class="n">brd</span><span class="p">,</span> <span class="n">Ld</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">br</span><span class="p">,</span> <span class="n">so</span><span class="p">(</span><span class="mi">3</span><span class="p">)))</span>
+     <span class="k">for</span> <span class="n">br</span> <span class="ow">in</span> <span class="n">beta</span><span class="p">]</span>
+
+<span class="n">ttd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">5.</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">x0</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+<span class="n">sol</span> <span class="o">=</span> <span class="n">odeint</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">g</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
+             <span class="n">x0</span><span class="p">,</span>
+             <span class="n">ttd</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-mlfm-class">
+<h2>The MLFM Class<a class="headerlink" href="#the-mlfm-class" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mlfm</span> <span class="o">=</span> <span class="n">MLFMAdapGrad</span><span class="p">(</span><span class="n">so</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">R</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">lf_kernels</span><span class="o">=</span><span class="p">(</span><span class="n">RBF</span><span class="p">(),</span> <span class="p">))</span>
+
+<span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="c1"># downsample the dense time vector</span>
+<span class="n">tt</span> <span class="o">=</span> <span class="n">ttd</span><span class="p">[::</span><span class="mi">10</span><span class="p">]</span>
+<span class="n">Data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">mlfm</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">tt</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span> <span class="n">glist</span><span class="o">=</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ttd</span><span class="p">,</span> <span class="n">sol</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">Data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;o&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../_images/sphx_glr_plot_mlfmag_001.png" class="sphx-glr-single-img" src="../../_images/sphx_glr_plot_mlfmag_001.png" />
+</div>
+<div class="section" id="latent-force-estimation">
+<h2>Latent Force Estimation<a class="headerlink" href="#latent-force-estimation" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">Data</span><span class="p">)</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">mlfm</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">beta0</span> <span class="o">=</span> <span class="n">beta</span><span class="p">,</span> <span class="n">beta_is_fixed</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># predict the lf using the Laplace approximation</span>
+<span class="n">Eg</span><span class="p">,</span> <span class="n">SDg</span> <span class="o">=</span> <span class="n">mlfm</span><span class="o">.</span><span class="n">predict_lf</span><span class="p">(</span><span class="n">ttd</span><span class="p">,</span> <span class="n">return_std</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># sphinx_gallery_thumbnail_number = 2</span>
+<span class="n">fig2</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ttd</span><span class="p">,</span> <span class="n">g</span><span class="p">(</span><span class="n">ttd</span><span class="p">),</span> <span class="s1">&#39;k-&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">Egr</span><span class="p">,</span> <span class="n">SDgr</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">Eg</span><span class="p">,</span> <span class="n">SDg</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">ttd</span><span class="p">,</span>
+                    <span class="n">Egr</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">SDgr</span><span class="p">,</span> <span class="n">Egr</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">SDgr</span><span class="p">,</span>
+                    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../../_images/sphx_glr_plot_mlfmag_002.png" class="sphx-glr-single-img" src="../../_images/sphx_glr_plot_mlfmag_002.png" />
+<p><strong>Total running time of the script:</strong> ( 0 minutes  2.627 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-mlfm-adapgrad-tutorials-plot-mlfmag-py">
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../../_downloads/plot_mlfmag.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_mlfmag.py</span></code></a></div>
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../../_downloads/plot_mlfmag.ipynb" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_mlfmag.ipynb</span></code></a></div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="plot_mlfmagvar.html" class="btn btn-neutral float-right" title="Variational Inference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="plot_mlfmaggibbs.html" class="btn btn-neutral" title="Gibbs Sampling" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Daniel Tait.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

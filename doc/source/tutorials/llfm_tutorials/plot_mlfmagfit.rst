@@ -14,8 +14,9 @@ MLFM-AG Model Fitting
 
 .. currentmodule:: pydygp.linlatentforcemodels
 
-This note decribes hot to carry out the porcess of carrying out MAP parameter
-estimation for the MLFM model using the Adaptive Gradient matching approximation :class:`MLFMAdapGrad` 
+This note decribes how to carry out the porcess of carrying out MAP parameter
+estimation for the MLFM model using the Adaptive Gradient matching approximation
+:class:`MLFMAdapGrad` 
 
 
 
@@ -70,12 +71,21 @@ We can set up this model by and simulate some observations by
 
 
 
+.. code-block:: pytb
+
+    Traceback (most recent call last):
+      File "/Users/danieltait/Desktop/pydygp/tutorials/llfm_tutorials/plot_mlfmagfit.py", line 48, in <module>
+        Y, gtrue = mlfm.sim([1., 0], tt)    # Simulation result
+      File "/Users/danieltait/Desktop/pydygp/pydygp/linlatentforcemodels/mlfm.py", line 132, in sim
+        raise ValueError("Must supply beta.")
+    ValueError: Must supply beta.
+
 
 
 
 Model Fit
 ~~~~~~~~~
-The API is designed to be as simple as possible and so for reasonably simple
+The API is designed to be as simple as possible and so for simple enough
 models we should get reasonable results by simply calling
 
 
@@ -84,11 +94,6 @@ models we should get reasonable results by simply calling
 
 
     res0 = mlfm.fit(tt, Y)
-
-
-
-
-
 
 this returns a simple :class:`namedtuple` object which has attributes with
 names corresponding to the parameters described in
@@ -102,22 +107,14 @@ the true latent force functions
     ttdense = np.linspace(tt[0], tt[-1], 21)  # make a set of dense times
     fig0, ax = plt.subplots()
     ax.plot(ttdense, gtrue[0](ttdense), 'k-', alpha=0.5)
-    ax.plot(tt, res0.g, '+')
-
-
-
-
-.. image:: /tutorials/llfm_tutorials/images/sphx_glr_plot_mlfmagfit_001.png
-    :class: sphx-glr-single-img
-
-
+    ax.plot(tt, res0.g.T, '+')
 
 
 Sample Density Dependenance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The adaptive gradient matching processes depend on the use of GP
 interpolators of the unknown state trajectories, and therefore
-we might express the accuracy of these methods to decreae not with the
+we might expect the accuracy of these methods to decrease not with the
 sample size but with the space between samples.
 
 Dense Predictions
@@ -135,20 +132,12 @@ Dense Predictions
     fig, ax = plt.subplots()
     ss = np.linspace(tt[0], tt[-1])
     ax.plot(ss, gtrue[0](ss), 'k-', alpha=0.2)
-    ax.plot(mlfm.ttc, res0.g, '+')
-    ax.plot(mlfm2.ttc, res_dense.g, 'o')
+    ax.plot(mlfm.ttc, res0.g.T, '+')
+    ax.plot(mlfm2.ttc, res_dense.g.T, 'o')
 
     plt.show()
 
-
-
-.. image:: /tutorials/llfm_tutorials/images/sphx_glr_plot_mlfmagfit_002.png
-    :class: sphx-glr-single-img
-
-
-
-
-**Total running time of the script:** ( 0 minutes  5.974 seconds)
+**Total running time of the script:** ( 0 minutes  0.000 seconds)
 
 
 .. _sphx_glr_download_tutorials_llfm_tutorials_plot_mlfmagfit.py:

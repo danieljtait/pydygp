@@ -1,0 +1,347 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Specifying Priors &mdash; pydygp  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Fitting of the MLFM-MixSA Model" href="plot_mlfmmixsa_fit.html" />
+    <link rel="prev" title="Introduction to the LFM Mix Model" href="plot_mlfmmixsa_intro.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydygp
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installing PydyGP</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">PydyGP Tutorial</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../mlfm.html">Multiplicative Latent Force Models Tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lfm_tutorials/index.html">Latent Force Models</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Multiplicative Latent Force Models</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="index.html#multiplicative-latent-force-model">Multiplicative Latent Force Model</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="index.html#mlfm-adapgrad">MLFM AdapGrad</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="index.html#joint-density">Joint Density</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="index.html#parameters">Parameters</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Gallery of Examples</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/linlatentforcemodels.html">Linear Latent Force Models (<code class="docutils literal notranslate"><span class="pre">pydygp.linlatentforcemodels</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../probabilitydistributions.html">Probability Distributions (<code class="docutils literal notranslate"><span class="pre">pydygp.probabilitydistributions</span></code>)</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydygp</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">PydyGP Tutorial</a> &raquo;</li>
+        
+          <li><a href="index.html">Multiplicative Latent Force Models</a> &raquo;</li>
+        
+      <li>Specifying Priors</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/tutorials/llfm_tutorials/plot_mlfm_wpriors.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Click <a class="reference internal" href="#sphx-glr-download-tutorials-llfm-tutorials-plot-mlfm-wpriors-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="specifying-priors">
+<span id="tutorials-mlfm-fit-wpriors"></span><span id="sphx-glr-tutorials-llfm-tutorials-plot-mlfm-wpriors-py"></span><h1>Specifying Priors<a class="headerlink" href="#specifying-priors" title="Permalink to this headline">¶</a></h1>
+<p>This note provides more detail into the process of carrying out model fitting using
+the MLFM model with the adaptive gradient matching process.</p>
+<p>As usual we carry out the initial imports and construct some data, one interesting
+feature of this example is that we are going</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">pydygp.linlatentforcemodels</span> <span class="kn">import</span> <span class="n">MLFMAdapGrad</span>
+<span class="kn">import</span> <span class="nn">pydygp.liealgebras</span>
+<span class="kn">from</span> <span class="nn">sklearn.gaussian_process.kernels</span> <span class="kn">import</span> <span class="n">RBF</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+<span class="n">so3</span> <span class="o">=</span> <span class="n">pydygp</span><span class="o">.</span><span class="n">liealgebras</span><span class="o">.</span><span class="n">so</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">lf_kernels</span> <span class="o">=</span> <span class="p">[</span><span class="n">RBF</span><span class="p">(),</span> <span class="p">]</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>One interesting feature of this example is that we are going to simulate the
+model at a collection of different initial values with a common latent forces.
+We chose our initial conditions to be uniformly distribution on te surface of
+the sphere.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nsim</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">nsim</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">x0</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="bp">None</span><span class="p">]</span>
+
+<span class="n">mlfm</span> <span class="o">=</span> <span class="n">MLFMAdapGrad</span><span class="p">(</span><span class="n">so3</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="n">lf_kernels</span><span class="o">=</span><span class="n">lf_kernels</span><span class="p">,</span>
+                    <span class="n">is_beta_fixed</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+<span class="c1"># Time points to simulate on</span>
+<span class="n">tt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">5.</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+<span class="n">Data</span><span class="p">,</span> <span class="n">gtrue</span> <span class="o">=</span> <span class="n">mlfm</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">tt</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">x0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-pytb notranslate"><div class="highlight"><pre><span></span><span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;/Users/danieltait/Desktop/pydygp/tutorials/llfm_tutorials/plot_mlfm_wpriors.py&quot;</span>, line <span class="m">38</span>, in <span class="n">&lt;module&gt;</span>
+    <span class="n">is_beta_fixed</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+  File <span class="nb">&quot;/Users/danieltait/Desktop/pydygp/pydygp/linlatentforcemodels/mlfmadapgrad.py&quot;</span>, line <span class="m">157</span>, in <span class="n">__init__</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">MLFMAdapGrad</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">basis_mats</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="gr">TypeError</span>: <span class="n">__init__() got an unexpected keyword argument &#39;is_beta_fixed&#39;</span>
+</pre></div>
+</div>
+<div class="section" id="holding-parameters-fixed">
+<h2>Holding Parameters Fixed<a class="headerlink" href="#holding-parameters-fixed" title="Permalink to this headline">¶</a></h2>
+<p>The naming convention used for accessing parameters of interest is
+typically of the form …</p>
+<p>For example to fit the model holding <cite>beta’ fixed so we combine the above to
+produce our model and then carry out the fit treating the noise parameters,
+and the :math:`$log(gamma)$</cite> parameters fixed.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># vectorise the data</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">data</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">Data</span><span class="p">))</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">Data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;k-&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="c1"># corrupt Y with some iid noise</span>
+<span class="n">Y</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">Y</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">Y</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">Y</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="n">tt</span><span class="o">.</span><span class="n">size</span><span class="p">))</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="s1">&#39;+&#39;</span><span class="p">)</span>
+
+<span class="n">mapres</span> <span class="o">=</span> <span class="n">mlfm</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span>
+                  <span class="n">logtau_is_fixed</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                  <span class="n">beta0</span> <span class="o">=</span> <span class="n">beta</span><span class="p">,</span>
+                  <span class="n">beta_is_fixed</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">pydygp.probabilitydistributions</span> <span class="kn">import</span> <span class="n">ChiSquare</span>
+<span class="n">logtau_prior</span> <span class="o">=</span> <span class="n">ChiSquare</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">scaletransform</span><span class="p">(</span><span class="mf">0.1</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># X/C ~ N(0., 0.1**2)</span>
+<span class="n">logtau_prior</span> <span class="o">=</span> <span class="n">logtau_prior</span><span class="o">.</span><span class="n">logtransform</span><span class="p">()</span>
+<span class="n">logtau_prior</span> <span class="o">=</span> <span class="n">logtau_prior</span><span class="o">.</span><span class="n">scaletransform</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">q</span> <span class="o">=</span> <span class="n">ChiSquare</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">scaletransform</span><span class="p">(</span><span class="mf">0.05</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">logtransform</span><span class="p">()</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">scaletransform</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">([</span><span class="n">logtau_prior</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xx</span><span class="p">]),</span> <span class="s1">&#39;b--&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">([</span><span class="n">q</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xx</span><span class="p">]),</span> <span class="s1">&#39;r--&#39;</span><span class="p">)</span>
+
+<span class="n">logtau_prior</span> <span class="o">=</span> <span class="n">logtau_prior</span> <span class="o">*</span> <span class="mi">3</span>
+
+<span class="n">mapres2</span> <span class="o">=</span> <span class="n">mlfm</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span>
+                   <span class="n">logtau_is_fixed</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                   <span class="n">logtau_prior</span><span class="o">=</span><span class="n">logtau_prior</span><span class="p">,</span>
+                   <span class="n">beta0</span> <span class="o">=</span> <span class="n">beta</span><span class="p">,</span>
+                   <span class="n">beta_is_fixed</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">mapres</span><span class="o">.</span><span class="n">logtau</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">mapres2</span><span class="o">.</span><span class="n">logtau</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">gtrue</span><span class="p">[</span><span class="mi">0</span><span class="p">](</span><span class="n">tt</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">mapres</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="s1">&#39;s&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">mapres2</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="s1">&#39;o&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-llfm-tutorials-plot-mlfm-wpriors-py">
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../../_downloads/plot_mlfm_wpriors.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_mlfm_wpriors.py</span></code></a></div>
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../../_downloads/plot_mlfm_wpriors.ipynb" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_mlfm_wpriors.ipynb</span></code></a></div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="plot_mlfmmixsa_fit.html" class="btn btn-neutral float-right" title="Fitting of the MLFM-MixSA Model" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="plot_mlfmmixsa_intro.html" class="btn btn-neutral" title="Introduction to the LFM Mix Model" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Daniel Tait.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

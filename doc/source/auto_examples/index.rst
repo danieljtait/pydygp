@@ -14,6 +14,26 @@ General examples
 General-purpose and introductory examples
 
 
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Simple example. ">
+
+.. only:: html
+
+    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_mocap_example_thumb.png
+
+        :ref:`sphx_glr_auto_examples_plot_mocap_example.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_mocap_example
 .. raw:: html
 
     <div style='clear:both'></div>
@@ -28,13 +48,13 @@ General-purpose and introductory examples
 
   .. container:: sphx-glr-download
 
-    :download:`Download all examples in Python source code: auto_examples_python.zip <//Users/danieltait/Desktop/pydygp_lite/pydygp/doc/source/auto_examples/auto_examples_python.zip>`
+    :download:`Download all examples in Python source code: auto_examples_python.zip <//Users/danieltait/Desktop/pydygp/doc/source/auto_examples/auto_examples_python.zip>`
 
 
 
   .. container:: sphx-glr-download
 
-    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip <//Users/danieltait/Desktop/pydygp_lite/pydygp/doc/source/auto_examples/auto_examples_jupyter.zip>`
+    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip <//Users/danieltait/Desktop/pydygp/doc/source/auto_examples/auto_examples_jupyter.zip>`
 
 
 .. only:: html

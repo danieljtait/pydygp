@@ -1,0 +1,335 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Approximate Density &mdash; pydygp  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="MLFM Adaptive Gradient Matching" href="../mlfm_adapgrad/index.html" />
+    <link rel="prev" title="Successive Approximations" href="index.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydygp
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installing PydyGP</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">PydyGP Tutorial</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../mlfm.html">Multiplicative Latent Force Models Tutorial</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../mlfm.html#model-description">Model Description</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../mlfm.html#model-fitting">Model Fitting</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../mlfm_adapgrad_tutorials/index.html">Adaptive Gradient Matching Methods</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="index.html">Successive Approximations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../mlfm.html#adaptive-gradient-matching">Adaptive Gradient Matching</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../lfm_tutorials/index.html">Latent Force Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../llfm_tutorials/index.html">Multiplicative Latent Force Models</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Gallery of Examples</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/linlatentforcemodels.html">Linear Latent Force Models (<code class="docutils literal notranslate"><span class="pre">pydygp.linlatentforcemodels</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../probabilitydistributions.html">Probability Distributions (<code class="docutils literal notranslate"><span class="pre">pydygp.probabilitydistributions</span></code>)</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydygp</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">PydyGP Tutorial</a> &raquo;</li>
+        
+          <li><a href="../mlfm.html">Multiplicative Latent Force Models Tutorial</a> &raquo;</li>
+        
+          <li><a href="index.html">Successive Approximations</a> &raquo;</li>
+        
+      <li>Approximate Density</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/tutorials/mlfm_sa_tutorials/plot_mlfmsa_kf.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Click <a class="reference internal" href="#sphx-glr-download-tutorials-mlfm-sa-tutorials-plot-mlfmsa-kf-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="approximate-density">
+<span id="sphx-glr-tutorials-mlfm-sa-tutorials-plot-mlfmsa-kf-py"></span><h1>Approximate Density<a class="headerlink" href="#approximate-density" title="Permalink to this headline">¶</a></h1>
+<p>When using the method of successive approximation we construct
+a regression model</p>
+<div class="math notranslate nohighlight">
+\[p(\mathbf{x} \mid \mathbf{g}, \boldsymbol{\beta})
+= \mathcal{N}(
+\mathbf{x}
+\mid \mathbf{P}^{M} \boldsymbol{\mu}_0,
+\alpha \mathbf{I})\]</div>
+<p>The idea is to construct an approximation to this density by
+introduction each of the successive approximations</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{z}_{i} = \mathbf{P}\mathbf{z}_{i-1},\]</div>
+<p>the idea being that knowing the complete set of approximations
+<span class="math notranslate nohighlight">\(\{ z_0,\ldots,z_M\}\)</span> we can solve for the latent variables
+by rearranging the linear equations, instead of manipulating the
+polynomial mean function.</p>
+<p>For this conversion to work we need to introduce a regularisation
+parameter <span class="math notranslate nohighlight">\(\lambda &gt; 0\)</span> and then define <span class="math notranslate nohighlight">\(\mathcal{N}(
+\mathbf{z}_{i} \mid \mathbf{P}\mathbf{z}_{i-1}, \lambda
+\mathbf{I})\)</span>, once we do this we can write log-likelihood of the
+state variables</p>
+<div class="math notranslate nohighlight">
+\[\log = -\frac{\lambda}{2} \sum_{i=1}^{M}
+\left(
+\mathbf{z}_{i-1}^{\top}\mathbf{P}^{\top}\mathbf{P}\mathbf{z}_{i-1}
+- 2\mathbf{z}_{i}^{\top}\mathbf{P}\mathbf{z}_{i-1}
+\right)\]</div>
+<p>Now the matrices <span class="math notranslate nohighlight">\(\mathbf{P}\)</span> are linear in the parameters
+which means that after vectorisation they can be represented as</p>
+<div class="math notranslate nohighlight">
+\[\operatorname{vec}(\mathbf{P}) = \mathbf{V}\mathbf{g} + \mathbf{v}_0\]</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The matrices <span class="math notranslate nohighlight">\(\mathbf{P}\)</span> and their affine representations are
+most easily written compactly using kronecker products, unfortunately
+these are not necessarily the best computational representations and
+there is a lot here that needs refining.</p>
+</div>
+<div class="section" id="linear-gaussian-model">
+<h2>Linear Gaussian Model<a class="headerlink" href="#linear-gaussian-model" title="Permalink to this headline">¶</a></h2>
+<p>We take a break in the model to now discuss how to start putting some
+of the ideas discussed above into code. For the Kalman Filter we are
+going to use the code in the
+<a class="reference external" href="https://pykalman.github.io/">PyKalman package</a>, but hacked a little
+bit to allow for filtering and smoothing of independent sequences
+with a common transition matrix.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pydygp.linlatentforcemodels</span> <span class="kn">import</span> <span class="n">MLFMSA</span>
+
+<span class="k">def</span> <span class="nf">_get_kf_statistics</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">kf</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Gets</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># the mean, cov and kalman gain matrix</span>
+    <span class="n">means</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">kalman_gains</span> <span class="o">=</span> <span class="n">kf</span><span class="o">.</span><span class="n">smooth</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="c1"># pairwise cov between Cov{ z[i], z[i-1]</span>
+    <span class="c1"># note pairwise_covs[0] = 0  - it gets ignored</span>
+    <span class="n">pairwise_covs</span> <span class="o">=</span> <span class="n">kf</span><span class="o">.</span><span class="n">_smooth_pair</span><span class="p">(</span><span class="n">covs</span><span class="p">,</span> <span class="n">gains</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="expectation-maximisation">
+<h2>Expectation Maximisation<a class="headerlink" href="#expectation-maximisation" title="Permalink to this headline">¶</a></h2>
+<p>So we have introduced a large collection of unintersting latent variables,
+the set of successive approximations <span class="math notranslate nohighlight">\(\{ z_0, \ldots, z_M \}\)</span>, and
+so we need to integrate them out. If we define the statistics</p>
+<div class="math notranslate nohighlight">
+\[\boldsymbol{\Psi}_0 = \sum_{i=1}^{M} \langle \mathbf{z}_{i-1}
+\mathbf{z}_{i-1}^{\top} \rangle_{q(Z)}, \quad
+\boldsymbol{\Psi}_1 = \sum_{i=1}^{M} \langle \mathbf{z}_{i}
+\mathbf{z}_{i-1}^{\top} \rangle_{q(Z)}\]</div>
+<p>Then the objective function of the <cite>M-step</cite> becomes</p>
+<div class="math notranslate nohighlight">
+\[Q(\mathbf{g}, \mathbf{g}^{old}) =
+-\frac{1}{2} \mathbf{g}^{\top}
+\left( \mathbf{V}^{\top}
+(\boldsymbol{\Psi}_0 \otimes \mathbf{I}_{NK})\mathbf{V} +
+\lambda^{-1} \mathbf{C}^{-1} \right)\mathbf{g} - 2\]</div>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-mlfm-sa-tutorials-plot-mlfmsa-kf-py">
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../../_downloads/plot_mlfmsa_kf.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_mlfmsa_kf.py</span></code></a></div>
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../../_downloads/plot_mlfmsa_kf.ipynb" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_mlfmsa_kf.ipynb</span></code></a></div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../mlfm_adapgrad/index.html" class="btn btn-neutral float-right" title="MLFM Adaptive Gradient Matching" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Successive Approximations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Daniel Tait.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1 @@
+.. automodule:: pydygp.probabilitydistributions

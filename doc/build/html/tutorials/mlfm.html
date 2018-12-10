@@ -1,0 +1,288 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Multiplicative Latent Force Models Tutorial &mdash; pydygp  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Adaptive Gradient Matching Methods" href="mlfm_adapgrad_tutorials/index.html" />
+    <link rel="prev" title="PydyGP Tutorial" href="index.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> pydygp
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installing PydyGP</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">PydyGP Tutorial</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Multiplicative Latent Force Models Tutorial</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#model-description">Model Description</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#model-fitting">Model Fitting</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mlfm_adapgrad_tutorials/index.html">Adaptive Gradient Matching Methods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mlfm_sa_tutorials/index.html">Successive Approximations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#adaptive-gradient-matching">Adaptive Gradient Matching</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mlfm_adapgrad/index.html">MLFM Adaptive Gradient Matching</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lfm_tutorials/index.html">Latent Force Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="llfm_tutorials/index.html">Multiplicative Latent Force Models</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Gallery of Examples</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules/linlatentforcemodels.html">Linear Latent Force Models (<code class="docutils literal notranslate"><span class="pre">pydygp.linlatentforcemodels</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../probabilitydistributions.html">Probability Distributions (<code class="docutils literal notranslate"><span class="pre">pydygp.probabilitydistributions</span></code>)</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pydygp</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">PydyGP Tutorial</a> &raquo;</li>
+        
+      <li>Multiplicative Latent Force Models Tutorial</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/tutorials/mlfm.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="multiplicative-latent-force-models-tutorial">
+<span id="tutorial-mlfm"></span><h1>Multiplicative Latent Force Models Tutorial<a class="headerlink" href="#multiplicative-latent-force-models-tutorial" title="Permalink to this headline">¶</a></h1>
+<p>This module provides methods to carry out simulation and fitting of
+latent force models, which are broadly taken to be time dependent
+linear ODEs driven by a set of smooth Gaussian processes which are
+allowed to interact multiplicatively with the state
+variable, and so the name Multiplicative Latent Force Models (MLFM)
+to differ them from the case with an additive forcing term
+which are discussed in <a class="reference internal" href="lfm_tutorials/index.html#lfm-tutorials-index"><span class="std std-ref">Latent Force Models</span></a>.</p>
+<div class="section" id="model-description">
+<h2>Model Description<a class="headerlink" href="#model-description" title="Permalink to this headline">¶</a></h2>
+<p>Multiplicative latent force models are time dependent linear ODEs of
+the form</p>
+<div class="math notranslate nohighlight">
+\[\dot{X}(t) = A(t)X(t), \qquad A(t) = A_0 + \sum_{r=1}^R g_r(t) A_r,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\{ g_r(t) \}_{r=1}^R\)</span> are a set of independent smooth scalar
+Gaussian processes, and <span class="math notranslate nohighlight">\(\{A_r \}_{r=0}^{R}\)</span> are a set of square
+<span class="math notranslate nohighlight">\(K\times K\)</span> matrices. Furthermore it may also be the case that for
+each of the structure matrices <span class="math notranslate nohighlight">\(A_r\)</span> we have</p>
+<div class="math notranslate nohighlight">
+\[A_r = \sum_{d} \beta_{rd} L_d,\]</div>
+<p>for some common set of shared basis matrices <span class="math notranslate nohighlight">\(\{ L_d \}_{d=1}^{D}\)</span>
+– typically these will be chosen to form a basis of some Lie algebra.</p>
+<p>The following tutorials demonstrate the process of constructing these
+models as well as demonstrating the possible structure preserving properties
+of this model as well as how to carry out inference.</p>
+</div>
+<div class="section" id="model-fitting">
+<h2>Model Fitting<a class="headerlink" href="#model-fitting" title="Permalink to this headline">¶</a></h2>
+<p>In the near future we consider two methods of fitting these models,
+more will be added as and when they are dreamt of and coded up</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mlfm_adapgrad_tutorials/index.html">Adaptive Gradient Matching Methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mlfm_sa_tutorials/index.html">Successive Approximations</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="adaptive-gradient-matching">
+<h2>Adaptive Gradient Matching<a class="headerlink" href="#adaptive-gradient-matching" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mlfm_adapgrad/index.html">MLFM Adaptive Gradient Matching</a></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="mlfm_adapgrad_tutorials/index.html" class="btn btn-neutral float-right" title="Adaptive Gradient Matching Methods" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="PydyGP Tutorial" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Daniel Tait.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

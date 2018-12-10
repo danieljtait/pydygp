@@ -1,0 +1,112 @@
+
+
+Examples using ``pydygp.linlatentforcemodels.MLFMAdapGrad``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Simple example. ">
+
+.. only:: html
+
+    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_mocap_example_thumb.png
+
+        :ref:`sphx_glr_auto_examples_plot_mocap_example.py`
+
+.. raw:: html
+
+    </div>
+
+.. only:: not html
+
+    * :ref:`sphx_glr_auto_examples_plot_mocap_example.py`
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This note decribes how to carry out the porcess of carrying out MAP parameter estimation for th...">
+
+.. only:: html
+
+    .. figure:: /tutorials/llfm_tutorials/images/thumb/sphx_glr_plot_mlfmagfit_thumb.png
+
+        :ref:`sphx_glr_tutorials_llfm_tutorials_plot_mlfmagfit.py`
+
+.. raw:: html
+
+    </div>
+
+.. only:: not html
+
+    * :ref:`sphx_glr_tutorials_llfm_tutorials_plot_mlfmagfit.py`
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This note provides more detail into the process of carrying out model fitting using the MLFM mo...">
+
+.. only:: html
+
+    .. figure:: /tutorials/llfm_tutorials/images/thumb/sphx_glr_plot_mlfm_wpriors_thumb.png
+
+        :ref:`sphx_glr_tutorials_llfm_tutorials_plot_mlfm_wpriors.py`
+
+.. raw:: html
+
+    </div>
+
+.. only:: not html
+
+    * :ref:`sphx_glr_tutorials_llfm_tutorials_plot_mlfm_wpriors.py`
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Fitting the LFM Using the MLFM">
+
+.. only:: html
+
+    .. figure:: /tutorials/llfm_tutorials/images/thumb/sphx_glr_plot_lfm_thumb.png
+
+        :ref:`sphx_glr_tutorials_llfm_tutorials_plot_lfm.py`
+
+.. raw:: html
+
+    </div>
+
+.. only:: not html
+
+    * :ref:`sphx_glr_tutorials_llfm_tutorials_plot_lfm.py`
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Fitting of the MLFM">
+
+.. only:: html
+
+    .. figure:: /tutorials/llfm_tutorials/images/thumb/sphx_glr_plot_mlfmsamix_thumb.png
+
+        :ref:`sphx_glr_tutorials_llfm_tutorials_plot_mlfmsamix.py`
+
+.. raw:: html
+
+    </div>
+
+.. only:: not html
+
+    * :ref:`sphx_glr_tutorials_llfm_tutorials_plot_mlfmsamix.py`
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This note descibes how to carry out the process of carrying out MAP parameter estimation for th...">
+
+.. only:: html
+
+    .. figure:: /tutorials/mlfm_adapgrad_tutorials/images/thumb/sphx_glr_plot_mlfmag_thumb.png
+
+        :ref:`sphx_glr_tutorials_mlfm_adapgrad_tutorials_plot_mlfmag.py`
+
+.. raw:: html
+
+    </div>
+
+.. only:: not html
+
+    * :ref:`sphx_glr_tutorials_mlfm_adapgrad_tutorials_plot_mlfmag.py`

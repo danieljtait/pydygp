@@ -1,0 +1,40 @@
+
+
+Examples using ``pydygp.linlatentforcemodels.MLFMMixSA``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Introduction to the LFM Mix Model">
+
+.. only:: html
+
+    .. figure:: /tutorials/llfm_tutorials/images/thumb/sphx_glr_plot_mlfmmixsa_intro_thumb.png
+
+        :ref:`sphx_glr_tutorials_llfm_tutorials_plot_mlfmmixsa_intro.py`
+
+.. raw:: html
+
+    </div>
+
+.. only:: not html
+
+    * :ref:`sphx_glr_tutorials_llfm_tutorials_plot_mlfmmixsa_intro.py`
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Fitting of the MLFM">
+
+.. only:: html
+
+    .. figure:: /tutorials/llfm_tutorials/images/thumb/sphx_glr_plot_mlfmmixsa_fit_thumb.png
+
+        :ref:`sphx_glr_tutorials_llfm_tutorials_plot_mlfmmixsa_fit.py`
+
+.. raw:: html
+
+    </div>
+
+.. only:: not html
+
+    * :ref:`sphx_glr_tutorials_llfm_tutorials_plot_mlfmmixsa_fit.py`

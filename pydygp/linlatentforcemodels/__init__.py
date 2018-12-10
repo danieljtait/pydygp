@@ -1,9 +1,9 @@
 """
-==========================
-Linear Latent Force Models
-==========================
+===============================================================
+Linear Latent Force Models (:mod:`pydygp.linlatentforcemodels`)
+===============================================================
 
-.. module:: pydygp.linlatentforcemodels
+.. currentmodule:: pydygp.linlatentforcemodels
 
 Linear ordinary differential equations driven by smooth Gaussian processes.
 
@@ -15,8 +15,15 @@ Multiplicative Forces
    :toctree:
 
    BaseMLFM     -- Base class for the MLFM.
-   MLFMAdapGrad -- MLFM using adaptive gradient matching. 
+   MLFMAdapGrad -- MLFM using adaptive gradient matching.
+   GibbsMLFMAdapGrad -- Gibbs sampling for MLFM using adaptive gradient matching.
+   MLFMSuccApprox -- MLFM using successive approximations.
 
 """
 from .mlfm import BaseMLFM
-from .mlfmadapgrad import MLFMAdapGrad
+from .lfmorder2 import LFMorder2, LFMorder2Kernel
+from .mlfmadapgrad import MLFMAdapGrad, GibbsMLFMAdapGrad, VarMLFMAdapGrad
+from .mlfmsuccapprox import MLFMSuccApprox, VarMLFMSuccApprox
+from .mlfmsamoe import MLFMSA
+from .mlfmsamoe2 import MLFMSAMix
+from .mlfmmixsa import MLFMMixSA

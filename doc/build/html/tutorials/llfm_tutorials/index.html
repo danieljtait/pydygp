@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Linear Latent Force Models &mdash; pydygp  documentation</title>
+  <title>Multiplicative Latent Force Models &mdash; pydygp  documentation</title>
   
 
   
@@ -29,8 +29,8 @@
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Automatic Relevance Determination" href="plot_ard.html" />
-    <link rel="prev" title="PydyGP Tutorial" href="../index.html" /> 
+    <link rel="next" title="MLFM-AG Model Fitting" href="plot_mlfmagfit.html" />
+    <link rel="prev" title="Latent Force Models 2" href="../lfm_tutorials/plot_lfm_fit2.html" /> 
 
   
   <script src="../../_static/js/modernizr.min.js"></script>
@@ -81,10 +81,14 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installing PydyGP</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">PydyGP Tutorial</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Linear Latent Force Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../mlfm.html">Multiplicative Latent Force Models Tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lfm_tutorials/index.html">Latent Force Models</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Multiplicative Latent Force Models</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#multiplicative-latent-force-model">Multiplicative Latent Force Model</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#mlfm-adapgrad">MLFM AdapGrad</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#joint-density">Joint Density</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
 </ul>
 </li>
@@ -92,9 +96,11 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Gallery of Examples</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../linlatentforcemodels.html">Linear Latent Force Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/linlatentforcemodels.html">Linear Latent Force Models (<code class="docutils literal notranslate"><span class="pre">pydygp.linlatentforcemodels</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../probabilitydistributions.html">Probability Distributions (<code class="docutils literal notranslate"><span class="pre">pydygp.probabilitydistributions</span></code>)</a></li>
 </ul>
 
             
@@ -142,7 +148,7 @@
         
           <li><a href="../index.html">PydyGP Tutorial</a> &raquo;</li>
         
-      <li>Linear Latent Force Models</li>
+      <li>Multiplicative Latent Force Models</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -161,36 +167,90 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="linear-latent-force-models">
-<span id="tutorials-index"></span><h1>Linear Latent Force Models<a class="headerlink" href="#linear-latent-force-models" title="Permalink to this headline">¶</a></h1>
-<p>This module provides methods to carry out simulation and fitting of latent force models, which are broadly taken to be time dependent linear ODEs driven by a set of smooth Gaussian processes.</p>
+  <div class="section" id="multiplicative-latent-force-models">
+<span id="tutorials-index"></span><h1>Multiplicative Latent Force Models<a class="headerlink" href="#multiplicative-latent-force-models" title="Permalink to this headline">¶</a></h1>
+<p>This module provides methods to carry out simulation and fitting of
+latent force models, which are broadly taken to be time dependent
+linear ODEs driven by a set of smooth Gaussian processes which are
+allowed to interact multiplicatively with the state
+variable, and so the name Multiplicative Latent Force Models (MLFM)
+to differ them from the case with an additive forcing term
+which are discussed in <a class="reference internal" href="../lfm_tutorials/index.html#lfm-tutorials-index"><span class="std std-ref">Latent Force Models</span></a></p>
 <div class="section" id="multiplicative-latent-force-model">
 <span id="tutorials-mlfm"></span><h2>Multiplicative Latent Force Model<a class="headerlink" href="#multiplicative-latent-force-model" title="Permalink to this headline">¶</a></h2>
 <p>Multiplicative latent force models are time dependent linear ODEs of the form</p>
 <div class="math notranslate nohighlight">
 \[\dot{X}(t) = A(t)X(t), \qquad A(t) = A_0 + \sum_{r=1}^R g_r(t) A_r,\]</div>
-<p>where <span class="math notranslate nohighlight">\(\{ g_r(t) \}_{r=1}^R\)</span> are a set of independent smooth scalar Gaussian processes, and <span class="math notranslate nohighlight">\(\{A_r \}_{r=0}^{R}\)</span> are a set of square <span class="math notranslate nohighlight">\(K\times K\)</span>. The following examples demonstrate the process of constructing these models and demonstrates the structure preserving properties of this model as well as how to carry out inference.</p>
+<p>where <span class="math notranslate nohighlight">\(\{ g_r(t) \}_{r=1}^R\)</span> are a set of independent smooth scalar Gaussian processes, and <span class="math notranslate nohighlight">\(\{A_r \}_{r=0}^{R}\)</span> are a set of square <span class="math notranslate nohighlight">\(K\times K\)</span> matrices. Furthermore it may also be the case that for each of the structure matrices <span class="math notranslate nohighlight">\(A_r\)</span> we have</p>
+<div class="math notranslate nohighlight">
+\[A_r = \sum_{d} \beta_{rd} L_d,\]</div>
+<p>for some common set of shared basis matrices <span class="math notranslate nohighlight">\(\{ L_d \}_{d=1}^{D}\)</span> – typically these will be chosen to form a basis of some Lie algebra.</p>
+<p>The following tutorials demonstrate the process of constructing these models as well as demonstrating the possible structure preserving properties of this model as well as how to carry out inference.</p>
 </div>
 <div class="section" id="mlfm-adapgrad">
 <h2>MLFM AdapGrad<a class="headerlink" href="#mlfm-adapgrad" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="joint-density">
+<h3>Joint Density<a class="headerlink" href="#joint-density" title="Permalink to this headline">¶</a></h3>
+<p>For the MLFM AdapGrad model the likelihood of a set of state variables may be written</p>
+<div class="math notranslate nohighlight">
+\[p(\mathbf{X} \mid \mathbf{g} ) \propto \prod_{k=1}^{K} \exp\left\{-\frac{1}{2}(f_k - m_{\dot{x}_k|x_k})^{\top}(C_{\dot{x}_k|\dot{x}} + \gamma I)^{-1}(f_k - m_{\dot{x}_k|x_k})\right\}\]</div>
+</div>
 <div class="section" id="parameters">
 <span id="tutorials-index-mlfmag-par"></span><h3>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h3>
 <p>The model parameters we are most interested in include the</p>
-<div class="sphx-glr-thumbcontainer" tooltip="Automatic Relevance Determination"><div class="figure" id="id1">
-<img alt="../../_images/sphx_glr_plot_ard_thumb.png" src="../../_images/sphx_glr_plot_ard_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="plot_ard.html#sphx-glr-tutorials-llfm-tutorials-plot-ard-py"><span class="std std-ref">Automatic Relevance Determination</span></a></span></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="This note decribes hot to carry out the porcess of carrying out MAP parameter estimation for th..."><div class="figure" id="id2">
+<table border="1" class="docutils">
+<colgroup>
+<col width="41%" />
+<col width="59%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><span class="math notranslate nohighlight">\(\mathbf{g}\)</span></td>
+<td>The (vectorised) latent force variable</td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate nohighlight">\(\boldsymbol{\psi}\)</span></td>
+<td>Hyperparameters of the latent force GPs</td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate nohighlight">\(\boldsymbol{\phi}\)</span></td>
+<td>Hyperparameters of the latent state GPs</td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate nohighlight">\(\boldsymbol{\gamma}\)</span></td>
+<td>ODE model <cite>temperature</cite>       parameter</td>
+</tr>
+</tbody>
+</table>
+<div class="sphx-glr-thumbcontainer" tooltip="This note decribes how to carry out the porcess of carrying out MAP parameter estimation for th..."><div class="figure" id="id1">
 <img alt="../../_images/sphx_glr_plot_mlfmagfit_thumb.png" src="../../_images/sphx_glr_plot_mlfmagfit_thumb.png" />
 <p class="caption"><span class="caption-text"><a class="reference internal" href="plot_mlfmagfit.html#sphx-glr-tutorials-llfm-tutorials-plot-mlfmagfit-py"><span class="std std-ref">MLFM-AG Model Fitting</span></a></span></p>
 </div>
 </div><div class="toctree-wrapper compound">
 </div>
-<div class="sphx-glr-thumbcontainer" tooltip="This note describes the process of simulating the MLFM using any of the classes extending :clas..."><div class="figure" id="id3">
-<img alt="../../_images/sphx_glr_plot_mlfmsim_thumb.png" src="../../_images/sphx_glr_plot_mlfmsim_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="plot_mlfmsim.html#sphx-glr-tutorials-llfm-tutorials-plot-mlfmsim-py"><span class="std std-ref">MLFM Simulation</span></a></span></p>
+<div class="sphx-glr-thumbcontainer" tooltip="Introduction to the LFM Mix Model"><div class="figure" id="id2">
+<img alt="../../_images/sphx_glr_plot_mlfmmixsa_intro_thumb.png" src="../../_images/sphx_glr_plot_mlfmmixsa_intro_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="plot_mlfmmixsa_intro.html#sphx-glr-tutorials-llfm-tutorials-plot-mlfmmixsa-intro-py"><span class="std std-ref">Introduction to the LFM Mix Model</span></a></span></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="This note provides more detail into the process of carrying out model fitting using the MLFM mo..."><div class="figure" id="id3">
+<img alt="../../_images/sphx_glr_plot_mlfm_wpriors_thumb.png" src="../../_images/sphx_glr_plot_mlfm_wpriors_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="plot_mlfm_wpriors.html#sphx-glr-tutorials-llfm-tutorials-plot-mlfm-wpriors-py"><span class="std std-ref">Specifying Priors</span></a></span></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="Fitting of the MLFM"><div class="figure" id="id4">
+<img alt="../../_images/sphx_glr_plot_mlfmmixsa_fit_thumb.png" src="../../_images/sphx_glr_plot_mlfmmixsa_fit_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="plot_mlfmmixsa_fit.html#sphx-glr-tutorials-llfm-tutorials-plot-mlfmmixsa-fit-py"><span class="std std-ref">Fitting of the MLFM-MixSA Model</span></a></span></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="Fitting the LFM Using the MLFM"><div class="figure" id="id5">
+<img alt="../../_images/sphx_glr_plot_lfm_thumb.png" src="../../_images/sphx_glr_plot_lfm_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="plot_lfm.html#sphx-glr-tutorials-llfm-tutorials-plot-lfm-py"><span class="std std-ref">Fitting the LFM Using the MLFM</span></a></span></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="Fitting of the MLFM"><div class="figure" id="id6">
+<img alt="../../_images/sphx_glr_plot_mlfmsamix_thumb.png" src="../../_images/sphx_glr_plot_mlfmsamix_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="plot_mlfmsamix.html#sphx-glr-tutorials-llfm-tutorials-plot-mlfmsamix-py"><span class="std std-ref">Fitting of the MLFM-MixSA Model 2</span></a></span></p>
 </div>
 </div><div class="toctree-wrapper compound">
 </div>
@@ -213,10 +273,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="plot_ard.html" class="btn btn-neutral float-right" title="Automatic Relevance Determination" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="plot_mlfmagfit.html" class="btn btn-neutral float-right" title="MLFM-AG Model Fitting" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../index.html" class="btn btn-neutral" title="PydyGP Tutorial" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../lfm_tutorials/plot_lfm_fit2.html" class="btn btn-neutral" title="Latent Force Models 2" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

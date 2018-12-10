@@ -10,7 +10,7 @@ from scipy.optimize import minimize
 from collections import namedtuple
 
 MLFMAdapGradFitResults = namedtuple('MLFMAdapGradFitResults',
-                                    'g, beta, logpsi, logphi, loggamma, tau, \
+                                    'g, beta, logpsi, logphi, loggamma, logtau, \
                                     optimres')
 
 def _unpack_vector(x, xk_shape):
@@ -88,7 +88,28 @@ def _ls_covar_k_wgrad(logpsi, gamma, tt, gradientgp,
     else:
         return (Lxx, Mdx, np.linalg.cholesky(S)), \
                (Cxx_grad, M_grad, Cdx_x_grad)        
-        
+
+def _check_Y(Y, mlfm):
+    """ Backwards compatibility for nonvectorised Y.
+    """
+    if len(Y.shape) == 1:
+        # Y has been vectorised
+        return Y
+    elif len(Y.shape) == 2:
+        ncol = Y.shape[1]
+        nrow = Y.shape[0]
+        if ncol == mlfm.dim.K and \
+              nrow == mlfm.Ndata:
+              # only one output, return vectorised Y
+              return Y.T.ravel()
+        elif nrow == mlfm.Ndata*mlfm.dim.K:
+            # already columns of vectorised outputs
+            return Y
+        else:
+            raise ValueError("Bad shape for data Y.")
+    else:
+        msg = "Shape of Y is not compatible."
+        raise ValueError(msg)
 
 class MLFMAdapGrad(BaseMLFM):
     """
@@ -166,7 +187,7 @@ class MLFMAdapGrad(BaseMLFM):
             self.dim = Dimensions(tt.size, self.dim.K, self.dim.R, self.dim.D)
             self.ttc = tt
 
-    def _setup_latentstates(self, kernels=None):
+    def _setup_latentstates(self, kernels=None, logphi_has_prior=False):
         """ Handles setting up of the latent state GPs.
 
         Parameters
@@ -175,13 +196,22 @@ class MLFMAdapGrad(BaseMLFM):
         kernels : list, optional
             list of gradientkernel objects
         """
+        self.logphi_has_prior = logphi_has_prior
+        
         if kernels is None:
             # Default is for kernels = 1.*exp(-.5*(s-t)**2)
             ls_kernels = [ConstantKernel(1.)*RBF(1.)
                           for k in range(self.dim.K)]
             self.latentstates = [GaussianProcessRegressor(kern) for kern in ls_kernels]
+
+            if self.logphi_has_prior:
+                from pydygp.probabilitydistributions import (ExpGeneralisedInvGaussian,
+                                                             )
+                # Default is ExpGeneralisedInvGaussian for the length scale
+            
         else:
             raise NotImplementedError("User supplied kernels not currently supported.")
+
 
     def _setup(self, times, **kwargs):
         """ Prepares the model for fitting.
@@ -193,11 +223,7 @@ class MLFMAdapGrad(BaseMLFM):
         if not hasattr(self, 'latentstates'):
             # no latent states supplied so use default setting
             self._setup_latentstates()
-        
-    def foo(self, y, vecg, beta, logphi, loggamma, tau, eval_gradient=False):
-        return self.log_likelihood(y, vecg, beta, logphi,
-                                   loggamma, tau,
-                                   eval_gradient=eval_gradient)
+
 
     def fit(self, times, Y, **kwargs):
         """ Fit the MLFM using Adaptive Gradient Matching by maximimising
@@ -222,70 +248,66 @@ class MLFMAdapGrad(BaseMLFM):
         # make sure the model is ready for fitting by calling _setup
         self._setup(times, **kwargs)
 
-        # for now default behaviour is fix the data precisions
-        kwargs['tau_is_fixed'] = True
-        kwargs['beta_is_fixed'] = self.is_beta_fixed
+        # parse kwargs to see if any args kept fixed
+        is_fixed_vars = _fit_kwarg_parser(self, **kwargs)
 
-        # Initial preprocessing of fit args. and shape
-        # to allow for parameters to be kept fixed during
-        # the optimisation process
-        var_names = ['g', 'beta', 'logpsi', 'logphi', 'loggamma', 'tau']
+        y_train = _check_Y(Y, self)
 
-        # check **kwargs to see if any variables have been kept fixed
-        is_fixed_vars = [kwargs.pop("".join((vn, "_is_fixed")), False)
-                         for vn in var_names]
+        # Check for kwarg priors
+        try:
+            beta_prior_logpdf = kwargs.pop('beta_prior')
+        except:
+            beta_prior_logpdf = lambda b: (0, 0)
 
-        # utility function to mix the free vars and the fixed vars
-        def _var_mixer(free_vars, free_vars_shape, fixed_vars):
-            """ Returns the ordered full variable list
-            """
-            free_vars = _unpack_vector(free_vars, free_vars_shape)
-            if is_fixed_vars is None:
-                return free_vars
-            else:
-                full_vars = []
-                ifree, ifixed = (0, 0)
-                for b in is_fixed_vars:
-                    if b:
-                        full_vars.append(fixed_vars[ifixed])
-                        ifixed += 1
-                    else:
-                        full_vars.append(free_vars[ifree])
-                        ifree += 1
-                return full_vars
-
-        # vectorise y
-        vecy = Y.T.ravel()
+        try:
+            logtau_prior_logpdf = kwargs.pop('logtau_prior')
+        except:
+            logtau_prior_logpdf = lambda lt: (0, 0)
 
         # obj function is given by neg. log likelihood + log prior
         def objfunc(arg, free_vars_shape, fixed_vars):
-            g, vbeta, logpsi, logphi, loggamma, tau = \
-               _var_mixer(arg, free_vars_shape, fixed_vars)
+            g, vbeta, logpsi, logphi, loggamma, logtau = \
+               _var_mixer(arg, free_vars_shape, fixed_vars, is_fixed_vars)
             # reshape beta
             beta = vbeta.reshape(self.dim.R+1, self.dim.D)
-
             try:
-                ll, ll_g_grad, ll_beta_grad, ll_lphi_grad, ll_lgam_grad = \
-                    self.log_likelihood(vecy, g, beta, logphi, loggamma, tau, eval_gradient=True)
+                ll, ll_g_grad, ll_beta_grad, ll_lphi_grad, ll_lgam_grad, ll_ltau_grad = \
+                    self.log_likelihood(y_train, g, beta,
+                                        logphi, loggamma, logtau,
+                                        eval_gradient=True)
+
                 lp, lp_g_grad, lp_lpsi_grad = \
-                    self.prior_logpdf(g, logpsi, eval_gradient=True)
+                    self.prior_logpdf(g, logpsi,
+                                      eval_gradient=True,
+                                      **kwargs)  # pass kwargs to logprior
 
                 grad = [-(ll_g_grad + lp_g_grad),
                         -ll_beta_grad,
                         -lp_lpsi_grad,
                         -ll_lphi_grad,
-                        -ll_lgam_grad]
+                        -ll_lgam_grad,
+                        -ll_ltau_grad]
 
+                # add the contribution from optional kwarg priors
+                lp_beta, lp_beta_grad = beta_prior_logpdf(vbeta)
+                lp += lp_beta
+                grad[1] += -lp_beta_grad
+
+                # possible logtau prior
+                lp_logtau, lp_logtau_grad = logtau_prior_logpdf(logtau)
+
+                lp += lp_logtau
+                grad[-1] += -lp_logtau_grad
+                
                 grad = np.concatenate([item for item, b in zip(grad, is_fixed_vars)
                                        if not b])
-                
                 return -(ll + lp), grad
 
-            except:
+            except np.linalg.LinAlgError:
                 return np.inf, np.zeros(arg.size)
 
         init, free_vars_shape, fixed_vars = \
-              _fit_init(self, is_fixed_vars, **kwargs)
+              self._fit_init(is_fixed_vars, **kwargs)
         res = minimize(objfunc, init,
                        jac=True,
                        args=(free_vars_shape, fixed_vars),
@@ -294,15 +316,69 @@ class MLFMAdapGrad(BaseMLFM):
         # save a copy of the results from optim
         self._optim_res = res
 
-        g_, vbeta_, logpsi_, logphi_, loggamma_, tau_ = \
-            _var_mixer(res.x, free_vars_shape, fixed_vars)
+        g_, vbeta_, logpsi_, logphi_, loggamma_, logtau_ = \
+            _var_mixer(res.x, free_vars_shape, fixed_vars, is_fixed_vars)
         beta_ = vbeta_.reshape(self.dim.R+1, self.dim.D)
 
-        return MLFMAdapGradFitResults(g_, beta_, logpsi_, logphi_, loggamma_, tau_, res)
+        return MLFMAdapGradFitResults(g_.reshape(self.dim.R, self.dim.N),
+                                      beta_, logpsi_, logphi_, loggamma_, logtau_, res)
 
+
+    def _fit_kwarg_parser(self, **kwargs):
+        return _fit_kwarg_parser(self, **kwargs)
+
+    def _fit_init(self, is_fixed_vars, **kwargs):
+        # Initalise the value of latent force GPs
+        try:
+            g0 = kwargs['g0']
+        except KeyError:
+            g0 = np.zeros(self.dim.R*self.dim.N)
+        # Initalise the hyperparameters for the latent force GPs
+        try:
+            logpsi0 = kwargs['logpsi0']
+        except:
+            logpsi0 = np.concatenate([gp.kernel.theta
+                                      for gp in self.latentforces])
+        # Initalise the hyperparameters for the state state GPs
+        try:
+            logphi0 = kwargs['logphi0']
+        except:
+            logphi0 = np.concatenate([gp.kernel.theta
+                                      for gp in self.latentstates])
+        # Initalise the gradient matching error variance
+        try:
+            loggamma0 = kwargs['loggamma0']
+        except:
+            loggamma0 = np.log(1e-4*np.ones(self.dim.K))
+        # Initalise the data precisions
+        try:
+            logtau0 = kwargs['logtau0']
+        except:
+            logtau0 = np.log(1e4*np.ones(self.dim.K))
+        # Initalise beta
+        try:
+            beta0 = kwargs['beta0']
+        except:
+            if self.is_beta_fixed:
+                beta0 = self.beta
+            else:
+                beta0 = np.eye(N=self.dim.R+1, M=self.dim.D)
+        vbeta0 = beta0.ravel()  # vec. beta as [br1,...,brD]
+
+        full_init = [g0, vbeta0, logpsi0, logphi0, loggamma0, logtau0]
+        full_init_shape = [item.size for item in full_init]
+
+        free_vars, fixed_vars = ([], [])
+        for item, boolean in zip(full_init, is_fixed_vars):
+            if boolean:
+                fixed_vars.append(item)
+            else:
+                free_vars.append(item)
+        free_vars_shape = [item.size for item in free_vars]
+        return np.concatenate(free_vars), free_vars_shape, fixed_vars
 
     def log_likelihood(self, y, g, beta,
-                       logphi, loggamma, tau,
+                       logphi, loggamma, logtau,
                        eval_gradient=False, **kwargs):
         """Log-likelihood of the data
 
@@ -336,6 +412,7 @@ class MLFMAdapGrad(BaseMLFM):
         Kode = cho_solve((Lode, True), np.eye(Lode.shape[0]))
 
         # data covariance
+        tau = np.exp(logtau)        
         Kdat = block_diag(*[1 / tauk * np.eye(self.Ndata)
                             for tauk in tau])
 
@@ -350,11 +427,19 @@ class MLFMAdapGrad(BaseMLFM):
         Kchol = np.linalg.cholesky(K)
 
         # evaluate the loglikelihood
-        alpha = cho_solve((Kchol, True), y)
 
-        log_lik = -.5 * y.dot(alpha)
-        log_lik -= np.log(np.diag(Kchol)).sum()
-        log_lik -= K.shape[0] / 2 * np.log(2 * np.pi)
+        # Support multi-dimensional output of self.y_train_ (as in sklean GPR api)
+        if len(y.shape) == 1:
+            y_train = y[:, np.newaxis]
+        else:
+            y_train = y
+
+        alpha = cho_solve((Kchol, True), y_train)
+
+        log_lik_dims = -.5 * np.einsum("ik, ik->k",y_train, alpha)
+        log_lik_dims -= np.log(np.diag(Kchol)).sum()
+        log_lik_dims -= K.shape[0] / 2 * np.log(2 * np.pi)
+        log_lik = log_lik_dims.sum(-1)  # sum over output dimensions
 
         if eval_gradient:
 
@@ -390,27 +475,48 @@ class MLFMAdapGrad(BaseMLFM):
                 K_lphi_grad = np.dstack(K_lphi_grad)
                 K_gam_grad = np.dstack(K_gam_grad)
 
-            tmp = np.outer(alpha, alpha)
-            tmp -= cho_solve((Kchol, True), np.eye(Kchol.shape[0]))
+            # gradient of K with respect to data precisions
+            K_tau_grad = []
+            dek = np.zeros(self.dim.K)
+            for k in range(self.dim.K):
+                dek[k] = -1/tau[k]**2
+                K_tau_grad.append(np.kron(np.diag(dek),
+                                          np.eye(self.Ndata)))
+                dek[k] = 0.
+            K_tau_grad = np.dstack(K_tau_grad)
 
-            log_lik_g_grad = .5 * np.einsum("ij,jik", tmp, K_g_grad)
-            log_lik_b_grad = .5 * np.einsum("ij,jik", tmp, K_b_grad)
-            log_lik_lphi_grad = .5 * np.einsum("ij,jik", tmp, K_lphi_grad)
-            log_lik_lgam_grad = .5 * np.einsum("ij,jik", tmp, K_gam_grad) * \
-                                np.exp(loggamma)
+            tmp = np.einsum("ik,jk->ijk", alpha, alpha)  # k: output-dimension
+            tmp -= cho_solve((Kchol, True), np.eye(Kchol.shape[0]))[:, :, np.newaxis]
+
+            log_lik_g_grad_dims = .5 * np.einsum("ijl,ijk->kl", tmp, K_g_grad)
+            log_lik_g_grad = log_lik_g_grad_dims.sum(-1)
+
+            log_lik_b_grad_dims = .5 * np.einsum("ijl,ijk->kl", tmp, K_b_grad)
+            log_lik_b_grad = log_lik_b_grad_dims.sum(-1)
+
+            log_lik_lphi_grad_dims = .5 * np.einsum("ijl,ijk->kl", tmp, K_lphi_grad)
+            log_lik_lphi_grad = log_lik_lphi_grad_dims.sum(-1)
+            
+            log_lik_lgam_grad_dims = .5 * np.einsum("ijl,ijk->kl", tmp, K_gam_grad)
+            log_lik_lgam_grad = log_lik_lgam_grad_dims.sum(-1) * np.exp(loggamma)
+
+            log_lik_ltau_grad_dims = .5 * np.einsum("ijl,ijk->kl", tmp, K_tau_grad)
+            log_lik_ltau_grad = log_lik_ltau_grad_dims.sum(-1) * np.exp(logtau)
 
             return log_lik, \
                    log_lik_g_grad, \
                    log_lik_b_grad, \
                    log_lik_lphi_grad, \
-                   log_lik_lgam_grad
+                   log_lik_lgam_grad, \
+                   log_lik_ltau_grad
 
         else:
             return log_lik
 
-    def prior_logpdf(self, g, logpsi, eval_gradient=False):
+    def prior_logpdf(self, g, logpsi, eval_gradient=False, **kwargs):
         """Logpdf of the prior
         """
+        veclogpsi = logpsi.copy()  # need to keep a copy of the vectorised var.
         logpsi_shape = _get_gp_theta_shape(self.latentforces)
         logpsi = _unpack_vector(logpsi, logpsi_shape)
 
@@ -451,10 +557,29 @@ class MLFMAdapGrad(BaseMLFM):
                 tmp -= cho_solve((L, True), np.eye(K.shape[0]))
                 ll_logpsi_grad.append(.5 * np.einsum("ij,ijk", tmp, K_gradient))
 
+        # concatenate things together
+        if eval_gradient:
+            ll_logpsi_grad = np.concatenate(ll_logpsi_grad)
+
+        ## Inspect kwargs for any additionally passed priors
+        try:
+            logpsi_prior = kwargs['logpsi_prior']
+            if eval_gradient:
+                lp_psi, lp_psi_grad = logpsi_prior.logpdf(veclogpsi, eval_gradient=True)
+                ll_logpsi_grad += lp_psi_grad
+            else:
+                lp_psi = logpsi_prior(logpsi, eval_gradient=False)
+            ll += lp_psi  # add the contribution from psi prior
+
+        except KeyError:
+            # Ignore it if no logpsi prior passed.
+            pass
+            
+
         if eval_gradient:
             return ll, \
                    np.concatenate(ll_g_grad), \
-                   np.concatenate(ll_logpsi_grad)
+                   ll_logpsi_grad
 
         return ll
 
@@ -465,6 +590,372 @@ class MLFMAdapGrad(BaseMLFM):
         else:
             return self.dim.N
 
+
+class GibbsMLFMAdapGrad(MLFMAdapGrad):
+    """
+    Extends the MLFM-AG matching model to implement
+    conditional Gibbs sampling.
+
+    Parameters
+    ----------
+
+    basis_mats : tuple of square ndarray
+        A tuple of square numpy array_like with the same shape.
+
+    R : int
+        Number of latent forces in the model.
+
+    lf_kernels : list of kernel objects, optional
+        Kernels of the latent force Gaussian process objects. If None
+        is passed, the kernel \"1.0 * RBF(1.0)\" is used for the R
+        latent forces.
+    """
+    def __init__(self,
+                 basis_mats,
+                 R,
+                 is_beta_fixed=True,
+                 **kwargs):
+
+        super(GibbsMLFMAdapGrad, self).__init__(basis_mats,
+                                                R=R,
+                                                is_beta_fixed=is_beta_fixed,
+                                                **kwargs)
+
+    def g_condpdf(self, vecx, beta, gamma=None, logphi=None, logpsi=None, **kwargs):
+        """
+        Conditional distribution of the latent force.
+
+        Parameters
+        ----------
+
+        vecx : numpy array, shape (N*K, )
+            Vectorised state variables.
+
+        beta : numpy array, shape (R+1, D)
+        """
+
+        ## handle parameter construct from arguments
+        if logphi is None and gamma is not None \
+           or logphi is not None and gamma is None:
+            raise ValueError("gamma and logphi must either be set together or both None.")
+
+        elif logphi is None and gamma is None:
+            # if logphi hasn't been passed then
+            try:
+                # the model matrices depending on logphi
+                phi_depmats = kwargs.pop('phi_depmats')
+                Lxx_list, Mdx_list, Schol_list = \
+                          phi_depmat
+            except:
+                raise ValueError
+
+        else:
+            logphi_shape = _get_gp_theta_shape(self.latentstates)
+            logphi = _unpack_vector(logphi, logphi_shape)
+
+        A = np.asarray([sum(brd*Lrd for brd, Lrd in zip(br, self.basis_mats))
+                        for br in beta])
+
+        # handy shapes
+        Xrowform = vecx.reshape(self.dim.K, self.dim.N)
+        invcov, premean = ([], [])
+        for k in range(self.dim.K):
+
+            vk = vk_flow_rep(k, Xrowform, A)
+
+            if logphi is None:
+                # get the phi dependent matrices from earlier
+                Lxx, Mdx, Schol = Lxx_list[k], \
+                                  Mdx_list[k], \
+                                  Schol_list[k]
+            else:
+                _phidep_covs =  _ls_covar_k_wgrad(logphi[k],
+                                                   gamma[k],
+                                                   self.ttc,
+                                                   self.latentstates[k])
+                Lxx, Mdx, Schol = _phidep_covs[0]
+            mk = Mdx.dot(Xrowform[k, :])
+            SkinvVk = np.column_stack(
+                [cho_solve((Schol, True), np.diag(vkr))
+                 for vkr in vk[1:]])
+
+            Vk = np.row_stack([np.diag(vkr) for vkr in vk[1:]])
+            ic = Vk.dot(SkinvVk)
+
+            premean.append(SkinvVk.T.dot(mk-vk[0]))
+            invcov.append(ic)
+        
+        # add the contribution from the prior
+        prior_ic = []
+
+        if logpsi is None:
+            try:
+                # the model matries depending on logpsi
+                prior_ic = kwargs.pop('gprior_invcovs')
+            except:
+                raise ValueError
+        else:
+            logpsi_shape = _get_gp_theta_shape(self.latentforces)
+            logpsi = _unpack_vector(logpsi, logpsi_shape)
+            for theta, gp in zip(logpsi, self.latentforces):
+                kern = gp.kernel.clone_with_theta(theta)
+                Cgr = kern(self.ttc[:, None])
+                Cgr[np.diag_indices_from(Cgr)] += gp.alpha
+                L = np.linalg.cholesky(Cgr)
+
+                prior_ic.append(cho_solve((L, True), np.eye(L.shape[0])))
+
+        invcov = sum(invcov) + block_diag(*prior_ic)
+
+        cov = np.linalg.inv(invcov)
+        mean = cov.dot(sum(premean))
+
+        return mean, cov
+
+    def beta_condpdf(self, vecx, vecg, gamma=None, logphi=None, **kwargs):
+
+        invcov, premean = ([], [])
+        X = vecx.reshape(self.dim.K, self.dim.N)
+
+        if logphi is not None:
+            logphi = _unpack_vector(logphi, _get_gp_theta_shape(self.latentstates))
+
+        for k in range(self.dim.K):
+
+            if logphi is None:
+                ## get the phi dependent matrices from earlier
+                Lxx, Mdx, Schol = Lxx_list[k], \
+                                  Mdx_list[k], \
+                                  Schol_list[k]
+            else:
+                _phidep_covs = _ls_covar_k_wgrad(logphi[k],
+                                                 gamma[k],
+                                                 self.ttc,
+                                                 self.latentstates[k])
+                Lxx, Mdx, Schol = _phidep_covs[0]
+            
+            mk = Mdx.dot(X[k, :])
+
+            wk = wk_flow_rep(k,
+                             X,
+                             vecg.reshape(self.dim.R, self.dim.N),
+                             self.basis_mats)
+            Wk = np.column_stack(wk)
+
+
+            Skinv = cho_solve((Schol, True), np.eye(self.dim.N))
+
+            Skinvmk = Skinv.dot(mk)
+            pm = np.array([w.dot(Skinvmk) for w in wk])
+
+            invcov.append(Wk.T.dot(Skinv.dot(Wk)))
+            premean.append(pm)
+
+        invcov = sum(invcov) + \
+                 np.diag(np.ones((self.dim.R+1)*self.dim.D) / 10.**2)
+        cov = np.linalg.inv(invcov)
+        mean = cov.dot(sum(premean))
+        return mean, cov
+
+    def x_condpdf(self, beta, vecg, logphi, loggamma, **kwargs):
+        Lam = Lambda(vecg, beta, logphi, np.exp(loggamma), self, False)
+
+        include_data = kwargs.pop("include_data", False)
+        if include_data:
+            try:
+                logtau = kwargs.pop("logtau")
+                tau = np.exp(logtau)
+                data_invcov = np.kron(np.diag(tau), np.eye(self.Ndata))
+
+                try:
+                    cov = np.linalg.inv(Lam + data_invcov)
+                    
+                    y = kwargs.pop("vecy")
+                    premean = data_invcov.dot(y)
+
+                    invcov = Lam + data_invcov
+                    cov = np.linalg.inv(invcov)
+                    mean = cov.dot(premean)
+
+                    return mean, cov
+                    
+                except KeyError:
+                    raise ValueError("Must provide (vectorised) data: vecy")
+                    
+            except KeyError:
+                raise ValueError("Must provide log precisions: logtau")
+        
+        return np.zeros(self.dim.N*self.dim.K), np.linalg.inv(Lam)
+
+    def x_condpdf_mo(self, beta, vecg, logphi, loggamma, **kwargs):
+        """
+        Possibility of multiple outputs
+        """
+        Lam = Lambda(vecg, beta, logphi, np.exp(loggamma), self, False)
+
+        include_data = kwargs.pop("include_data", False)
+        if include_data:
+
+            logtau = kwargs.pop("logtau")
+            tau = np.exp(logtau)
+
+            data_invcov = np.zeros((self.dim.N*self.dim.K,
+                                    self.dim.N*self.dim.K))
+            premean = np.zeros(self.dim.N*self.dim.K)
+
+            Ys = kwargs.pop('Ys')
+            data_inds = kwargs.pop('data_inds')
+            n_outputs = len(Ys)  # Ys should be list lik
+            
+            for q, vecy in enumerate(Ys):
+                dind = data_inds[q]
+                dic_q = np.kron(np.diag(tau), np.eye(len(dind)))
+                
+                # pad indices with extra dimension
+                dind = np.asarray(dind)
+                dind = np.concatenate([dind + self.dim.N*k
+                                       for k in range(self.dim.K)])
+                data_invcov[np.ix_(dind, dind)] += dic_q
+
+                premean[dind] += dic_q.dot(vecy)
+
+            invcov = Lam + data_invcov
+            cov = np.linalg.inv(invcov)
+            mean = cov.dot(premean)
+
+            return mean, cov
+
+
+class VarMLFMAdapGrad(MLFMAdapGrad):
+    def __init__(self, *args, **kwargs):
+        super(VarMLFMAdapGrad, self).__init__(*args, **kwargs)
+        self.basis_mats = np.array(self.basis_mats)
+
+    def g_cond(self, Ex, Covx, Eb, Covb,
+               logphi, gamma, logpsi, **kwargs):
+
+        # reshape logphi
+        logphi = _unpack_vector(logphi, _get_gp_theta_shape(self.latentstates))
+
+        premean = 0.
+        invcov = np.zeros((self.dim.R*self.dim.N, self.dim.R*self.dim.N))
+
+        if len(Ex.shape) == 1:
+            Ex = Ex[:, None]
+
+        ExxTs = [Covx + np.outer(Ex_q, Ex_q) for Ex_q in Ex.T]
+        EbbT = Covb + np.outer(Eb, Eb)
+
+        # EA
+        Eb = Eb.reshape((self.dim.R+1, self.dim.D))
+        EA = np.array([sum(Ebrd*Ld for Ebrd, Ld in zip(Ebr, self.basis_mats))
+                       for Ebr in Eb])
+
+        # Useful variables
+        N = self.dim.N
+
+        for k in range(self.dim.K):
+
+            LxxMdxSchol = _ls_covar_k_wgrad(logphi[k],
+                                            gamma[k],
+                                            self.ttc,
+                                            self.latentstates[k])
+            Lxx, Mdx, Schol = LxxMdxSchol[0]
+            Skinv = cho_solve((Schol, True), np.eye(self.dim.N))
+
+            # sum over possibly multimensional output of state variable
+            for ExxT in ExxTs:
+                # E[vkr xkT]
+                Evkr_mkT, Evkr_vk0 = ([], [])
+
+                for r in range(1, self.dim.R+1):
+                    Evkr_mkT.append(sum(EA[r, k, j]*ExxT[j*N:(j+1)*N,
+                                                         k*N:(k+1)*N].dot(Mdx.T)
+                                        for j in range(self.dim.K)))
+
+                    Evkr_vk0.append(EvkrvksT(k, r, 0, ExxT, EbbT, self.basis_mats))
+                
+                    for s in range(1, self.dim.R+1):
+                        expr = EvkrvksT(k, r, s, ExxT, EbbT, self.basis_mats)
+
+                        invcov[(r-1)*self.dim.N:r*self.dim.N,
+                               (s-1)*self.dim.N:s*self.dim.N] += expr * Skinv
+
+                pmk = [np.sum( (_Evkr_mk - _Evkr_v0) * Skinv, axis=1)
+                       for _Evkr_mk, _Evkr_v0 in zip(Evkr_mkT, Evkr_vk0)]
+                pmk = np.concatenate(pmk)
+
+                premean += pmk
+
+        # Add contribution from prior
+        logpsi = _unpack_vector(logpsi, _get_gp_theta_shape(self.latentforces))
+        for r in range(self.dim.R):
+            gp = self.latentforces[r]
+            kern = gp.kernel.clone_with_theta(logpsi[r])
+            Kr = kern(self.ttc[:, None])
+            Kr[np.diag_indices_from(Kr)] += 1e-5
+            Lr = np.linalg.cholesky(Kr)
+
+            invcov[r*self.dim.N:(r+1)*self.dim.N,
+                   r*self.dim.N:(r+1)*self.dim.N] += cho_solve((Lr, True), np.eye(self.dim.N))
+
+        cov = np.linalg.inv(invcov)
+        mean = cov.dot(premean)
+
+        return mean, cov
+
+    def x_cond(self,
+               Eg, Covg, Eb, Covb,
+               logphi, gamma, **kwargs):
+
+        # contribution from model
+        invcov = E_qGqB_Lambdag(Eg, Covg, Eb, Covb, self,
+                                logphi, gamma, **kwargs)
+
+        # potential contribution from data
+        include_data = kwargs.pop('include_data', False)
+        if include_data:
+
+            try:
+                tau = kwargs.pop('tau')
+            except KeyError:
+                msg = "If including the data contribution must pass precisions tau"
+                raise ValueError(msg)
+
+            datainv_cov = np.kron(np.diag(tau), np.eye(self.Ndata))
+
+            try:
+                Y = kwargs.pop('Y')  # assumed to be already shaped
+                if len(Y.shape) == 1:
+                    Y = Y[:, None]                    
+            except KeyError:
+                raise ValueError("If including data must include data 'Y'")
+
+            if self.is_tt_aug:
+                _data_inds = np.array(self.data_inds)
+                _data_inds = np.concatenate([_data_inds + self.dim.N*k
+                                             for k in range(self.dim.K)])
+
+                pY = np.zeros((self.dim.N*self.dim.K, Y.shape[1]))
+                pY[_data_inds, :] = Y
+
+                ic = np.zeros(invcov.shape)
+                ic[np.ix_(_data_inds, _data_inds)] = datainv_cov
+                
+                invcov += ic
+                premean = ic.dot(pY)
+
+            else:
+                invcov += datainv_cov
+                premean = datainv_cov.dot(Y)
+        cov = np.linalg.inv(invcov)
+
+        if include_data:
+            mean = cov.dot(premean)
+        else:
+            mean = np.zeros(self.dim.N*self.dim.K)
+
+        return mean, cov
 
 """
 Flow Function Representations
@@ -492,6 +983,63 @@ def uk_flow_rep(k, g, A):
     return [A[0, k, j] + sum(ar[k, j]*gr for ar, gr in zip(A[1:], g))
             for j in range(A[0].shape[0])]
 
+def vk_flow_rep(k, x, A):
+    """
+    Representation as [A(ti)x]_k = sum_{r=0}^R v_{kr} o g_r
+
+    Parameters
+    ----------
+
+    k : int
+
+    x : array_like, shape (K, N)
+
+    A : list
+        list of square K x K structure matrices
+    """
+    vk0 = sum(A[0, k, j]*xj for j, xj in enumerate(x))
+    vkr = [sum(ar[k, j]*xj for j, xj in enumerate(x)) for ar in A[1:]]
+    return [vk0] + vkr
+
+def EvkrvksT(k, r, s, ExxT, EbbT, L):
+    """
+    Returns EvkrvksT.
+    """
+    K = L.shape[-1]
+    N = ExxT.shape[0] // K
+    D = L.shape[0]
+
+    vkrvksT = 0.
+    for i in range(K):
+        for j in range(K):
+            lki = L[:, k, i]
+            lkj = L[:, k, j]
+
+            EArkiAskj = lki.dot(EbbT[r*D:(r+1)*D,
+                                     s*D:(s+1)*D].dot(lkj))
+
+            vkrvksT += EArkiAskj*ExxT[i*N:(i+1)*N,
+                                      j*N:(j+1)*N]
+    return vkrvksT
+
+def wk_flow_rep(k, x, g, L):
+    """
+    Representation as [A(ti)x]_k =
+
+    [..., w_{0d}, w_{1d},..., w_{Rd}, ...]
+    """
+    D = len(L)
+    R = g.shape[0]
+    wk = []
+    for d in range(D):
+        for r in range(R+1):
+            if r == 0:
+                gr = 1.
+            else:
+                gr = g[r-1, :]
+            wkrd = sum(L[d][k, j] * xj for j, xj in enumerate(x)) * gr
+            wk.append(wkrd)
+    return wk
 
 """
 ODE Probability Model
@@ -517,7 +1065,6 @@ def Lambdag_k(k, vecg, beta, logphi_k, gamma_k, mlfm,
     covs, grads = _ls_covar_k_wgrad(logphi_k, gamma_k,
                                     mlfm.ttc, mlfm.latentstates[k],
                                     return_Cxx_inv_grad=True)
-
     # unpack cov and grads
     Lxx, Mdx, Schol = covs
     Cxx_inv_grad, Mdx_grad, S_grad = grads
@@ -528,7 +1075,7 @@ def Lambdag_k(k, vecg, beta, logphi_k, gamma_k, mlfm,
     diagUk = [np.diag(uki) for uki in uk]
     diagUk[k] -= Mdx
     Skinv_Uk = np.column_stack([cho_solve((Schol, True), Dkj) for Dkj in diagUk])
-    
+
     lamk = np.row_stack([Dki.T for Dki in diagUk]).dot(Skinv_Uk)
 
     # add the contribution from the prior, (Cxx inverse)
@@ -609,7 +1156,7 @@ def Lambda(vecg, beta, logphi, gamma, mlfm, eval_gradient=False):
     Force dependent contribution to the model covariance function.
     """    
     logphi_shape = _get_gp_theta_shape(mlfm.latentstates)
-    logphi = _unpack_vector(logphi, logphi_shape)    
+    logphi = _unpack_vector(logphi, logphi_shape)
     if eval_gradient:
         res = ([], [], [], [], [])
         for k in range(mlfm.dim.K):
@@ -637,63 +1184,146 @@ def Lambda(vecg, beta, logphi, gamma, mlfm, eval_gradient=False):
                              mlfm, eval_gradient=False)
                    for k in range(mlfm.dim.K))
 
+"""
+Variational Inference fitting functions
+=======================================
+"""
+def EukiukjT(k, i, j, EggT, EbbT, L):
+
+    D = len(L)
+    R = EbbT.shape[0] // D - 1
+    N = EggT.shape[0] // (R + 1)
+
+    ukiukjT = 0.
+    for r in range(R+1):
+        for s in range(R+1):
+            EbrbsT = EbbT[r*D:(r+1)*D, s*D:(s+1)*D]
+            EArkiAskj = L[:, k, i].dot(EbrbsT.dot(L[:, k, j]))
+            ukiukjT += EArkiAskj * EggT[r*N:(r+1)*N, s*N:(s+1)*N]
+
+    return ukiukjT
+            
+def E_qGqB_Lambdag_k(k, Eg, Covg, Eb, Covb,
+                     Skinv, Mk, mlfm):
+    """
+    Expectation of Lambda_k w.r.t q(G)q(B)
+    """
+    # Useful names
+    L = mlfm.basis_mats
+    N, K, R, D = mlfm.dim
+
+    # pad Eg
+    _Eg = np.concatenate((np.ones(N), Eg))
+
+    _Covg = block_diag(np.zeros((N, N)), Covg)
+                        
+    EggT = _Covg + np.outer(_Eg, _Eg)
+    EbbT = Covb + np.outer(Eb, Eb)
+    
+    # reshape E[beta]
+    Eb = Eb.reshape((R+1, D))
+    # reshape E[g]
+    Eg = Eg.reshape((R, N))    
+    # get the expectation of the vectors Uki
+    EA = np.array([sum(Ebrd*Ld for Ebrd, Ld in zip(Ebr, L))
+                   for Ebr in Eb])
+
+    Euk = uk_flow_rep(k, Eg, EA)
+
+    res = np.zeros((N*K, N*K))  # to hold the result
+    SkinvMk = Skinv.dot(Mk)
+    
+    for i in range(K):
+
+        Eduki_SkinvkMk = np.diag(Euk[i]).dot(SkinvMk)
+        
+        for j in range(i+1):
+            # calculate E[uki ukjT]
+            E_uik_ukj_T = EukiukjT(k, i, j, EggT, EbbT, L)
+
+            res[i*N:(i+1)*N, j*N:(j+1)*N] += E_uik_ukj_T * Skinv
+
+            if i == k:
+                res[i*N:(i+1)*N, j*N:(j+1)*N] -= \
+                                 Mk.T.dot(Skinv.dot(np.diag(Euk[j])))
+
+            if j == k:
+                res[i*N:(i+1)*N, j*N:(j+1)*N] -= \
+                                 np.diag(Euk[i]).dot(Skinv.dot(Mk))
+            
+            if i == k and j == k:
+                res[i*N:(i+1)*N, j*N:(j+1)*N] += Mk.T.dot(SkinvMk)
+
+            # Symmetric matrix
+            res[j*N:(j+1)*N, i*N:(i+1)*N] = res[i*N:(i+1)*N, j*N:(j+1)*N].T
+
+    return res
+
+def E_qGqB_Lambdag(Eg, Covg, Eb, Covb,
+                   mlfm,
+                   logphi=None, gamma=None, **kwargs):
+
+    # handle prior contribution to covariance matrices
+    if logphi is not None:
+        logphi = _unpack_vector(logphi, _get_gp_theta_shape(mlfm.latentstates))
+    else:
+        raise ValueError("Must provde logphi")
+
+    res = 0.
+    for k in range(mlfm.dim.K):
+
+        # get the covariance matrices depending on the GP
+        # interpolator of the kth latent state
+        _phidep_covs = _ls_covar_k_wgrad(logphi[k],
+                                         gamma[k],
+                                         mlfm.ttc,
+                                         mlfm.latentstates[k])
+        Lxx, Mdx, Schol = _phidep_covs[0]
+        Skinv = cho_solve((Schol, True), np.eye(Schol.shape[0]))
+
+        # Calculate E[ Lambda_k(G, B) | q(G)q(B) ]
+        res += E_qGqB_Lambdag_k(k, Eg, Covg, Eb, Covb,
+                                Skinv, Mdx, mlfm)
+    return res
+
 
 """
 Model Fitting Utility Functions
 ===============================
 """
+var_names = ['g', 'beta', 'logpsi', 'logphi', 'loggamma', 'logtau']
 
-def _fit_init(mlfm, is_fixed_vars, **kwargs):
-    # Initalise the value of latent force GPs
-    try:
-        g0 = kwargs['g0']
-    except KeyError:
-        g0 = np.zeros(mlfm.dim.R*mlfm.dim.N)
-    # Initalise the hyperparameters for the latent force GPs
-    try:
-        logpsi0 = kwargs['logpsi0']
-    except:
-        logpsi0 = np.concatenate([gp.kernel.theta
-                                  for gp in mlfm.latentforces])
-    # Initalise the hyperparameters for the state state GPs
-    try:
-        logphi0 = kwargs['logphi0']
-    except:
-        logphi0 = np.concatenate([gp.kernel.theta
-                                  for gp in mlfm.latentstates])
-    # Initalise the gradient matching error variance
-    try:
-        loggamma0 = kwargs['loggamma0']
-    except:
-        loggamma0 = np.log(1e-4*np.ones(mlfm.dim.K))
-    # Initalise the data precisions
-    try:
-        tau0 = kwargs['tau0']
-    except:
-        tau0 = 1e4*np.ones(mlfm.dim.K)
-    # Initalise beta
-    try:
-        beta0 = kwargs['beta0']
-    except:
-        if mlfm.is_beta_fixed:
-            beta0 = mlfm.beta
-        else:
-            msg = "".join("If MLFMAdapGrad model initalised ",
-                          "with 'beta_is_fixed = False' ",
-                          "then beta0 must be passed to fit.")
-            raise ValueError(msg)
+def _fit_kwarg_parser(mlfm, **kwargs):
+    # default behaviour
+    #kwargs['beta_is_fixed'] = mlfm.is_beta_fixed
 
-    vbeta0 = beta0.ravel()  # vec. beta as [br1,...,brD]
+    # check **kwargs to see if any variables have been kept fixed
+    is_fixed_vars = [kwargs.pop("".join((vn, "_is_fixed")), False)
+                     for vn in var_names[:-1]]
 
-    full_init = [g0, vbeta0, logpsi0, logphi0, loggamma0, tau0]
-    full_init_shape = [item.size for item in full_init]
+    # Different default behaviour for logtau
+    is_fixed_vars.append(kwargs.pop('logtau_is_fixed', True))
 
-    free_vars, fixed_vars = ([], [])
-    for item, boolean in zip(full_init, is_fixed_vars):
-        if boolean:
-            fixed_vars.append(item)
-        else:
-            free_vars.append(item)
-        free_vars_shape = [item.size for item in free_vars]
-    return np.concatenate(free_vars), free_vars_shape, fixed_vars
+    return is_fixed_vars
+    
+
+def _var_mixer(free_vars, free_vars_shape, fixed_vars, is_fixed_vars):
+    """
+    Utility function to mix the free vars and the fixed vars
+    """
+    free_vars = _unpack_vector(free_vars, free_vars_shape)
+    if is_fixed_vars is None:
+        return free_vars
+    else:
+        full_vars = []
+        ifree, ifixed = (0, 0)
+        for b in is_fixed_vars:
+            if b:
+                full_vars.append(fixed_vars[ifixed])
+                ifixed += 1
+            else:
+                full_vars.append(free_vars[ifree])
+                ifree += 1
+        return full_vars    
+
 
