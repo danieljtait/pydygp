@@ -12,7 +12,7 @@ setup(name='pydygp',
           'numpy',
           'scipy',
           'matplotlib>=2.2.0',
-          'scikit-learn'
+          'scikit-learn',
           'autograd',
       ],
       zip_safe=False)      
