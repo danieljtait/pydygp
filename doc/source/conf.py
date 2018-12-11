@@ -206,13 +206,13 @@ todo_include_todos = True
 
 # path to example scripts
 examples_dirs = ['../../examples',
-                 '../../tutorials/lfm_tutorials',
-                 '../../tutorials/llfm_tutorials',
+                 #'../../tutorials/lfm_tutorials',
+                 #'../../tutorials/llfm_tutorials',
                  '../../tutorials/mlfm_adapgrad_tutorials',
                  '../../tutorials/mlfm_sa_tutorials']
 gallery_dirs = ['auto_examples',
-                'tutorials/lfm_tutorials',
-                'tutorials/llfm_tutorials',
+                #'tutorials/lfm_tutorials',
+                #'tutorials/llfm_tutorials',
                 'tutorials/mlfm_adapgrad_tutorials',
                 'tutorials/mlfm_sa_tutorials']
 

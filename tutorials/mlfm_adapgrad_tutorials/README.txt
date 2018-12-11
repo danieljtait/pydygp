@@ -62,5 +62,3 @@ MAP Estimation
     .. raw:: html
 
         <div style='clear:both'></div>
-
-Examples not loading :'(
