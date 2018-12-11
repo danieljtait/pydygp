@@ -1,0 +1,546 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pydygp.probabilitydistributions.probabilitydistributions &mdash; pydygp  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> pydygp
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installing PydyGP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/index.html">PydyGP Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Gallery of Examples</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_autosummary/pydygp.linlatentforcemodels.html">pydygp.linlatentforcemodels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_autosummary/pydygp.probabilitydistributions.html">pydygp.probabilitydistributions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pydygp</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>pydygp.probabilitydistributions.probabilitydistributions</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pydygp.probabilitydistributions.probabilitydistributions</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.special</span> <span class="k">import</span> <span class="n">gammaln</span>
+<span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="k">import</span> <span class="n">cho_solve</span>
+
+<span class="k">class</span> <span class="nc">ProbabilityDistribution</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_dim</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_dim</span> <span class="o">=</span> <span class="n">output_dim</span>
+
+    <span class="k">def</span> <span class="nf">logpdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">eval_gradient</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="k">def</span> <span class="nf">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">ProbabilityDistribution</span><span class="p">)</span> \
+           <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">ProductProbabilityDistribution</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">ProductProbabilityDistribution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">b</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">b</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span>
+            <span class="k">elif</span> <span class="n">b</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">ProductProbabilityDistribution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="n">res</span> <span class="o">*=</span> <span class="bp">self</span>
+                <span class="k">return</span> <span class="n">res</span>
+
+    <span class="k">def</span> <span class="nf">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">b</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">b</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span>
+            <span class="k">elif</span> <span class="n">b</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">ProductProbabilityDistribution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="n">res</span> <span class="o">*=</span> <span class="bp">self</span>
+                <span class="k">return</span> <span class="n">res</span>
+
+    <span class="k">def</span> <span class="nf">logtransform</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Distribution of the log-transformed random variable.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        prob_dist : ProbabilityDistribution</span>
+<span class="sd">            The distribution of the log-transformed random variable represented</span>
+<span class="sd">            as a `UnivariateProbabilityDistribution` object.</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">LogTransformedProbabilityDistribution</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">scaletransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ScaleTransformedProbabilityDistribution</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">LogTransformedProbabilityDistribution</span><span class="p">(</span><span class="n">ProbabilityDistribution</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orig_prob</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LogTransformedProbabilityDistribution</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">orig_prob</span><span class="o">.</span><span class="n">output_dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_p</span> <span class="o">=</span> <span class="n">orig_prob</span>
+
+    <span class="k">def</span> <span class="nf">logpdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">eval_gradient</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">ex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">eval_gradient</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">,</span> <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_p</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">f</span><span class="p">,</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">df</span> <span class="o">*</span> <span class="n">ex</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">x</span> <span class="o">+</span>  <span class="bp">self</span><span class="o">.</span><span class="n">_p</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">ScaleTransformedProbabilityDistribution</span><span class="p">(</span><span class="n">ProbabilityDistribution</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">orig_prob</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ScaleTransformedProbabilityDistribution</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">orig_prob</span><span class="o">.</span><span class="n">output_dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_p</span> <span class="o">=</span> <span class="n">orig_prob</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scalefactor</span> <span class="o">=</span> <span class="n">c</span>
+
+    <span class="k">def</span> <span class="nf">logpdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">eval_gradient</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">eval_gradient</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">,</span> <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_p</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_scalefactor</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">f</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scalefactor</span><span class="p">)),</span> \
+                   <span class="n">df</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_scalefactor</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_p</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_scalefactor</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scalefactor</span><span class="p">))</span>
+
+<span class="k">class</span> <span class="nc">ProductProbabilityDistribution</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p1</span> <span class="o">=</span> <span class="n">p1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p2</span> <span class="o">=</span> <span class="n">p2</span>
+
+    <span class="k">def</span> <span class="nf">logpdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">eval_gradient</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x1</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">p1</span><span class="o">.</span><span class="n">output_dim</span><span class="p">]</span>
+        <span class="n">x2</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">p1</span><span class="o">.</span><span class="n">output_dim</span><span class="p">:]</span>
+        <span class="k">if</span> <span class="n">eval_gradient</span><span class="p">:</span>
+            <span class="n">lp1</span><span class="p">,</span> <span class="n">lp1_dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p1</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="n">lp2</span><span class="p">,</span> <span class="n">lp2_dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p2</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lp1_dx</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+                <span class="n">lp1_dx</span> <span class="o">=</span> <span class="p">[</span><span class="n">lp1_dx</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lp2_dx</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+                <span class="n">lp2_dx</span> <span class="o">=</span> <span class="p">[</span><span class="n">lp2_dx</span><span class="p">]</span>
+
+            <span class="k">return</span> <span class="n">lp1</span> <span class="o">+</span> <span class="n">lp2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">lp1_dx</span><span class="p">,</span> <span class="n">lp2_dx</span><span class="p">))</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lp1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p1</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span>
+            <span class="n">lp2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p2</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">x2</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">lp1</span> <span class="o">+</span> <span class="n">lp2</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">output_dim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">p1</span><span class="o">.</span><span class="n">output_dim</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">p2</span><span class="o">.</span><span class="n">output_dim</span>
+
+    <span class="k">def</span> <span class="nf">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">ProbabilityDistribution</span><span class="p">)</span> <span class="ow">or</span> \
+           <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">ProductProbabilityDistribution</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">ProductProbabilityDistribution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+<div class="viewcode-block" id="UnivariateProbabilityDistribution"><a class="viewcode-back" href="../../../_autosummary/generated/pydygp.probabilitydistributions.UnivariateProbabilityDistribution.html#pydygp.probabilitydistributions.UnivariateProbabilityDistribution">[docs]</a><span class="k">class</span> <span class="nc">UnivariateProbabilityDistribution</span><span class="p">(</span><span class="n">ProbabilityDistribution</span><span class="p">):</span>
+
+<div class="viewcode-block" id="UnivariateProbabilityDistribution.__init__"><a class="viewcode-back" href="../../../_autosummary/generated/pydygp.probabilitydistributions.UnivariateProbabilityDistribution.html#pydygp.probabilitydistributions.UnivariateProbabilityDistribution.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Probability distribution of a scalar random variable</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">UnivariateProbabilityDistribution</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">output_dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="ChiSquare"><a class="viewcode-back" href="../../../_autosummary/generated/pydygp.probabilitydistributions.ChiSquare.html#pydygp.probabilitydistributions.ChiSquare">[docs]</a><span class="k">class</span> <span class="nc">ChiSquare</span><span class="p">(</span><span class="n">UnivariateProbabilityDistribution</span><span class="p">):</span>
+<div class="viewcode-block" id="ChiSquare.__init__"><a class="viewcode-back" href="../../../_autosummary/generated/pydygp.probabilitydistributions.ChiSquare.html#pydygp.probabilitydistributions.ChiSquare.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ChiSquare</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">df</span></div>
+
+    <span class="k">def</span> <span class="nf">logpdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">eval_gradient</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span>
+        <span class="n">lpdf</span> <span class="o">=</span> <span class="p">(</span><span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="n">x</span> <span class="o">-</span> \
+               <span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">gammaln</span><span class="p">(</span><span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="n">k</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">eval_gradient</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">lpdf</span><span class="p">,</span> <span class="p">(</span><span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">x</span> <span class="o">-</span> <span class="o">.</span><span class="mi">5</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">lpdf</span></div>
+
+<div class="viewcode-block" id="Gamma"><a class="viewcode-back" href="../../../_autosummary/generated/pydygp.probabilitydistributions.Gamma.html#pydygp.probabilitydistributions.Gamma">[docs]</a><span class="k">class</span> <span class="nc">Gamma</span><span class="p">(</span><span class="n">UnivariateProbabilityDistribution</span><span class="p">):</span>
+<div class="viewcode-block" id="Gamma.__init__"><a class="viewcode-back" href="../../../_autosummary/generated/pydygp.probabilitydistributions.Gamma.html#pydygp.probabilitydistributions.Gamma.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Gamma</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">a</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span></div>
+
+    <span class="k">def</span> <span class="nf">logpdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">eval_gradient</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">lpdf</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">)</span> <span class="o">-</span> <span class="n">gammaln</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">eval_gradient</span><span class="p">:</span>
+            <span class="n">lpdf_dx</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
+            <span class="k">return</span> <span class="n">lpdf</span><span class="p">,</span> <span class="n">lpdf_dx</span>
+        <span class="k">return</span> <span class="n">lpdf</span></div>
+
+<div class="viewcode-block" id="GeneralisedInverseGaussian"><a class="viewcode-back" href="../../../_autosummary/generated/pydygp.probabilitydistributions.GeneralisedInverseGaussian.html#pydygp.probabilitydistributions.GeneralisedInverseGaussian">[docs]</a><span class="k">class</span> <span class="nc">GeneralisedInverseGaussian</span><span class="p">(</span><span class="n">UnivariateProbabilityDistribution</span><span class="p">):</span>
+<div class="viewcode-block" id="GeneralisedInverseGaussian.__init__"><a class="viewcode-back" href="../../../_autosummary/generated/pydygp.probabilitydistributions.GeneralisedInverseGaussian.html#pydygp.probabilitydistributions.GeneralisedInverseGaussian.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">p</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GeneralisedInverseGaussian</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">a</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span></div>
+
+    <span class="k">def</span> <span class="nf">logpdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">eval_gradient</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">lpdf</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">)</span> <span class="o">+</span> \
+               <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> \
+               <span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">/</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">eval_gradient</span><span class="p">:</span>
+            <span class="n">lpdf_dx</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">x</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">/</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">lpdf</span><span class="p">,</span> <span class="n">lpdf_dx</span>
+        <span class="k">return</span> <span class="n">lpdf</span></div>
+
+<div class="viewcode-block" id="Normal"><a class="viewcode-back" href="../../../_autosummary/generated/pydygp.probabilitydistributions.Normal.html#pydygp.probabilitydistributions.Normal">[docs]</a><span class="k">class</span> <span class="nc">Normal</span><span class="p">(</span><span class="n">UnivariateProbabilityDistribution</span><span class="p">):</span>
+<div class="viewcode-block" id="Normal.__init__"><a class="viewcode-back" href="../../../_autosummary/generated/pydygp.probabilitydistributions.Normal.html#pydygp.probabilitydistributions.Normal.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Normal</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loc</span> <span class="o">=</span> <span class="n">loc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">scale</span></div>
+
+    <span class="k">def</span> <span class="nf">logpdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">eval_gradient</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">lpdf</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">loc</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">lpdf</span> <span class="o">-=</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">eval_gradient</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">lpdf</span><span class="p">,</span> <span class="o">-</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">loc</span><span class="p">)</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="o">**</span><span class="mi">2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">lpdf</span></div>
+        
+<div class="viewcode-block" id="InverseGamma"><a class="viewcode-back" href="../../../_autosummary/generated/pydygp.probabilitydistributions.InverseGamma.html#pydygp.probabilitydistributions.InverseGamma">[docs]</a><span class="k">class</span> <span class="nc">InverseGamma</span><span class="p">(</span><span class="n">UnivariateProbabilityDistribution</span><span class="p">):</span>
+
+<div class="viewcode-block" id="InverseGamma.__init__"><a class="viewcode-back" href="../../../_autosummary/generated/pydygp.probabilitydistributions.InverseGamma.html#pydygp.probabilitydistributions.InverseGamma.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Inverse Gamma probability distribution</span>
+<span class="sd">        </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The probability density for the Inverse Gamma distribution is</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            p(x) = \\frac{\\beta^{\\alpha}}{\\Gamma(\\alpha)}</span>
+<span class="sd">            x^{-(\\alpha+1)} e^{-\\beta x^{-1}}</span>
+
+<span class="sd">        where :math:`\\alpha` is the shape parameter and :math:`\\beta` is</span>
+<span class="sd">        the scale parameter.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+
+<span class="sd">        &gt;&gt;&gt; # compare with the gamma distribution in scipy.stats</span>
+<span class="sd">        &gt;&gt;&gt; from scipy.stats import gamma</span>
+<span class="sd">        &gt;&gt;&gt; p = InverseGamma()</span>
+<span class="sd">        &gt;&gt;&gt; q = p.logtransform()  # dist. of log transformed inv. gamma r.v.</span>
+<span class="sd">        &gt;&gt;&gt; z = gamma.rvs(a=2, size=1000)</span>
+<span class="sd">        &gt;&gt;&gt; x = np.linspace(-5., 5., 100)</span>
+<span class="sd">        &gt;&gt;&gt; # plot the pdf of the log transformed inv. gamma r.v.</span>
+<span class="sd">        &gt;&gt;&gt; plt.plot(x, np.exp(q.logpdf(x)))</span>
+<span class="sd">        &gt;&gt;&gt; # plot the histogram of log(1/Z) Z ~ gamma(a, b)</span>
+<span class="sd">        &gt;&gt;&gt; plt.hist(-np.log(z), density=True, alpha=0.5)</span>
+
+<span class="sd">        .. plot::</span>
+
+<span class="sd">            import matplotlib.pyplot as plt</span>
+<span class="sd">            from scipy.stats import gamma</span>
+<span class="sd">            import numpy as np</span>
+<span class="sd">            from pydygp.probabilitydistributions import InverseGamma</span>
+<span class="sd">            p = InverseGamma(a=2)</span>
+<span class="sd">            q = p.logtransform()</span>
+<span class="sd">            z = gamma.rvs(a=2, size=1000)</span>
+<span class="sd">            x = np.linspace(-5., 5., 100)</span>
+<span class="sd">            plt.plot(x, np.exp(q.logpdf(x)))</span>
+<span class="sd">            plt.hist(-np.log(z), density=True, alpha=0.5)</span>
+<span class="sd">            plt.show()</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>        
+        <span class="nb">super</span><span class="p">(</span><span class="n">InverseGamma</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">a</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span></div>
+
+    <span class="k">def</span> <span class="nf">logpdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">eval_gradient</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">lpdf</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">/</span><span class="n">x</span>
+        <span class="n">lpdf</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">)</span> <span class="o">-</span> <span class="n">gammaln</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">eval_gradient</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">lpdf</span><span class="p">,</span> <span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">/</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">lpdf</span></div>
+        
+        
+
+
+<span class="k">class</span> <span class="nc">ExpGamma</span><span class="p">(</span><span class="n">ProbabilityDistribution</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">a</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span>
+
+    <span class="k">def</span> <span class="nf">logpdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">eval_gradient</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">ex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="n">lpdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">*</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">*</span><span class="n">ex</span>
+        <span class="n">lpdf</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">)</span> <span class="o">-</span> <span class="n">gammaln</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">eval_gradient</span><span class="p">:</span>
+            <span class="n">lpdf_dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">*</span><span class="n">ex</span>
+            <span class="k">return</span> <span class="n">lpdf</span><span class="p">,</span> <span class="n">lpdf_dx</span>
+
+        <span class="k">return</span> <span class="n">lpdf</span>
+
+<span class="k">class</span> <span class="nc">ExpInvGamma</span><span class="p">(</span><span class="n">ProbabilityDistribution</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">=</span><span class="n">a</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">=</span><span class="n">b</span>
+
+    <span class="k">def</span> <span class="nf">logpdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">eval_gradient</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">ex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="n">lpdf</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">*</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">/</span><span class="n">ex</span>
+        <span class="n">lpdf</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">)</span> <span class="o">-</span> <span class="n">gammaln</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">eval_gradient</span><span class="p">:</span>
+            <span class="n">lpdf_dx</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">/</span><span class="n">ex</span>
+            <span class="k">return</span> <span class="n">lpdf</span><span class="p">,</span> <span class="n">lpdf_dx</span>
+
+        <span class="k">return</span> <span class="n">lpdf</span>
+
+<span class="k">class</span> <span class="nc">ExpGeneralisedInvGaussian</span><span class="p">(</span><span class="n">ProbabilityDistribution</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">a</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
+
+    <span class="k">def</span> <span class="nf">logpdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">eval_gradient</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">ex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="n">lpdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">*</span><span class="n">x</span> <span class="o">-</span> <span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">*</span><span class="n">ex</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">/</span><span class="n">ex</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">eval_gradient</span><span class="p">:</span>
+            <span class="n">lpdf_dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">-</span> <span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">*</span><span class="n">ex</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">/</span><span class="n">ex</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">lpdf</span><span class="p">,</span> <span class="n">lpdf_dx</span>
+
+        <span class="k">return</span> <span class="n">lpdf</span>
+
+
+<div class="viewcode-block" id="MultivariateNormal"><a class="viewcode-back" href="../../../_autosummary/generated/pydygp.probabilitydistributions.MultivariateNormal.html#pydygp.probabilitydistributions.MultivariateNormal">[docs]</a><span class="k">class</span> <span class="nc">MultivariateNormal</span><span class="p">(</span><span class="n">ProbabilityDistribution</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MultivariateNormal.__init__"><a class="viewcode-back" href="../../../_autosummary/generated/pydygp.probabilitydistributions.MultivariateNormal.html#pydygp.probabilitydistributions.MultivariateNormal.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">jitter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">):</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="n">cov</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MultivariateNormal</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">output_dim</span><span class="o">=</span><span class="n">N</span><span class="p">)</span> 
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mean</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">jitter</span><span class="p">:</span>
+            <span class="n">cov</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">diag_indices_from</span><span class="p">(</span><span class="n">cov</span><span class="p">)]</span> <span class="o">+=</span> <span class="n">alpha</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">cov</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_L</span> <span class="o">=</span> <span class="n">L</span></div>
+
+    <span class="k">def</span> <span class="nf">logpdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">eval_gradient</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_L</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">cho_solve</span><span class="p">((</span><span class="n">L</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span> <span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span>
+
+        <span class="n">log_lik</span> <span class="o">=</span> <span class="o">-.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">x</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+        <span class="n">log_lik</span> <span class="o">-=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">L</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">log_lik</span> <span class="o">-=</span> <span class="n">L</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">eval_gradient</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">log_lik</span><span class="p">,</span> <span class="o">-</span><span class="n">alpha</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">log_lik</span>
+
+    <span class="k">def</span> <span class="nf">rvs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dim</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dim</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_L</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">z</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">z</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_L</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_L</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
+
+    
+        
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Daniel Tait.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

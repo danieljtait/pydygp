@@ -12,7 +12,7 @@ Multiplicative Forces
 =====================
 
 .. autosummary::
-   :toctree:
+   :toctree: _autosummary
 
    BaseMLFM     -- Base class for the MLFM.
    MLFMAdapGrad -- MLFM using adaptive gradient matching.

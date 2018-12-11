@@ -1,0 +1,483 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pydygp.linlatentforcemodels.MLFMAdapGrad &mdash; pydygp  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="pydygp.linlatentforcemodels.GibbsMLFMAdapGrad" href="pydygp.linlatentforcemodels.GibbsMLFMAdapGrad.html" />
+    <link rel="prev" title="pydygp.linlatentforcemodels.BaseMLFM" href="pydygp.linlatentforcemodels.BaseMLFM.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydygp
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installing PydyGP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">PydyGP Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Gallery of Examples</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../pydygp.linlatentforcemodels.html">pydygp.linlatentforcemodels</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../pydygp.linlatentforcemodels.html#linear-latent-force-models-pydygp-linlatentforcemodels">Linear Latent Force Models (<code class="docutils literal notranslate"><span class="pre">pydygp.linlatentforcemodels</span></code>)</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../pydygp.linlatentforcemodels.html#multiplicative-forces">Multiplicative Forces</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pydygp.linlatentforcemodels.BaseMLFM.html">pydygp.linlatentforcemodels.BaseMLFM</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">pydygp.linlatentforcemodels.MLFMAdapGrad</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydygp.linlatentforcemodels.GibbsMLFMAdapGrad.html">pydygp.linlatentforcemodels.GibbsMLFMAdapGrad</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydygp.linlatentforcemodels.MLFMSuccApprox.html">pydygp.linlatentforcemodels.MLFMSuccApprox</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../pydygp.probabilitydistributions.html">pydygp.probabilitydistributions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydygp</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../pydygp.linlatentforcemodels.html">pydygp.linlatentforcemodels</a> &raquo;</li>
+        
+      <li>pydygp.linlatentforcemodels.MLFMAdapGrad</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/_autosummary/_autosummary/pydygp.linlatentforcemodels.MLFMAdapGrad.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="pydygp-linlatentforcemodels-mlfmadapgrad">
+<h1>pydygp.linlatentforcemodels.MLFMAdapGrad<a class="headerlink" href="#pydygp-linlatentforcemodels-mlfmadapgrad" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pydygp.linlatentforcemodels.MLFMAdapGrad">
+<em class="property">class </em><code class="descclassname">pydygp.linlatentforcemodels.</code><code class="descname">MLFMAdapGrad</code><span class="sig-paren">(</span><em>basis_mats</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pydygp/linlatentforcemodels/mlfmadapgrad.html#MLFMAdapGrad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydygp.linlatentforcemodels.MLFMAdapGrad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multiplicative latent force model (MLFM) using the adaptive
+gradient matching approximation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>struct_mats</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of square ndarray</span></dt>
+<dd><p class="first last">A set of [A0,…,AR] square numpy array_like</p>
+</dd>
+<dt><strong>lf_kernels</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of kernel objects, optional</span></dt>
+<dd><p class="first last">Kernels of the latent force Gaussian process objects. If None
+is passed, the kernel “1.0 * RBF(1.0)” is used as a defualt.</p>
+</dd>
+<dt><strong>Read more in the :ref:`Tutorial &lt;tutorials-mlfm&gt;`.</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pydygp.linlatentforcemodels.MLFMAdapGrad.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>basis_mats</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pydygp/linlatentforcemodels/mlfmadapgrad.html#MLFMAdapGrad.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydygp.linlatentforcemodels.MLFMAdapGrad.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#pydygp.linlatentforcemodels.MLFMAdapGrad.__init__" title="pydygp.linlatentforcemodels.MLFMAdapGrad.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(basis_mats,&nbsp;**kwargs)</td>
+<td>Initialize self.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#pydygp.linlatentforcemodels.MLFMAdapGrad.fit" title="pydygp.linlatentforcemodels.MLFMAdapGrad.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(times,&nbsp;Y,&nbsp;**kwargs)</td>
+<td>Fit the MLFM using Adaptive Gradient Matching by maximimising the likelihood function.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#pydygp.linlatentforcemodels.MLFMAdapGrad.log_likelihood" title="pydygp.linlatentforcemodels.MLFMAdapGrad.log_likelihood"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log_likelihood</span></code></a>(y,&nbsp;g,&nbsp;beta,&nbsp;logphi,&nbsp;loggamma,&nbsp;…)</td>
+<td>Log-likelihood of the data</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#pydygp.linlatentforcemodels.MLFMAdapGrad.predict_lf" title="pydygp.linlatentforcemodels.MLFMAdapGrad.predict_lf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict_lf</span></code></a>(tt[,&nbsp;return_std])</td>
+<td>Predict the latent force variables using the Laplace approximation.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#pydygp.linlatentforcemodels.MLFMAdapGrad.setup_latentforces" title="pydygp.linlatentforcemodels.MLFMAdapGrad.setup_latentforces"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup_latentforces</span></code></a>([kernels])</td>
+<td>Initalises the latent force GPs</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#pydygp.linlatentforcemodels.MLFMAdapGrad.sim" title="pydygp.linlatentforcemodels.MLFMAdapGrad.sim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sim</span></code></a>(x0,&nbsp;tt[,&nbsp;beta,&nbsp;dt_max,&nbsp;latent_forces,&nbsp;size])</td>
+<td>Simulate the process along a set of points</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pydygp.linlatentforcemodels.MLFMAdapGrad.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>times</em>, <em>Y</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pydygp/linlatentforcemodels/mlfmadapgrad.html#MLFMAdapGrad.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydygp.linlatentforcemodels.MLFMAdapGrad.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit the MLFM using Adaptive Gradient Matching by maximimising
+the likelihood function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>times</strong> <span class="classifier-delimiter">:</span> <span class="classifier">ndarray, shape (ndata, )</span></dt>
+<dd><p class="first last">Data time points. Ordered array of size (ndata, ),
+where ‘ndata’ is the number of data points</p>
+</dd>
+<dt><strong>Y</strong> <span class="classifier-delimiter">:</span> <span class="classifier">ndarray, shape = (ndata, K)</span></dt>
+<dd><p class="first last">Data to be fitted. Array of size (ndata, K),
+where ‘ndata’ is the number of data points and K
+is the dimension of the latent variable space.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>res_par</strong> <span class="classifier-delimiter">:</span> <span class="classifier">A <code class="xref py py-class docutils literal notranslate"><span class="pre">MLFMAdapGradFitResults</span></code></span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydygp.linlatentforcemodels.MLFMAdapGrad.log_likelihood">
+<code class="descname">log_likelihood</code><span class="sig-paren">(</span><em>y</em>, <em>g</em>, <em>beta</em>, <em>logphi</em>, <em>loggamma</em>, <em>logtau</em>, <em>eval_gradient=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pydygp/linlatentforcemodels/mlfmadapgrad.html#MLFMAdapGrad.log_likelihood"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydygp.linlatentforcemodels.MLFMAdapGrad.log_likelihood" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log-likelihood of the data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>y</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array</span></dt>
+<dd></dd>
+<dt><strong>g</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array</span></dt>
+<dd></dd>
+<dt><strong>beta</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array</span></dt>
+<dd></dd>
+<dt><strong>logphi</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array</span></dt>
+<dd></dd>
+<dt><strong>loggamma</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array</span></dt>
+<dd></dd>
+<dt><strong>logtau</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array</span></dt>
+<dd></dd>
+<dt><strong>eval_gradient</strong> <span class="classifier-delimiter">:</span> <span class="classifier">boolean</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>res</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float,</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Returns the log-likelihood</p>
+<div class="math notranslate nohighlight">
+\[\ln p(\mathbf{y} \mid \mathbf{g},
+\boldsymbol{\beta},
+\ln \boldsymbol{\phi},
+\ln \boldsymbol{\gamma},
+\ln \boldsymbol{\tau})\]</div>
+<p>of the vectorised data <span class="math notranslate nohighlight">\(\mathbf{y}\)</span>. Although note the
+for the GP hyperparameters, temperature parameter
+<span class="math notranslate nohighlight">\(oldsymbol{\gamma}\)</span> and data precision
+<span class="math notranslate nohighlight">\(boldsymbol{      au}\)</span> that function takes as arguments the
+log transform of these values (and consequently returns the
+gradient wth respect to the log transformed parameters) to
+ensure a natural positivity constraints.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydygp.linlatentforcemodels.MLFMAdapGrad.predict_lf">
+<code class="descname">predict_lf</code><span class="sig-paren">(</span><em>tt</em>, <em>return_std=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pydygp/linlatentforcemodels/mlfmadapgrad.html#MLFMAdapGrad.predict_lf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydygp.linlatentforcemodels.MLFMAdapGrad.predict_lf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict the latent force variables using the Laplace approximation.</p>
+<p>Requires that the model has been fitted.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>tt</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like, shape = (n, )</span></dt>
+<dd><p class="first last">Time points where the GPs are evaluated</p>
+</dd>
+<dt><strong>return_std: bool, default: False</strong></dt>
+<dd><p class="first last">If True, the standard deviation of the predictive distribution at
+the query times is returned, along with the mean.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>lf_mean</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array, shape = (R, tt.size)</span></dt>
+<dd><p class="first last">Mean of predictive distribution at tt</p>
+</dd>
+<dt><strong>lf_std</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array, shape = (R, tt.size), optional</span></dt>
+<dd><p class="first last">Standard deviation of the predictive distribution at tt. Only
+returned when return_std is True</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydygp.linlatentforcemodels.MLFMAdapGrad.setup_latentforces">
+<code class="descname">setup_latentforces</code><span class="sig-paren">(</span><em>kernels=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pydygp.linlatentforcemodels.MLFMAdapGrad.setup_latentforces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initalises the latent force GPs</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>kernels</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list, optional</span></dt>
+<dd><p class="first last">Kernels of the latent force Gaussian process objects</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydygp.linlatentforcemodels.MLFMAdapGrad.sim">
+<code class="descname">sim</code><span class="sig-paren">(</span><em>x0</em>, <em>tt</em>, <em>beta=None</em>, <em>dt_max=0.1</em>, <em>latent_forces=None</em>, <em>size=1</em><span class="sig-paren">)</span><a class="headerlink" href="#pydygp.linlatentforcemodels.MLFMAdapGrad.sim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simulate the process along a set of points</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>x0</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array_like, shape (K, )</span></dt>
+<dd><p class="first last">initial condition for the ode</p>
+</dd>
+<dt><strong>tt</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array_like</span></dt>
+<dd><p class="first last">Ordered sequence of time points for the model to be simulated at</p>
+</dd>
+<dt><strong>beta</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array_like, shape (R+1, D)</span></dt>
+<dd></dd>
+<dt><strong>dt_max</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float, defualt = 0.1</span></dt>
+<dd><p class="first last">Maximum spacing of dense time points used for simulating the model.</p>
+</dd>
+<dt><strong>latent_forces</strong> <span class="classifier-delimiter">:</span> <span class="classifier">Tuple of callables, optional, default = None</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>Y</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array, shape(len(tt), K)</span></dt>
+<dd><p class="first last">Values of the MLFM simulated at tt</p>
+</dd>
+<dt><strong>latent_forces</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple of callables</span></dt>
+<dd><p class="first last">Tuple of functions (g_1(t),…,g_R(t)) used to simulate the model.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydygp.linlatentforcemodels</span> <span class="k">import</span> <span class="n">BaseMLFM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">struct_mats</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))]</span> <span class="o">+</span> <span class="p">[</span><span class="o">*</span><span class="n">pydygp</span><span class="o">.</span><span class="n">liealgebras</span><span class="o">.</span><span class="n">so2</span><span class="p">()]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">5.</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mlfm</span> <span class="o">=</span> <span class="n">BaseMLFM</span><span class="p">(</span><span class="n">struct_mats</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Y</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">mlfm</span><span class="o">.</span><span class="n">sim</span><span class="p">([</span><span class="mf">1.</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">tt</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pydygp.linlatentforcemodels.GibbsMLFMAdapGrad.html" class="btn btn-neutral float-right" title="pydygp.linlatentforcemodels.GibbsMLFMAdapGrad" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pydygp.linlatentforcemodels.BaseMLFM.html" class="btn btn-neutral" title="pydygp.linlatentforcemodels.BaseMLFM" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Daniel Tait.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

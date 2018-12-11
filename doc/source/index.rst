@@ -17,11 +17,11 @@ Welcome to pydygp's documentation!
 API Reference
 -------------
 
-.. toctree::
-   :maxdepth: 1
+.. autosummary::
+   :toctree: _autosummary
 
-   modules/linlatentforcemodels
-   modules/probabilitydistributions
+   pydygp.linlatentforcemodels
+   pydygp.probabilitydistributions		   
 		   
 Indices and tables
 ==================
