@@ -86,7 +86,7 @@ x0 = np.eye(3)
 
 # downsample the dense time vector
 tt = ttd[::10]
-Data, _ = mlfm.sim(x0, tt, beta=beta, glist=(g, ), size=3)
+Data, _ = mlfm.sim(x0, tt, beta=beta, latent_forces=(g, ), size=3)
 
 fig, ax = plt.subplots()
 ax.plot(ttd, sol, '-', alpha=0.3)

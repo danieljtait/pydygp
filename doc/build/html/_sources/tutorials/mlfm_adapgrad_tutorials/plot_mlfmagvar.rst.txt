@@ -155,7 +155,7 @@ for example there is the class :ref:`ProbabilityDistribution`
 
 
 
-**Total running time of the script:** ( 0 minutes  6.980 seconds)
+**Total running time of the script:** ( 0 minutes  6.434 seconds)
 
 
 .. _sphx_glr_download_tutorials_mlfm_adapgrad_tutorials_plot_mlfmagvar.py:

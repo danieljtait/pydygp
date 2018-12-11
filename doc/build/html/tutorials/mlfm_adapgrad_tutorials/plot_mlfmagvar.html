@@ -99,7 +99,7 @@
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../modules/linlatentforcemodels.html">Linear Latent Force Models (<code class="docutils literal notranslate"><span class="pre">pydygp.linlatentforcemodels</span></code>)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../probabilitydistributions.html">Probability Distributions (<code class="docutils literal notranslate"><span class="pre">pydygp.probabilitydistributions</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/probabilitydistributions.html">Probability Distributions (<code class="docutils literal notranslate"><span class="pre">pydygp.probabilitydistributions</span></code>)</a></li>
 </ul>
 
             
@@ -223,7 +223,7 @@ fixed as well as defining priors</p>
 <p>The prior should have a loglikelihood(x, eval_gradient=False) method
 which returns the loglikelihood of the prior variable at x and
 and optionally its gradient.</p>
-<p>Preexisting priors are contained in <a class="reference internal" href="../../probabilitydistributions.html#module-pydygp.probabilitydistributions" title="pydygp.probabilitydistributions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pydygp.probabilitydistributions</span></code></a></p>
+<p>Preexisting priors are contained in <a class="reference internal" href="../../modules/probabilitydistributions.html#module-pydygp.probabilitydistributions" title="pydygp.probabilitydistributions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pydygp.probabilitydistributions</span></code></a></p>
 <p>for example there is the class <span class="xref std std-ref">ProbabilityDistribution</span></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">logpsi_prior</span> <span class="o">=</span> <span class="n">GeneralisedInverseGaussian</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">p</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">logtransform</span><span class="p">()</span>
 <span class="n">loggamma_prior</span> <span class="o">=</span> <span class="p">[</span><span class="n">InverseGamma</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span><span class="o">.</span><span class="n">logtransform</span><span class="p">(),]</span><span class="o">*</span><span class="n">vmlfm</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">K</span>
@@ -280,7 +280,7 @@ and optionally its gradient.</p>
 </pre></div>
 </div>
 <img alt="../../_images/sphx_glr_plot_mlfmagvar_001.png" class="sphx-glr-single-img" src="../../_images/sphx_glr_plot_mlfmagvar_001.png" />
-<p><strong>Total running time of the script:</strong> ( 0 minutes  6.980 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  6.434 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-mlfm-adapgrad-tutorials-plot-mlfmagvar-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" href="../../_downloads/plot_mlfmagvar.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_mlfmagvar.py</span></code></a></div>

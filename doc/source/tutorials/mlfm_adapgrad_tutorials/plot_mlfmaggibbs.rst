@@ -210,7 +210,7 @@ We do the usual imports and generate some simulated data
     
     plt.show()
 
-**Total running time of the script:** ( 0 minutes  32.439 seconds)
+**Total running time of the script:** ( 0 minutes  33.574 seconds)
 
 
 .. _sphx_glr_download_tutorials_mlfm_adapgrad_tutorials_plot_mlfmaggibbs.py:

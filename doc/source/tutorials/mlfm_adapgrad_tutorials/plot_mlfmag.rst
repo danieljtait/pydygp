@@ -145,7 +145,7 @@ The MLFM Class
 
     # downsample the dense time vector
     tt = ttd[::10]
-    Data, _ = mlfm.sim(x0, tt, beta=beta, glist=(g, ), size=3)
+    Data, _ = mlfm.sim(x0, tt, beta=beta, latent_forces=(g, ), size=3)
 
     fig, ax = plt.subplots()
     ax.plot(ttd, sol, '-', alpha=0.3)
@@ -191,7 +191,7 @@ Latent Force Estimation
 
 
 
-**Total running time of the script:** ( 0 minutes  2.627 seconds)
+**Total running time of the script:** ( 0 minutes  2.101 seconds)
 
 
 .. _sphx_glr_download_tutorials_mlfm_adapgrad_tutorials_plot_mlfmag.py:

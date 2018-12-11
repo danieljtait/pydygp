@@ -21,7 +21,7 @@ API Reference
    :maxdepth: 1
 
    modules/linlatentforcemodels
-   probabilitydistributions
+   modules/probabilitydistributions
 		   
 Indices and tables
 ==================
