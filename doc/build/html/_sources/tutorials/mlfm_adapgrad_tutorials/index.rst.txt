@@ -69,6 +69,26 @@ MAP Estimation
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="This note demonstrates the use of the :py:obj:`*` operator to construct the Cartesian product o...">
+
+.. only:: html
+
+    .. figure:: /tutorials/mlfm_adapgrad_tutorials/images/thumb/sphx_glr_plot_mlfm_product_thumb.png
+
+        :ref:`sphx_glr_tutorials_mlfm_adapgrad_tutorials_plot_mlfm_product.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /tutorials/mlfm_adapgrad_tutorials/plot_mlfm_product
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="This note descibes how to carry out the process of carrying out MAP parameter estimation for th...">
 
 .. only:: html
@@ -89,13 +109,13 @@ MAP Estimation
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example presents an illustration of using the MLFM to learn the model">
+    <div class="sphx-glr-thumbcontainer" tooltip="Variational Inference">
 
 .. only:: html
 
-    .. figure:: /tutorials/mlfm_adapgrad_tutorials/images/thumb/sphx_glr_plot_mlfmagvar_thumb.png
+    .. figure:: /tutorials/mlfm_adapgrad_tutorials/images/thumb/sphx_glr_plot_mlfmagvar2_thumb.png
 
-        :ref:`sphx_glr_tutorials_mlfm_adapgrad_tutorials_plot_mlfmagvar.py`
+        :ref:`sphx_glr_tutorials_mlfm_adapgrad_tutorials_plot_mlfmagvar2.py`
 
 .. raw:: html
 
@@ -105,7 +125,7 @@ MAP Estimation
 .. toctree::
    :hidden:
 
-   /tutorials/mlfm_adapgrad_tutorials/plot_mlfmagvar
+   /tutorials/mlfm_adapgrad_tutorials/plot_mlfmagvar2
 
 .. raw:: html
 
@@ -126,6 +146,26 @@ MAP Estimation
    :hidden:
 
    /tutorials/mlfm_adapgrad_tutorials/plot_mlfmaggibbs
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example presents an illustration of using the MLFM to learn the model">
+
+.. only:: html
+
+    .. figure:: /tutorials/mlfm_adapgrad_tutorials/images/thumb/sphx_glr_plot_mlfmagvar_thumb.png
+
+        :ref:`sphx_glr_tutorials_mlfm_adapgrad_tutorials_plot_mlfmagvar.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /tutorials/mlfm_adapgrad_tutorials/plot_mlfmagvar
 .. raw:: html
 
     <div style='clear:both'></div>

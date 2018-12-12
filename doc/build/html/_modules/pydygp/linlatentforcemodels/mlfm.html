@@ -355,7 +355,49 @@
         <span class="n">comp_funcs</span> <span class="o">=</span> <span class="n">struct_mats</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">g</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
 
         <span class="c1"># sum over r</span>
-        <span class="k">return</span> <span class="n">comp_funcs</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">comp_funcs</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">MLFMCartesianProduct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">,</span></div>
+    
+
+<span class="k">class</span> <span class="nc">MLFMCartesianProduct</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Cartesian product of two MLFM like objects</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mlfm1</span><span class="p">,</span> <span class="n">mlfm2</span><span class="p">):</span>
+        <span class="c1"># Check compatability</span>
+        <span class="n">N1</span><span class="p">,</span> <span class="n">K1</span><span class="p">,</span> <span class="n">R1</span><span class="p">,</span> <span class="n">D1</span> <span class="o">=</span> <span class="n">mlfm1</span><span class="o">.</span><span class="n">dim</span>
+        <span class="n">N2</span><span class="p">,</span> <span class="n">K2</span><span class="p">,</span> <span class="n">R2</span><span class="p">,</span> <span class="n">D2</span> <span class="o">=</span> <span class="n">mlfm2</span><span class="o">.</span><span class="n">dim</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlfm1</span> <span class="o">=</span> <span class="n">mlfm1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlfm2</span> <span class="o">=</span> <span class="n">mlfm2</span>
+        
+        <span class="k">if</span> <span class="n">R1</span> <span class="o">!=</span> <span class="n">R2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The number of latent forces in both &quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;both models must be the same&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">N1</span> <span class="o">!=</span> <span class="n">N2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dimension of the input vector must &quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;be the same for both models&quot;</span><span class="p">)</span>
+
+        <span class="c1"># This causes a bit of rewrite</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">Dimensions</span><span class="p">(</span><span class="n">N1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">R1</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mlfm</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">MLFMCartesianProduct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mlfm</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a flat tuple of the constituents of the MMLF objects</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mlfms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlfm1</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlfm2</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">mlfms</span>
+
+        
 </pre></div>
 
            </div>

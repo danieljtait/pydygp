@@ -20,82 +20,14 @@ We do the usual imports and generate some simulated data
 
 
 
-
-.. rst-class:: sphx-glr-horizontal
-
-
-    *
-
-      .. image:: /tutorials/mlfm_adapgrad_tutorials/images/sphx_glr_plot_mlfmaggibbs_001.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /tutorials/mlfm_adapgrad_tutorials/images/sphx_glr_plot_mlfmaggibbs_002.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /tutorials/mlfm_adapgrad_tutorials/images/sphx_glr_plot_mlfmaggibbs_003.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /tutorials/mlfm_adapgrad_tutorials/images/sphx_glr_plot_mlfmaggibbs_004.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /tutorials/mlfm_adapgrad_tutorials/images/sphx_glr_plot_mlfmaggibbs_005.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /tutorials/mlfm_adapgrad_tutorials/images/sphx_glr_plot_mlfmaggibbs_006.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /tutorials/mlfm_adapgrad_tutorials/images/sphx_glr_plot_mlfmaggibbs_007.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /tutorials/mlfm_adapgrad_tutorials/images/sphx_glr_plot_mlfmaggibbs_008.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /tutorials/mlfm_adapgrad_tutorials/images/sphx_glr_plot_mlfmaggibbs_009.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /tutorials/mlfm_adapgrad_tutorials/images/sphx_glr_plot_mlfmaggibbs_010.png
-            :class: sphx-glr-multi-img
-
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    [[ 0.09  -0.1    0.045]
-     [-0.797  0.86  -0.396]]
-
-
-
-
-|
-
-
 .. code-block:: python
 
     import numpy as np
     import matplotlib.pyplot as plt
     from pydygp.probabilitydistributions import (Normal,
                                                  GeneralisedInverseGaussian,
+                                                 ChiSquare,
+                                                 Gamma,
                                                  InverseGamma)
     from sklearn.gaussian_process.kernels import RBF
     from pydygp.liealgebras import so
@@ -121,96 +53,80 @@ We do the usual imports and generate some simulated data
     Y = np.column_stack((y.T.ravel() for y in Data))
 
     logpsi_prior = GeneralisedInverseGaussian(a=5, b=5, p=-1).logtransform()
-    loggamma_prior = InverseGamma(a=0.001, b=0.001).logtransform() * gmlfm.dim.K
+    loggamma_prior = Gamma(a=2.00, b=10.0).logtransform() * gmlfm.dim.K
     beta_prior = Normal(scale=1.) * beta.size
 
     fitopts = {'logpsi_is_fixed': True, 'logpsi_prior': logpsi_prior,
-               'loggamma_is_fixed': True,# 'loggamma_prior': loggamma_prior,
+               'loggamma_is_fixed': False, 'loggamma_prior': loggamma_prior,
                'beta_is_fixed': False, 'beta_prior': beta_prior,
                'beta0': beta,
                }
+
+    nsample = 100
     gibbsRV = gmlfm.gibbsfit(tt, Y,
-                             sample=('g', 'x'),
-                             size=1000,
+                             sample=('g', 'beta', 'x'),
+                             size=nsample,
                              **fitopts)
-    mapres = gmlfm.fit(tt, Y, **fitopts)
 
-    A = [sum(brd*Ld for brd, Ld in zip(br, gmlfm.basis_mats))
-         for br in beta]
 
-    aij = []
 
-    _aa = 0.
 
-    for g in gibbsRV['g']:# in zip(gibbsRV['g']):#, gibbsRV['beta']):
-        _beta = mapres.beta #b.reshape((2, 3))
-        _A = [sum(brd*Ld for brd, Ld in zip(br, gmlfm.basis_mats))
-              for br in _beta]
-        aij.append(_A[0][0, 2] + _A[1][0, 2]*g)
-        _aa += gmlfm._component_functions(g, _beta)
-    aij = np.array(aij)
 
-    print(_beta)
 
-    #print(np.mean(gibbsRV['beta'], axis=0))
-      
-    _aa /= gibbsRV['g'].shape[0]
+Learning the Coefficient Matrix
+-------------------------------
 
-    fig, ax = plt.subplots()
+The goal in fitting models of dynamic systems is to learn the dynamics,
+and more subtly learn the dynamics of the model independent of the
+state variables.
+
+
+
+.. code-block:: python
+
+
+    aijRV = []
+    for g, b in zip(gibbsRV['g'], gibbsRV['beta']):
+        _beta = b.reshape((2, 3))
+        aijRV.append(gmlfm._component_functions(g, _beta))
+    aijRV = np.array(aijRV)
+
+    # True component functions
     ttd = np.linspace(0., tt[-1], 100)
-    ax.plot(ttd, A[0][0, 2] + A[1][0, 2]*lf[0](ttd), 'b-')
-    ax.plot(tt, aij.T, 'k+')
-    ax.plot(tt, np.mean(aij, axis=0), '+')
-    ax.plot(tt, _aa[0, 1, :], '-.')
-
-    fig2, ax2 = plt.subplots()
-    ax2.plot(ttd, lf[0](ttd), 'k-')
-    ax2.plot(tt, np.mean(gibbsRV['g'], axis=0), '+')
-    ax2.plot(tt, mapres.g.T, 'o')
-    ax2.plot(tt, gibbsRV['g'].T, 'k+')
-
-    fig3, ax3 = plt.subplots()
-    #ax3.hist(gibbsRV['beta'][:, 2], density=True)
-
     aaTrue = gmlfm._component_functions(lf[0](ttd), beta, N=ttd.size)
-    aaMap = gmlfm._component_functions(mapres.g.ravel(), mapres.beta)
 
-    fig4, ax4 = plt.subplots()
-    for i, j in zip([0, 0, 1], [1, 2, 2]):
-        ax4.plot(tt, _aa[i, j, :], '+-',
-                 label=r'$a{}{}$'.format(i, j))
-        ax4.plot(ttd, aaTrue[i, j, :], alpha=0.4)
-        ax4.plot(tt, aaMap[i, j, :], 's')
-    ax4.legend()
+    # Make some plots
+    inds = [(0, 1), (0, 2), (1, 2)]
+    symbs = ['+', '+', '+']
+    colors = ['slateblue', 'peru', 'darkseagreen']
 
-    xrv = gibbsRV['x']
+    fig = plt.figure()
+    for nt, (ind, symb) in enumerate(zip(inds, symbs)):
 
-    for m in range(3):
-        fig, ax = plt.subplots()
+        i, j = ind
 
-        xm = xrv[..., m].reshape(xrv.shape[0],
-                                 gmlfm.dim.K,
-                                 gmlfm.dim.N)
+        ax = fig.add_subplot(1, 3, nt+1,
+                             adjustable='box', aspect=5.)
+        ax.plot(ttd, aaTrue[i, j, :], alpha=0.8,
+                label=r"$a^*_{{ {}{} }}$".format(i+1, j+1),
+                color=colors[nt])
+        ax.plot(tt, aijRV[:, i, j, :].T, 'k' + symb, alpha=0.1)
 
+        ax.set_title(r"$a_{{ {}{} }}$".format(i+1, j+1))
+        ax.set_ylim((-.7, .7))
+        ax.legend()
 
-        ax.plot(tt, xm[:, 2, :].T, 'k+')
-        ax.plot(tt, Data[m], 's')
-
-
-    from scipy.interpolate import interp1d
-    u = interp1d(tt, mapres.g.ravel(), kind='cubic', fill_value='extrapolate')
-
-    for m, x0m in enumerate(x0):
-    
-        sol, _ = gmlfm.sim(x0m, ttd, beta=mapres.beta, latent_forces=(u, ))
-
-        fig, ax = plt.subplots()
-        ax.plot(ttd, sol, 'k-')
-        ax.plot(tt, Data[m], 's')
-    
     plt.show()
 
-**Total running time of the script:** ( 0 minutes  33.574 seconds)
+
+
+.. image:: /tutorials/mlfm_adapgrad_tutorials/images/sphx_glr_plot_mlfmaggibbs_001.png
+    :class: sphx-glr-single-img
+
+
+
+
+**Total running time of the script:** ( 0 minutes  9.547 seconds)
 
 
 .. _sphx_glr_download_tutorials_mlfm_adapgrad_tutorials_plot_mlfmaggibbs.py:

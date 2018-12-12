@@ -158,12 +158,41 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="k">import</span> <span class="n">multivariate_normal</span>
-<span class="kn">from</span> <span class="nn">.mlfm</span> <span class="k">import</span> <span class="n">Dimensions</span><span class="p">,</span> <span class="n">BaseMLFM</span>
+<span class="kn">from</span> <span class="nn">.mlfm</span> <span class="k">import</span> <span class="n">Dimensions</span><span class="p">,</span> <span class="n">BaseMLFM</span><span class="p">,</span> <span class="n">MLFMCartesianProduct</span>
 <span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="k">import</span> <span class="p">(</span><span class="n">block_diag</span><span class="p">,</span> <span class="n">cho_solve</span><span class="p">,</span> <span class="n">cholesky</span><span class="p">,</span> <span class="n">solve_triangular</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pydygp.gradientkernels</span> <span class="k">import</span> <span class="n">ConstantKernel</span><span class="p">,</span> <span class="n">RBF</span>
 <span class="kn">from</span> <span class="nn">sklearn.gaussian_process</span> <span class="k">import</span> <span class="n">GaussianProcessRegressor</span>
 <span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="k">import</span> <span class="n">minimize</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
+
+<span class="k">class</span> <span class="nc">MLFMAdapGradCartesianProduct</span><span class="p">(</span><span class="n">MLFMCartesianProduct</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mlfm1</span><span class="p">,</span> <span class="n">mlfm2</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MLFMAdapGradCartesianProduct</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mlfm1</span><span class="p">,</span> <span class="n">mlfm2</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mlfm</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">MLFMAdapGradCartesianProduct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mlfm</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_fit_kwarg_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N_manifolds</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">var_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;logpsi&#39;</span><span class="p">]</span> <span class="o">+</span> \
+                    <span class="p">[</span><span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">vn</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)))</span>
+                     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_manifolds</span><span class="p">)</span>
+                     <span class="k">for</span> <span class="n">vn</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">,</span> <span class="s1">&#39;logphi&#39;</span><span class="p">,</span> <span class="s1">&#39;loggamma&#39;</span><span class="p">,</span> <span class="s1">&#39;logtau&#39;</span><span class="p">]]</span>
+
+        <span class="c1"># check **kwargs to see if any variables have been kept fixed</span>
+        <span class="n">is_fixed_vars</span> <span class="o">=</span> <span class="p">{</span><span class="n">vn</span><span class="p">:</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">vn</span><span class="p">,</span> <span class="s2">&quot;_is_fixed&quot;</span><span class="p">)),</span> <span class="kc">False</span><span class="p">)</span>
+                         <span class="k">for</span> <span class="n">vn</span> <span class="ow">in</span> <span class="n">var_names</span><span class="p">}</span>
+
+        <span class="c1"># check for blanket variable name fixing</span>
+        <span class="c1">#    -- done last so will take precedence</span>
+        <span class="k">for</span> <span class="n">vn</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;loggamma&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">vn</span><span class="p">,</span> <span class="s1">&#39;_is_fixed&#39;</span><span class="p">)),</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_manifolds</span><span class="p">):</span>
+                    <span class="n">is_fixed_vars</span><span class="p">[</span><span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">vn</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)))]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="n">is_fixed_vars</span>
+            
+
 
 <span class="k">class</span> <span class="nc">MLFMAdapGradFitResults</span><span class="p">(</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;MLFMAdapGradFitResults&#39;</span><span class="p">,</span>
                                         <span class="p">(</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;beta&#39;</span><span class="p">,</span> <span class="s1">&#39;logpsi&#39;</span><span class="p">,</span> <span class="s1">&#39;logphi&#39;</span><span class="p">,</span>
@@ -284,6 +313,7 @@
     <span class="n">gp</span><span class="o">.</span><span class="n">alpha_</span> <span class="o">=</span> <span class="n">cho_solve</span><span class="p">((</span><span class="n">gp</span><span class="o">.</span><span class="n">L_</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span> <span class="n">gp</span><span class="o">.</span><span class="n">y_train_</span><span class="p">)</span>
     <span class="n">gp</span><span class="o">.</span><span class="n">_y_train_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
+
 <div class="viewcode-block" id="MLFMAdapGrad"><a class="viewcode-back" href="../../../_autosummary/_autosummary/pydygp.linlatentforcemodels.MLFMAdapGrad.html#pydygp.linlatentforcemodels.MLFMAdapGrad">[docs]</a><span class="k">class</span> <span class="nc">MLFMAdapGrad</span><span class="p">(</span><span class="n">BaseMLFM</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Multiplicative latent force model (MLFM) using the adaptive</span>
@@ -309,6 +339,9 @@
 
         <span class="c1"># flags for fitting function</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_tt_aug</span> <span class="o">=</span> <span class="kc">False</span>     <span class="c1"># Has the time vector been augmented</span></div>
+
+    <span class="k">def</span> <span class="nf">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mlfm</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">MLFMAdapGradCartesianProduct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mlfm</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_setup_times</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tt</span><span class="p">,</span> <span class="n">tt_aug</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data_inds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Sets up the model time vector, optionally augments the time</span>
@@ -420,7 +453,7 @@
 
         <span class="c1"># Check for kwarg priors</span>
         <span class="n">priors</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">vn</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;logpsi&#39;</span><span class="p">,</span> <span class="s1">&#39;beta&#39;</span><span class="p">,</span> <span class="s1">&#39;logtau&#39;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">vn</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;logpsi&#39;</span><span class="p">,</span> <span class="s1">&#39;beta&#39;</span><span class="p">,</span> <span class="s1">&#39;logtau&#39;</span><span class="p">,</span> <span class="s1">&#39;loggamma&#39;</span><span class="p">]:</span>
             <span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">vn</span><span class="p">,</span> <span class="s1">&#39;prior&#39;</span><span class="p">))</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">priors</span><span class="p">[</span><span class="n">vn</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">logpdf</span>
@@ -466,16 +499,17 @@
 
                 <span class="c1"># possible logtau prior</span>
                 <span class="c1"># add contributions from the various priors</span>
-                <span class="k">for</span> <span class="n">vn</span><span class="p">,</span> <span class="n">indx</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="s1">&#39;beta&#39;</span><span class="p">,</span> <span class="s1">&#39;logpsi&#39;</span><span class="p">,</span> <span class="s1">&#39;logtau&#39;</span><span class="p">],</span>
+                <span class="k">for</span> <span class="n">vn</span><span class="p">,</span> <span class="n">indx</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="s1">&#39;beta&#39;</span><span class="p">,</span> <span class="s1">&#39;logpsi&#39;</span><span class="p">,</span> <span class="s1">&#39;loggamma&#39;</span><span class="p">,</span> <span class="s1">&#39;logtau&#39;</span><span class="p">],</span>
                                     <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="n">vbeta</span><span class="p">),</span>
                                      <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">logpsi</span><span class="p">),</span>
+                                     <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">loggamma</span><span class="p">),</span>
                                      <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">logtau</span><span class="p">)]):</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">prior_logpdf</span> <span class="o">=</span> <span class="n">priors</span><span class="p">[</span><span class="n">vn</span><span class="p">]</span>
                         <span class="n">ind</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">indx</span>  <span class="c1"># unpack the value of var. name</span>
                         <span class="n">vn_lp</span><span class="p">,</span> <span class="n">vn_lp_grad</span> <span class="o">=</span> <span class="n">prior_logpdf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
                         <span class="n">lp</span> <span class="o">+=</span> <span class="n">vn_lp</span>
-    
+
                         <span class="n">grad</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">+=</span> <span class="o">-</span><span class="n">vn_lp_grad</span>
 
                     <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
@@ -1409,9 +1443,14 @@
             <span class="n">Eg_</span><span class="p">,</span> <span class="n">Covg_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_cond</span><span class="p">(</span><span class="n">Ex</span><span class="p">,</span> <span class="n">Covx</span><span class="p">,</span> <span class="n">Eb</span><span class="p">,</span> <span class="n">Covb</span><span class="p">,</span>
                                      <span class="n">mapres</span><span class="o">.</span><span class="n">logphi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">mapres</span><span class="o">.</span><span class="n">loggamma</span><span class="p">),</span>
                                      <span class="n">mapres</span><span class="o">.</span><span class="n">logpsi</span><span class="p">)</span>
+            <span class="n">Eb</span><span class="p">,</span> <span class="n">Covb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta_cond</span><span class="p">(</span><span class="n">Ex</span><span class="p">,</span> <span class="n">Covx</span><span class="p">,</span> <span class="n">Eg</span><span class="p">,</span> <span class="n">Covg</span><span class="p">,</span>
+                                      <span class="n">mapres</span><span class="o">.</span><span class="n">logphi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">mapres</span><span class="o">.</span><span class="n">loggamma</span><span class="p">),</span>
+                                      <span class="n">prior_scale</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+            
             <span class="c1"># Calculate distance moved</span>
             <span class="n">Deltg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Eg</span> <span class="o">-</span> <span class="n">Eg_</span><span class="p">)</span>
-            <span class="c1"># Update </span>
+            <span class="c1"># Update</span>
+
             <span class="n">Eg</span> <span class="o">=</span> <span class="n">Eg_</span>
             <span class="n">Covg</span> <span class="o">=</span> <span class="n">Covg_</span>
             <span class="c1"># Check converg. conditions</span>
@@ -1433,10 +1472,11 @@
 
         <span class="c1"># Sensible reshaping</span>
         <span class="n">Eg</span> <span class="o">=</span> <span class="n">Eg</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">R</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">N</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">Eb</span> <span class="o">=</span> <span class="n">Eb</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">R</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">D</span><span class="p">)</span>
         <span class="n">Covg</span> <span class="o">=</span> <span class="n">Covg</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">R</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">R</span><span class="p">)</span>
         <span class="n">Covg</span> <span class="o">=</span> <span class="n">Covg</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
         
-        <span class="k">return</span> <span class="n">mapres</span><span class="p">,</span> <span class="n">Eg</span><span class="p">,</span> <span class="n">Covg</span>
+        <span class="k">return</span> <span class="n">mapres</span><span class="p">,</span> <span class="n">Eg</span><span class="p">,</span> <span class="n">Covg</span><span class="p">,</span> <span class="n">Eb</span><span class="p">,</span> <span class="n">Covb</span>
 
         
     <span class="k">def</span> <span class="nf">g_cond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ex</span><span class="p">,</span> <span class="n">Covx</span><span class="p">,</span> <span class="n">Eb</span><span class="p">,</span> <span class="n">Covb</span><span class="p">,</span>
@@ -1565,7 +1605,8 @@
         <span class="k">return</span> <span class="n">mean</span><span class="p">,</span> <span class="n">cov</span>
 
     <span class="k">def</span> <span class="nf">beta_cond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ex</span><span class="p">,</span> <span class="n">Covx</span><span class="p">,</span> <span class="n">Eg</span><span class="p">,</span> <span class="n">Covg</span><span class="p">,</span>
-                  <span class="n">logphi</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                  <span class="n">logphi</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">prior_scale</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span>
+                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
         <span class="c1"># reshape logphi</span>
         <span class="n">logphi</span> <span class="o">=</span> <span class="n">_unpack_vector</span><span class="p">(</span><span class="n">logphi</span><span class="p">,</span> <span class="n">_get_gp_theta_shape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latentstates</span><span class="p">))</span>
@@ -1608,7 +1649,7 @@
                         <span class="n">sum_ExxT</span> <span class="o">=</span> <span class="n">sum_ExxT</span> <span class="o">*</span> <span class="n">Eg</span><span class="p">[</span><span class="n">r1</span><span class="o">*</span><span class="n">N</span><span class="p">:(</span><span class="n">r1</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">N</span><span class="p">][</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
                         <span class="n">premean</span><span class="p">[</span><span class="n">r1</span><span class="o">*</span><span class="n">D</span> <span class="o">+</span> <span class="n">d1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij,ji-&gt;&#39;</span><span class="p">,</span> <span class="n">sum_ExxT</span><span class="p">,</span> <span class="n">SkinvMk</span><span class="p">)</span>
 
-        <span class="n">invcov</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">diag_indices_from</span><span class="p">(</span><span class="n">invcov</span><span class="p">)]</span> <span class="o">+=</span> <span class="mi">1</span><span class="o">/</span><span class="mi">10</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">invcov</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">diag_indices_from</span><span class="p">(</span><span class="n">invcov</span><span class="p">)]</span> <span class="o">+=</span> <span class="mi">1</span><span class="o">/</span><span class="n">prior_scale</span><span class="o">**</span><span class="mi">2</span>
 
         <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">invcov</span><span class="p">)</span>
 

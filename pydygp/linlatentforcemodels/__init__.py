@@ -27,3 +27,4 @@ from .mlfmsuccapprox import MLFMSuccApprox, VarMLFMSuccApprox
 from .mlfmsamoe import MLFMSA
 from .mlfmsamoe2 import MLFMSAMix
 from .mlfmmixsa import MLFMMixSA
+from .kalmanfilter import KalmanFilter

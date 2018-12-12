@@ -5,13 +5,13 @@ Examples using ``pydygp.linlatentforcemodels.MLFMSA``
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Fitting of the MLFM">
+    <div class="sphx-glr-thumbcontainer" tooltip="When using the method of successive approximation we construct a regression model ">
 
 .. only:: html
 
-    .. figure:: /tutorials/llfm_tutorials/images/thumb/sphx_glr_plot_mlfmsamix_thumb.png
+    .. figure:: /tutorials/mlfm_sa_tutorials/images/thumb/sphx_glr_plot_mlfmsa_kf_thumb.png
 
-        :ref:`sphx_glr_tutorials_llfm_tutorials_plot_mlfmsamix.py`
+        :ref:`sphx_glr_tutorials_mlfm_sa_tutorials_plot_mlfmsa_kf.py`
 
 .. raw:: html
 
@@ -19,4 +19,4 @@ Examples using ``pydygp.linlatentforcemodels.MLFMSA``
 
 .. only:: not html
 
-    * :ref:`sphx_glr_tutorials_llfm_tutorials_plot_mlfmsamix.py`
+    * :ref:`sphx_glr_tutorials_mlfm_sa_tutorials_plot_mlfmsa_kf.py`

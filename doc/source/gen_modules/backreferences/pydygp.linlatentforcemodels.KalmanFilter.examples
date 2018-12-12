@@ -1,0 +1,22 @@
+
+
+Examples using ``pydygp.linlatentforcemodels.KalmanFilter``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="When using the method of successive approximation we construct a regression model ">
+
+.. only:: html
+
+    .. figure:: /tutorials/mlfm_sa_tutorials/images/thumb/sphx_glr_plot_mlfmsa_kf_thumb.png
+
+        :ref:`sphx_glr_tutorials_mlfm_sa_tutorials_plot_mlfmsa_kf.py`
+
+.. raw:: html
+
+    </div>
+
+.. only:: not html
+
+    * :ref:`sphx_glr_tutorials_mlfm_sa_tutorials_plot_mlfmsa_kf.py`

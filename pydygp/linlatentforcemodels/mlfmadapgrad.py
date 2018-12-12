@@ -7,12 +7,41 @@ Class definition for the mlfm with adaptive gradient matching
 import numpy as np
 import warnings
 from scipy.stats import multivariate_normal
-from .mlfm import Dimensions, BaseMLFM
+from .mlfm import Dimensions, BaseMLFM, MLFMCartesianProduct
 from scipy.linalg import (block_diag, cho_solve, cholesky, solve_triangular)
 from pydygp.gradientkernels import ConstantKernel, RBF
 from sklearn.gaussian_process import GaussianProcessRegressor
 from scipy.optimize import minimize
 from collections import namedtuple
+
+class MLFMAdapGradCartesianProduct(MLFMCartesianProduct):
+    def __init__(self, mlfm1, mlfm2):
+        super(MLFMAdapGradCartesianProduct, self).__init__(mlfm1, mlfm2)
+
+    def __mul__(self, mlfm):
+        return MLFMAdapGradCartesianProduct(self, mlfm)
+
+    def _fit_kwarg_parser(self, N_manifolds, **kwargs):
+
+        var_names = ['g', 'logpsi'] + \
+                    ['_'.join((vn, str(i)))
+                     for i in range(N_manifolds)
+                     for vn in ['beta', 'logphi', 'loggamma', 'logtau']]
+
+        # check **kwargs to see if any variables have been kept fixed
+        is_fixed_vars = {vn: kwargs.pop("".join((vn, "_is_fixed")), False)
+                         for vn in var_names}
+
+        # check for blanket variable name fixing
+        #    -- done last so will take precedence
+        for vn in ['loggamma']:
+            if kwargs.pop(''.join((vn, '_is_fixed')), False):
+                for i in range(N_manifolds):
+                    is_fixed_vars['_'.join((vn, str(i)))] = True
+
+        return is_fixed_vars
+            
+
 
 class MLFMAdapGradFitResults(namedtuple('MLFMAdapGradFitResults',
                                         ('g', 'beta', 'logpsi', 'logphi',
@@ -133,6 +162,7 @@ def _sklearn_gp_falsefit(gp, y_train, X_train, kernel):
     gp.alpha_ = cho_solve((gp.L_, True), gp.y_train_)
     gp._y_train_mean = np.zeros(1)
 
+
 class MLFMAdapGrad(BaseMLFM):
     """
     Multiplicative latent force model (MLFM) using the adaptive
@@ -158,6 +188,9 @@ class MLFMAdapGrad(BaseMLFM):
 
         # flags for fitting function
         self.is_tt_aug = False     # Has the time vector been augmented
+
+    def __mul__(self, mlfm):
+        return MLFMAdapGradCartesianProduct(self, mlfm)
 
     def _setup_times(self, tt, tt_aug=None, data_inds=None, **kwargs):
         """ Sets up the model time vector, optionally augments the time
@@ -269,7 +302,7 @@ class MLFMAdapGrad(BaseMLFM):
 
         # Check for kwarg priors
         priors = {}
-        for vn in ['logpsi', 'beta', 'logtau']:
+        for vn in ['logpsi', 'beta', 'logtau', 'loggamma']:
             key = '_'.join((vn, 'prior'))
             try:
                 priors[vn] = kwargs[key].logpdf
@@ -315,16 +348,17 @@ class MLFMAdapGrad(BaseMLFM):
 
                 # possible logtau prior
                 # add contributions from the various priors
-                for vn, indx in zip(['beta', 'logpsi', 'logtau'],
+                for vn, indx in zip(['beta', 'logpsi', 'loggamma', 'logtau'],
                                     [(1, vbeta),
                                      (2, logpsi),
+                                     (4, loggamma),
                                      (5, logtau)]):
                     try:
                         prior_logpdf = priors[vn]
                         ind, x = indx  # unpack the value of var. name
                         vn_lp, vn_lp_grad = prior_logpdf(x, True)
                         lp += vn_lp
-    
+
                         grad[ind] += -vn_lp_grad
 
                     except KeyError:
@@ -1258,9 +1292,14 @@ class VarMLFMAdapGrad(MLFMAdapGrad):
             Eg_, Covg_ = self.g_cond(Ex, Covx, Eb, Covb,
                                      mapres.logphi, np.exp(mapres.loggamma),
                                      mapres.logpsi)
+            Eb, Covb = self.beta_cond(Ex, Covx, Eg, Covg,
+                                      mapres.logphi, np.exp(mapres.loggamma),
+                                      prior_scale=10)
+            
             # Calculate distance moved
             Deltg = np.linalg.norm(Eg - Eg_)
-            # Update 
+            # Update
+
             Eg = Eg_
             Covg = Covg_
             # Check converg. conditions
@@ -1282,10 +1321,11 @@ class VarMLFMAdapGrad(MLFMAdapGrad):
 
         # Sensible reshaping
         Eg = Eg.reshape(self.dim.R, self.dim.N).T
+        Eb = Eb.reshape(self.dim.R+1, self.dim.D)
         Covg = Covg.reshape(self.dim.N, self.dim.N, self.dim.R, self.dim.R)
         Covg = Covg.transpose(1, 0, 3, 2)
         
-        return mapres, Eg, Covg
+        return mapres, Eg, Covg, Eb, Covb
 
         
     def g_cond(self, Ex, Covx, Eb, Covb,
@@ -1414,7 +1454,8 @@ class VarMLFMAdapGrad(MLFMAdapGrad):
         return mean, cov
 
     def beta_cond(self, Ex, Covx, Eg, Covg,
-                  logphi, gamma, **kwargs):
+                  logphi, gamma, prior_scale=1.,
+                  **kwargs):
 
         # reshape logphi
         logphi = _unpack_vector(logphi, _get_gp_theta_shape(self.latentstates))
@@ -1457,7 +1498,7 @@ class VarMLFMAdapGrad(MLFMAdapGrad):
                         sum_ExxT = sum_ExxT * Eg[r1*N:(r1+1)*N][None, :]
                         premean[r1*D + d1] += np.einsum('ij,ji->', sum_ExxT, SkinvMk)
 
-        invcov[np.diag_indices_from(invcov)] += 1/10**2
+        invcov[np.diag_indices_from(invcov)] += 1/prior_scale**2
 
         L = np.linalg.cholesky(invcov)
 
