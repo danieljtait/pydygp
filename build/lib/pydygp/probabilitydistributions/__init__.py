@@ -23,6 +23,7 @@ distribution where each component is independent
 
    UnivariateProbabilityDistribution
    Normal
+   Laplace
    ChiSquare
    Gamma
    InverseGamma
@@ -44,6 +45,7 @@ from .probabilitydistributions import (ProbabilityDistribution,
                                        InverseGamma,
                                        ChiSquare,
                                        Normal,
+                                       Laplace,
                                        MultivariateNormal,
                                        GeneralisedInverseGaussian,
                                        ExpGamma,

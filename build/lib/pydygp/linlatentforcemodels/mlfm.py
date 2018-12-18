@@ -205,3 +205,58 @@ class BaseMLFM:
 
         # sum over r
         return comp_funcs.sum(0)
+
+    def __mul__(self, other):
+        return MLFMCartesianProduct(self, other)
+
+    def flatten(self):
+        return self,
+    
+
+class MLFMCartesianProduct:
+    """
+    Cartesian product of two MLFM like objects
+    """
+    def __init__(self, mlfm1, mlfm2):
+        # Check compatability
+        N1, K1, R1, D1 = mlfm1.dim
+        N2, K2, R2, D2 = mlfm2.dim
+
+        self.mlfm1 = mlfm1
+        self.mlfm2 = mlfm2
+        
+        if R1 != R2:
+            raise ValueError("The number of latent forces in both ",
+                             "both models must be the same")
+
+        if N1 != N2:
+            raise ValueError("Dimension of the input vector must ",
+                             "be the same for both models")
+
+        # This causes a bit of rewrite
+        self.dim = Dimensions(N1, None, R1, None)
+        
+    def __mul__(self, mlfm):
+        return MLFMCartesianProduct(self, mlfm)
+
+    def flatten(self):
+        """
+        Returns a flat tuple of the constituents of the MMLF objects
+        """
+        mlfms = self.mlfm1.flatten() + self.mlfm2.flatten()
+        return mlfms
+
+        
+    def sim(self, x0, tt, beta, dt_max=0.1, size=1, latent_forces=None):
+        mlfms = self.flatten()
+
+        # simulate from the first model
+        Y0, lf = mlfms[0].sim(x0[0], tt, beta[0], dt_max=dt_max, size=size)
+
+        Data = [Y0, ]
+        for i in range(len(mlfms)-1):
+            yi, _ = mlfms[i+1].sim(x0[i+1], tt,
+                                   latent_forces=lf,
+                                   beta=beta[i+1], dt_max=dt_max, size=size)
+            Data.append(yi)
+        return Data, lf

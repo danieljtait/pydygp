@@ -12,7 +12,7 @@ Multiplicative Forces
 =====================
 
 .. autosummary::
-   :toctree:
+   :toctree: _autosummary
 
    BaseMLFM     -- Base class for the MLFM.
    MLFMAdapGrad -- MLFM using adaptive gradient matching.
@@ -20,10 +20,11 @@ Multiplicative Forces
    MLFMSuccApprox -- MLFM using successive approximations.
 
 """
-from .mlfm import BaseMLFM
+from .mlfm import BaseMLFM, Dimensions
 from .lfmorder2 import LFMorder2, LFMorder2Kernel
 from .mlfmadapgrad import MLFMAdapGrad, GibbsMLFMAdapGrad, VarMLFMAdapGrad
 from .mlfmsuccapprox import MLFMSuccApprox, VarMLFMSuccApprox
 from .mlfmsamoe import MLFMSA
 from .mlfmsamoe2 import MLFMSAMix
 from .mlfmmixsa import MLFMMixSA
+from .kalmanfilter import KalmanFilter
