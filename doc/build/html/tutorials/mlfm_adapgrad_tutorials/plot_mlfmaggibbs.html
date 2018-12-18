@@ -29,8 +29,8 @@
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Variational Inference" href="plot_mlfmagvar.html" />
-    <link rel="prev" title="Variational Inference" href="plot_mlfmagvar2.html" /> 
+    <link rel="next" title="Successive Approximations" href="../mlfm_sa_tutorials/index.html" />
+    <link rel="prev" title="Basic MAP Estimation" href="plot_mlfmag.html" /> 
 
   
   <script src="../../_static/js/modernizr.min.js"></script>
@@ -263,11 +263,30 @@ state variables.</p>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">((</span><span class="o">-.</span><span class="mi">7</span><span class="p">,</span> <span class="o">.</span><span class="mi">7</span><span class="p">))</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">gibbsRV</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">gibbsRV</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">][:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">density</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="../../_images/sphx_glr_plot_mlfmaggibbs_001.png" class="sphx-glr-single-img" src="../../_images/sphx_glr_plot_mlfmaggibbs_001.png" />
-<p><strong>Total running time of the script:</strong> ( 0 minutes  9.547 seconds)</p>
+<ul class="sphx-glr-horizontal">
+<li><img alt="../../_images/sphx_glr_plot_mlfmaggibbs_001.png" class="sphx-glr-multi-img first" src="../../_images/sphx_glr_plot_mlfmaggibbs_001.png" />
+</li>
+<li><img alt="../../_images/sphx_glr_plot_mlfmaggibbs_002.png" class="sphx-glr-multi-img first" src="../../_images/sphx_glr_plot_mlfmaggibbs_002.png" />
+</li>
+<li><img alt="../../_images/sphx_glr_plot_mlfmaggibbs_003.png" class="sphx-glr-multi-img first" src="../../_images/sphx_glr_plot_mlfmaggibbs_003.png" />
+</li>
+<li><img alt="../../_images/sphx_glr_plot_mlfmaggibbs_004.png" class="sphx-glr-multi-img first" src="../../_images/sphx_glr_plot_mlfmaggibbs_004.png" />
+</li>
+<li><img alt="../../_images/sphx_glr_plot_mlfmaggibbs_005.png" class="sphx-glr-multi-img first" src="../../_images/sphx_glr_plot_mlfmaggibbs_005.png" />
+</li>
+<li><img alt="../../_images/sphx_glr_plot_mlfmaggibbs_006.png" class="sphx-glr-multi-img first" src="../../_images/sphx_glr_plot_mlfmaggibbs_006.png" />
+</li>
+<li><img alt="../../_images/sphx_glr_plot_mlfmaggibbs_007.png" class="sphx-glr-multi-img first" src="../../_images/sphx_glr_plot_mlfmaggibbs_007.png" />
+</li>
+</ul>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  9.494 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-mlfm-adapgrad-tutorials-plot-mlfmaggibbs-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" href="../../_downloads/plot_mlfmaggibbs.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_mlfmaggibbs.py</span></code></a></div>
@@ -286,10 +305,10 @@ state variables.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="plot_mlfmagvar.html" class="btn btn-neutral float-right" title="Variational Inference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../mlfm_sa_tutorials/index.html" class="btn btn-neutral float-right" title="Successive Approximations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="plot_mlfmagvar2.html" class="btn btn-neutral" title="Variational Inference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="plot_mlfmag.html" class="btn btn-neutral" title="Basic MAP Estimation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

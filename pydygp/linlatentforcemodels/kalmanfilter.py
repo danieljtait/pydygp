@@ -119,7 +119,7 @@ def _filter_correct(observation_matrix, observation_covariance,
     else:
         # no observation to worry about
         n_dim_state = predicted_state_covariance.shape[-1]
-        n_dim_obs = observation_matrix.shape[-1]
+        n_dim_obs = observation_matrix.shape[1]
         kalman_gain = np.zeros((n_dim_state, n_dim_obs))
         corrected_state_mean = predicted_state_mean
         corrected_state_covariance = predicted_state_covariance
@@ -136,6 +136,7 @@ def _filter(transition_matrices, observation_matrices, transition_covariance,
     n_timesteps = observations.shape[0]
     n_dim_state = len(initial_state_mean)
     n_dim_obs = observations.shape[1]
+
     n_samp = initial_state_mean.shape[-1]
     # use the initial state mean to learn the shape of the
     # state variable
@@ -148,9 +149,7 @@ def _filter(transition_matrices, observation_matrices, transition_covariance,
     kalman_gains = np.zeros(
         (n_timesteps, state_shape[1], n_dim_state, n_dim_obs))
 
-    
     filtered_state_means = np.zeros((n_timesteps, ) + state_shape)
-
     filtered_state_covariances = np.zeros(
         (n_timesteps, state_shape[1], n_dim_state, n_dim_state))
 
@@ -158,12 +157,12 @@ def _filter(transition_matrices, observation_matrices, transition_covariance,
         if t == 0:
             predicted_state_means[t] = initial_state_mean
             predicted_state_covariances[t] = initial_state_covariance
+
         else:
             transition_matrix = _last_dims(transition_matrices, t-1)
             transition_covariance = _last_dims(transition_covariance, t - 1)
             #transition_offset = _last_dims(transition_offsets, t - 1, ndims=n_samp)
             transition_offset = 0.
-
             predicted_state_means[t], predicted_state_covariances[t] = (
                 _filter_predict(
                 transition_matrix,
@@ -173,7 +172,6 @@ def _filter(transition_matrices, observation_matrices, transition_covariance,
                 filtered_state_covariances[t - 1],
                 )
                 )
-
         observation_matrix = _handle_shape(observation_matrices, t, 'obs_mat')
         #observation_matrix = _last_dims(observation_matrices, t)
         #observation_matrix = observation_matrices
@@ -193,7 +191,7 @@ def _filter(transition_matrices, observation_matrices, transition_covariance,
                             observations[t]
                             )
             )
-        
+
     return (predicted_state_means, predicted_state_covariances,
             kalman_gains, filtered_state_means,
             filtered_state_covariances)

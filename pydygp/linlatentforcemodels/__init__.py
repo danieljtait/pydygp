@@ -20,7 +20,7 @@ Multiplicative Forces
    MLFMSuccApprox -- MLFM using successive approximations.
 
 """
-from .mlfm import BaseMLFM
+from .mlfm import BaseMLFM, Dimensions
 from .lfmorder2 import LFMorder2, LFMorder2Kernel
 from .mlfmadapgrad import MLFMAdapGrad, GibbsMLFMAdapGrad, VarMLFMAdapGrad
 from .mlfmsuccapprox import MLFMSuccApprox, VarMLFMSuccApprox

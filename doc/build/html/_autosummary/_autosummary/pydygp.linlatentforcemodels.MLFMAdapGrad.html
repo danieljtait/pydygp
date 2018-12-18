@@ -178,20 +178,20 @@ gradient matching approximation.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>struct_mats</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of square ndarray</span></dt>
-<dd><p class="first last">A set of [A0,…,AR] square numpy array_like</p>
+<dt><strong>basis_mats</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of square ndarray</span></dt>
+<dd><p class="first last">A list of [L1,…,LD] square numpy array_like</p>
 </dd>
 <dt><strong>lf_kernels</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of kernel objects, optional</span></dt>
 <dd><p class="first last">Kernels of the latent force Gaussian process objects. If None
 is passed, the kernel “1.0 * RBF(1.0)” is used as a defualt.</p>
 </dd>
-<dt><strong>Read more in the :ref:`Tutorial &lt;tutorials-mlfm&gt;`.</strong></dt>
-<dd></dd>
 </dl>
 </td>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Notes</p>
+<p>Read more in the <a class="reference internal" href="../../tutorials/mlfm_adapgrad_tutorials/plot_mlfmag.html#tutorials-mlfm-ag"><span class="std std-ref">tutorial</span></a>.</p>
 <dl class="method">
 <dt id="pydygp.linlatentforcemodels.MLFMAdapGrad.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>basis_mats</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pydygp/linlatentforcemodels/mlfmadapgrad.html#MLFMAdapGrad.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydygp.linlatentforcemodels.MLFMAdapGrad.__init__" title="Permalink to this definition">¶</a></dt>

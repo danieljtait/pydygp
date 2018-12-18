@@ -247,3 +247,16 @@ class MLFMCartesianProduct:
         return mlfms
 
         
+    def sim(self, x0, tt, beta, dt_max=0.1, size=1, latent_forces=None):
+        mlfms = self.flatten()
+
+        # simulate from the first model
+        Y0, lf = mlfms[0].sim(x0[0], tt, beta[0], dt_max=dt_max, size=size)
+
+        Data = [Y0, ]
+        for i in range(len(mlfms)-1):
+            yi, _ = mlfms[i+1].sim(x0[i+1], tt,
+                                   latent_forces=lf,
+                                   beta=beta[i+1], dt_max=dt_max, size=size)
+            Data.append(yi)
+        return Data, lf

@@ -1,6 +1,38 @@
 
+.. _tutorials-mlfm-ag:
+
 Adaptive Gradient Matching Methods
 ==================================
+
+These methods have been introduced in [1]_ to handle parameter inference in the very
+general class of nonlinear ODE models
+
+.. math::
+
+   \dot{\mathbf{X}}(t) = f(\mathbf{X}; \boldsymbol{\theta}).
+
+The idea is to combine both the explicit relationship given by the function $f$, and
+a Gaussian process prior on the state variables. This leads to a pair of densities
+
+.. math::
+
+   p(\dot{\mathbf{X}}\mid \mathbf{X}) = \prod_{k=1}^{K}
+   p(\dot{\mathbf{x}}_k \mid \mathbf{x}_k)
+
+and
+
+.. math::
+
+   p(\dot{\mathbf{x}}_k \mid \mathbf{x}_k ) = \prod_{k=1}^{K}
+   \mathcal{N}(\dot{\mathbf{x}}_k \mid \mathbf{f}_k, \gamma_k^2 \mathbf{I})
+
+.. figure:: ../figures/prodexperts.png
+   :align: center
+
+   **Figure**
+   Conceptual diagram of the product of experts approximation. The
+   ODE model and the GP prior are combined by identifying the variables
+   connected with the \"--\" line by way of the product of experts assumption
 
 For the MLFM AdapGrad model the likelihood of a set of state variables may be written
 
@@ -36,10 +68,10 @@ All of the adative gradient matching methods proceed from this conditional densi
 Model Parameters
 ~~~~~~~~~~~~~~~~
 
-The following table gives the complete collection of variables that appear in the adaptive gradient
-matching method for the MLFM, along with a brief description of this variables, how this variable
-is referred to when using the package, along with transformation that is applied to this variable
-to give it a more natural support.
+The following table gives the complete collection of variables that appear in the adaptive
+gradient matching method for the MLFM, along with a brief description of this variables,
+how this variable is referred to when using the package, along with transformation that i
+s applied to this variable to give it a more natural support.
 
 +-----------------------------+-----------------------------+------------------+---------------------+---------------+ 
 | Parameter name              | Description                 | Variable name    | Transform           | Is Fixed      |
@@ -56,9 +88,32 @@ to give it a more natural support.
 +-----------------------------+-----------------------------+------------------+---------------------+---------------+
 
 MAP Estimation
-~~~~~~~~~~~~~~
+--------------
+
+The following list of notebooks give an introduction to fitting these models using
+the adaptive gradient matching approximation, as well as a discussion of some of
+the more general features of the MLFM model
+
+.. toctree::
+   :maxdepth: 1
+
+   plot_mlfmag
+   plot_mlfmaggibbs
+
+
+
+All Examples
+------------
 
     .. include:: ../../doc/source/gen_modules/backreferences/pydygp.linlatentforcemodels.MLFMAdapGrad.examples
     .. raw:: html
 
         <div style='clear:both'></div>
+
+
+References
+----------
+
+.. [1] Calderhead, Ben and Girolami, Mark and Neil D. Lawrence, "Accelerating
+   Bayesian Inference over Nonlinear Differential Equations with Gaussian
+   Processess", NIPS, 2009

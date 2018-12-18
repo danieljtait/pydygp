@@ -198,7 +198,7 @@ More sensible place to start -- the Kalman Filter performs the numerical integra
 
 
 
-**Total running time of the script:** ( 0 minutes  0.107 seconds)
+**Total running time of the script:** ( 0 minutes  0.092 seconds)
 
 
 .. _sphx_glr_download_tutorials_mlfm_sa_tutorials_plot_mlfmsa_kf.py:

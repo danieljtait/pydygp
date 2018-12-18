@@ -172,6 +172,177 @@
     <span class="k">def</span> <span class="nf">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mlfm</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">MLFMAdapGradCartesianProduct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mlfm</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">_setup_times</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">mlfms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">mlfm</span> <span class="ow">in</span> <span class="n">mlfms</span><span class="p">:</span>
+            <span class="n">mlfm</span><span class="o">.</span><span class="n">_setup_times</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_setup_latentstates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">mlfms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">mlfm</span> <span class="ow">in</span> <span class="n">mlfms</span><span class="p">:</span>
+            <span class="n">mlfm</span><span class="o">.</span><span class="n">_setup_latentstates</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">Ylist</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">mlfms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="n">N_manifolds</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mlfms</span><span class="p">)</span>
+        
+        <span class="c1"># make sure the submodels are ready for fitting</span>
+        <span class="k">for</span> <span class="n">Y</span><span class="p">,</span> <span class="n">mlfm</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">Ylist</span><span class="p">,</span> <span class="n">mlfms</span><span class="p">):</span>
+            <span class="n">mlfm</span><span class="o">.</span><span class="n">_setup</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
+            <span class="n">mlfm</span><span class="o">.</span><span class="n">y_train_</span> <span class="o">=</span> <span class="n">Y</span>
+
+        <span class="c1"># parse kwargs</span>
+        <span class="n">is_fixed_vars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_kwarg_parser</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mlfms</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">priors</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">vn</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">,</span> <span class="s1">&#39;logpsi&#39;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mlfms</span><span class="p">)):</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vn</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">vn_prior</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39;prior&#39;</span><span class="p">)))</span>
+                    <span class="n">priors</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">vn_prior</span><span class="o">.</span><span class="n">logpdf</span>
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+
+        <span class="k">def</span> <span class="nf">objfunc</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">free_vars_shape</span><span class="p">,</span> <span class="n">fixed_vars</span><span class="p">):</span>
+            <span class="n">free_vars</span> <span class="o">=</span> <span class="n">_unpack_vector</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">free_vars_shape</span><span class="p">)</span>
+            <span class="n">nt_fix</span><span class="p">,</span> <span class="n">full_vars</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="k">for</span> <span class="n">vn</span><span class="p">,</span> <span class="n">is_fixed</span> <span class="ow">in</span> <span class="n">is_fixed_vars</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">is_fixed</span><span class="p">:</span>
+                    <span class="n">full_vars</span><span class="p">[</span><span class="n">vn</span><span class="p">]</span> <span class="o">=</span> <span class="n">fixed_vars</span><span class="p">[</span><span class="n">nt_fix</span><span class="p">]</span>
+                    <span class="n">nt_fix</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">full_vars</span><span class="p">[</span><span class="n">vn</span><span class="p">]</span> <span class="o">=</span> <span class="n">free_vars</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># get the shared variable prior logpdf</span>
+                <span class="n">g</span> <span class="o">=</span> <span class="n">full_vars</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span>
+                <span class="n">logpsi</span> <span class="o">=</span> <span class="n">full_vars</span><span class="p">[</span><span class="s1">&#39;logpsi&#39;</span><span class="p">]</span>
+
+                <span class="n">ll</span><span class="p">,</span> <span class="n">lprior_g_grad</span><span class="p">,</span> <span class="n">lprior_lpsi_grad</span> <span class="o">=</span> \
+                    <span class="n">mlfms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_prior_logpdf</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">logpsi</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                
+
+                <span class="c1"># slightly clunky depending on if we are optimising</span>
+                <span class="c1"># the priors for logpsi</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">is_fixed_vars</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_fixed_vars</span><span class="p">[</span><span class="s1">&#39;logpsi&#39;</span><span class="p">]:</span>
+                    <span class="n">grad</span> <span class="o">=</span> <span class="p">[</span><span class="n">lprior_g_grad</span><span class="p">,</span> <span class="n">lprior_lpsi_grad</span><span class="p">]</span>
+
+                <span class="c1"># we are optimising wrt to g</span>
+                <span class="k">elif</span> <span class="ow">not</span> <span class="n">is_fixed_vars</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]:</span>
+                    <span class="n">grad</span> <span class="o">=</span> <span class="p">[</span><span class="n">lprior_g_grad</span><span class="p">]</span>
+
+                <span class="k">for</span> <span class="n">q</span><span class="p">,</span> <span class="n">mlfm</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mlfms</span><span class="p">):</span>
+                    <span class="c1"># argument is *ravelled* beta (i.e. vec(beta.T))</span>
+                    <span class="n">beta_q</span> <span class="o">=</span> <span class="n">full_vars</span><span class="p">[</span><span class="s1">&#39;beta_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">q</span><span class="p">)]</span>
+                    <span class="n">beta_q</span> <span class="o">=</span> <span class="n">beta_q</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">mlfm</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">D</span><span class="p">,</span> <span class="n">mlfm</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">R</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+                    <span class="n">lltup</span> <span class="o">=</span> <span class="n">mlfm</span><span class="o">.</span><span class="n">log_likelihood</span><span class="p">(</span><span class="n">mlfm</span><span class="o">.</span><span class="n">y_train_</span><span class="p">,</span> <span class="n">full_vars</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">],</span>
+                                                <span class="n">beta_q</span><span class="p">,</span>
+                                                <span class="n">full_vars</span><span class="p">[</span><span class="s1">&#39;logphi_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">q</span><span class="p">)],</span>
+                                                <span class="n">full_vars</span><span class="p">[</span><span class="s1">&#39;loggamma_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">q</span><span class="p">)],</span>
+                                                <span class="n">full_vars</span><span class="p">[</span><span class="s1">&#39;logtau_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">q</span><span class="p">)],</span> <span class="kc">True</span><span class="p">)</span>
+                    <span class="n">ll</span> <span class="o">+=</span> <span class="n">lltup</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_fixed_vars</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_fixed_vars</span><span class="p">[</span><span class="s1">&#39;logpsi&#39;</span><span class="p">]:</span>
+                        <span class="n">grad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">lltup</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="k">elif</span> <span class="ow">not</span> <span class="n">is_fixed_vars</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]:</span>
+                        <span class="c1"># g is not fixed but logpsi is fixed</span>
+                        <span class="n">grad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">lltup</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+                    <span class="c1"># now append the manifold specific variables</span>
+                    <span class="k">for</span> <span class="n">vn</span><span class="p">,</span> <span class="n">l_vn_grad</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="s1">&#39;beta&#39;</span><span class="p">,</span> <span class="s1">&#39;logphi&#39;</span><span class="p">,</span> <span class="s1">&#39;loggamma&#39;</span><span class="p">,</span> <span class="s1">&#39;logtau&#39;</span><span class="p">],</span>
+                                             <span class="n">lltup</span><span class="p">[</span><span class="mi">2</span><span class="p">:]):</span>
+                        <span class="n">vn</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">vn</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">m</span><span class="p">)))</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_fixed_vars</span><span class="p">[</span><span class="n">vn</span><span class="p">]:</span>
+                            <span class="c1"># check for existence of prior</span>
+                            <span class="k">try</span><span class="p">:</span>
+                                <span class="n">lp</span><span class="p">,</span> <span class="n">lpgrad</span> <span class="o">=</span> <span class="n">priors</span><span class="p">[</span><span class="n">vn</span><span class="p">](</span><span class="n">full_vars</span><span class="p">[</span><span class="n">vn</span><span class="p">],</span> <span class="kc">True</span><span class="p">)</span>
+                                <span class="n">l_vn_grad</span> <span class="o">+=</span> <span class="n">lpgrad</span>
+                                <span class="n">ll</span> <span class="o">+=</span> <span class="n">lp</span>
+                            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                                <span class="k">pass</span>
+                            <span class="n">grad</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l_vn_grad</span><span class="p">)</span>                    
+
+                <span class="n">grad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">grad</span><span class="p">)</span>
+                <span class="c1"># Flip the signs</span>
+                <span class="k">return</span> <span class="o">-</span><span class="n">ll</span><span class="p">,</span> <span class="o">-</span><span class="n">grad</span>
+
+            <span class="k">except</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">LinAlgError</span><span class="p">:</span>
+                <span class="k">pass</span>
+                
+
+        <span class="n">init</span><span class="p">,</span> <span class="n">free_vars_shape</span><span class="p">,</span> <span class="n">fixed_vars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_init</span><span class="p">(</span><span class="n">is_fixed_vars</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">objfunc</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span>
+                       <span class="n">jac</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                       <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">free_vars_shape</span><span class="p">,</span> <span class="n">fixed_vars</span><span class="p">))</span>
+
+        <span class="c1"># unpack and save the results</span>
+        <span class="n">free_vars</span> <span class="o">=</span> <span class="n">_unpack_vector</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">free_vars_shape</span><span class="p">)</span>
+        <span class="n">nt_fix</span><span class="p">,</span> <span class="n">full_vars</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">for</span> <span class="n">vn</span><span class="p">,</span> <span class="n">is_fixed</span> <span class="ow">in</span> <span class="n">is_fixed_vars</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">is_fixed</span><span class="p">:</span>
+                <span class="n">full_vars</span><span class="p">[</span><span class="n">vn</span><span class="p">]</span> <span class="o">=</span> <span class="n">fixed_vars</span><span class="p">[</span><span class="n">nt_fix</span><span class="p">]</span>
+                <span class="n">nt_fix</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">full_vars</span><span class="p">[</span><span class="n">vn</span><span class="p">]</span> <span class="o">=</span> <span class="n">free_vars</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">q</span><span class="p">,</span> <span class="n">mlfm</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mlfms</span><span class="p">):</span>
+            <span class="n">beta_q</span> <span class="o">=</span> <span class="n">full_vars</span><span class="p">[</span><span class="s1">&#39;beta_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">q</span><span class="p">)]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">mlfm</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">D</span><span class="p">,</span> <span class="n">mlfm</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">R</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">MLFMAdapGradFitResults</span><span class="p">(</span><span class="n">full_vars</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">],</span>
+                                         <span class="n">beta_q</span><span class="p">,</span>
+                                         <span class="n">full_vars</span><span class="p">[</span><span class="s1">&#39;logpsi&#39;</span><span class="p">],</span>
+                                         <span class="n">full_vars</span><span class="p">[</span><span class="s1">&#39;logphi_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">q</span><span class="p">)],</span>
+                                         <span class="n">full_vars</span><span class="p">[</span><span class="s1">&#39;loggamma_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">q</span><span class="p">)],</span>
+                                         <span class="n">full_vars</span><span class="p">[</span><span class="s1">&#39;logtau_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">q</span><span class="p">)],</span>
+                                         <span class="kc">None</span><span class="p">)</span>
+            <span class="n">mlfm</span><span class="o">.</span><span class="n">mapres</span> <span class="o">=</span> <span class="n">res</span>
+
+
+    <span class="k">def</span> <span class="nf">_fit_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">is_fixed_vars</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        .. note::</span>
+
+<span class="sd">        It would be much neater to write this as a method that</span>
+<span class="sd">        calls :func:`_fit_init` methods of the individual</span>
+<span class="sd">        product MLFM</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mlfms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        
+        <span class="n">init_strategies</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">mlfms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">N</span><span class="o">*</span><span class="n">mlfms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">R</span><span class="p">),</span>
+            <span class="s1">&#39;logpsi&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">gp</span><span class="o">.</span><span class="n">kernel</span><span class="o">.</span><span class="n">theta</span> <span class="k">for</span> <span class="n">gp</span> <span class="ow">in</span> <span class="n">mlfms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">latentforces</span><span class="p">]</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;beta&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">mlfms</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">R</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span>
+                                      <span class="n">mlfms</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">D</span><span class="p">),</span>
+            <span class="s1">&#39;logphi&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">gp</span><span class="o">.</span><span class="n">kernel</span><span class="o">.</span><span class="n">theta</span> <span class="k">for</span> <span class="n">gp</span> <span class="ow">in</span> <span class="n">mlfms</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">latentstates</span><span class="p">]</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;loggamma&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">1e-4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">mlfms</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">K</span><span class="p">)),</span>
+            <span class="s1">&#39;logtau&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">1e4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">mlfms</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">K</span><span class="p">))</span>
+            <span class="p">}</span>
+
+        <span class="n">free_vars</span><span class="p">,</span> <span class="n">fixed_vars</span> <span class="o">=</span> <span class="p">([],</span> <span class="p">[])</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">is_fixed</span> <span class="ow">in</span> <span class="n">is_fixed_vars</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">var0</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_init&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="c1"># initalise using initalising strategies</span>
+                <span class="n">varn</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">varn</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">var0</span> <span class="o">=</span> <span class="n">init_strategies</span><span class="p">[</span><span class="n">varn</span><span class="p">[</span><span class="mi">0</span><span class="p">]](</span><span class="nb">int</span><span class="p">(</span><span class="n">varn</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">var0</span> <span class="o">=</span> <span class="n">init_strategies</span><span class="p">[</span><span class="n">varn</span><span class="p">[</span><span class="mi">0</span><span class="p">]]()</span>
+
+            <span class="c1"># Add variable to free or fixed variables</span>
+            <span class="k">if</span> <span class="n">is_fixed</span><span class="p">:</span>
+                <span class="n">fixed_vars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">free_vars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var0</span><span class="p">)</span>
+        <span class="n">free_vars_shape</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">size</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">free_vars</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">free_vars</span><span class="p">),</span> <span class="n">free_vars_shape</span><span class="p">,</span> <span class="n">fixed_vars</span>
+
+
     <span class="k">def</span> <span class="nf">_fit_kwarg_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N_manifolds</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
         <span class="n">var_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;logpsi&#39;</span><span class="p">]</span> <span class="o">+</span> \
@@ -185,7 +356,7 @@
 
         <span class="c1"># check for blanket variable name fixing</span>
         <span class="c1">#    -- done last so will take precedence</span>
-        <span class="k">for</span> <span class="n">vn</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;loggamma&#39;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">vn</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;logpsi&#39;</span><span class="p">,</span> <span class="s1">&#39;beta&#39;</span><span class="p">,</span> <span class="s1">&#39;loggamma&#39;</span><span class="p">,</span> <span class="s1">&#39;logphi&#39;</span><span class="p">,</span> <span class="s1">&#39;logtau&#39;</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">vn</span><span class="p">,</span> <span class="s1">&#39;_is_fixed&#39;</span><span class="p">)),</span> <span class="kc">False</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_manifolds</span><span class="p">):</span>
                     <span class="n">is_fixed_vars</span><span class="p">[</span><span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">vn</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)))]</span> <span class="o">=</span> <span class="kc">True</span>
@@ -193,6 +364,97 @@
         <span class="k">return</span> <span class="n">is_fixed_vars</span>
             
 
+<span class="k">class</span> <span class="nc">GibbsMLFMAdapGradCartesianProduct</span><span class="p">(</span><span class="n">MLFMAdapGradCartesianProduct</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">gibbs_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span>
+                     <span class="n">sample</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="p">),</span>
+                     <span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                     <span class="n">burnin</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                     <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">mlfms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="n">N_manifolds</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mlfms</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">mapres</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;mapres&#39;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">yoldstyle</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">y</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">item</span><span class="p">])</span>
+                         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">Y</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">yoldstyle</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># cheeky initialisation of g and beta at the mapres</span>
+        <span class="n">gcur</span> <span class="o">=</span> <span class="n">mlfms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mapres</span><span class="o">.</span><span class="n">g</span>
+        <span class="n">bcur</span> <span class="o">=</span> <span class="p">[</span><span class="n">mlfm</span><span class="o">.</span><span class="n">mapres</span><span class="o">.</span><span class="n">beta</span> <span class="k">for</span> <span class="n">mlfm</span> <span class="ow">in</span> <span class="n">mlfms</span><span class="p">]</span>
+        <span class="n">xcur</span> <span class="o">=</span> <span class="p">[[]</span> <span class="p">]</span><span class="o">*</span><span class="n">N_manifolds</span>
+
+        <span class="n">logpsi</span> <span class="o">=</span> <span class="n">mlfms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mapres</span><span class="o">.</span><span class="n">logpsi</span>
+        <span class="n">latentforces</span> <span class="o">=</span> <span class="n">mlfms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">latentforces</span>
+        <span class="n">logpsi</span> <span class="o">=</span> <span class="n">_unpack_vector</span><span class="p">(</span><span class="n">logpsi</span><span class="p">,</span>
+                                <span class="n">_get_gp_theta_shape</span><span class="p">(</span><span class="n">mlfms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">latentforces</span><span class="p">))</span>
+        <span class="n">Cg_prior_invcov</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">theta</span><span class="p">,</span> <span class="n">gp</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">logpsi</span><span class="p">,</span> <span class="n">latentforces</span><span class="p">):</span>
+            <span class="n">kern</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">kernel</span><span class="o">.</span><span class="n">clone_with_theta</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+            <span class="n">Cgr</span> <span class="o">=</span> <span class="n">kern</span><span class="p">(</span><span class="n">mlfms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">ttc</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">])</span>
+            <span class="n">Cgr</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">diag_indices_from</span><span class="p">(</span><span class="n">Cgr</span><span class="p">)]</span> <span class="o">+=</span> <span class="n">gp</span><span class="o">.</span><span class="n">alpha</span>
+            <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">Cgr</span><span class="p">)</span>
+            <span class="n">Cg_prior_invcov</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cho_solve</span><span class="p">((</span><span class="n">L</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+                                             <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+        <span class="n">Cg_prior_invcov</span> <span class="o">=</span> <span class="n">block_diag</span><span class="p">(</span><span class="o">*</span><span class="n">Cg_prior_invcov</span><span class="p">)</span>
+
+        <span class="c1"># store the rvs in a dict</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">}</span>
+        <span class="n">nt</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="n">sample</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span> <span class="o">&lt;</span> <span class="n">size</span><span class="p">:</span>
+            <span class="c1">## sample the latent states for all of the</span>
+            <span class="k">for</span> <span class="n">q</span><span class="p">,</span> <span class="n">mlfm</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mlfms</span><span class="p">):</span>
+                <span class="n">vecy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">y</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+                                        <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">Y</span><span class="p">[</span><span class="n">q</span><span class="p">]))</span>
+                <span class="n">Ex_q</span><span class="p">,</span> <span class="n">Covx_q</span> <span class="o">=</span> <span class="n">mlfm</span><span class="o">.</span><span class="n">x_condpdf</span><span class="p">(</span><span class="n">bcur</span><span class="p">[</span><span class="n">q</span><span class="p">],</span> <span class="n">gcur</span><span class="p">,</span>
+                                              <span class="n">mlfm</span><span class="o">.</span><span class="n">mapres</span><span class="o">.</span><span class="n">logphi</span><span class="p">,</span>
+                                              <span class="n">mlfm</span><span class="o">.</span><span class="n">mapres</span><span class="o">.</span><span class="n">loggamma</span><span class="p">,</span>
+                                              <span class="n">include_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                              <span class="n">vecy</span><span class="o">=</span><span class="n">vecy</span><span class="p">,</span>
+                                              <span class="n">logtau</span><span class="o">=</span><span class="n">mlfm</span><span class="o">.</span><span class="n">mapres</span><span class="o">.</span><span class="n">logtau</span><span class="p">,</span>
+                                              <span class="n">same_ic</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">Covx_q</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">diag_indices_from</span><span class="p">(</span><span class="n">Covx_q</span><span class="p">)]</span> <span class="o">+=</span> <span class="mf">1e-5</span>
+                <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">Covx_q</span><span class="p">)</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">Ex_q</span><span class="o">.</span><span class="n">size</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">Ex_q</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+                <span class="n">xcur_q</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">+</span> <span class="n">Ex_q</span>
+                <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">xcur_q</span><span class="p">[:,</span> <span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">mlfm</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">K</span><span class="p">,</span> <span class="n">mlfm</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">N</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+                              <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">xcur_q</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])])</span>
+                
+                <span class="n">xcur</span><span class="p">[</span><span class="n">q</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span> <span class="c1">#L.dot(z) + Ex_q</span>
+
+
+            <span class="k">if</span> <span class="s1">&#39;g&#39;</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
+                <span class="n">premean</span> <span class="o">=</span> <span class="mf">0.</span>
+                <span class="n">invcov</span> <span class="o">=</span> <span class="mf">0.</span>
+                <span class="k">for</span> <span class="n">q</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">mlfm</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">xcur</span><span class="p">,</span> <span class="n">mlfms</span><span class="p">)):</span>
+                    <span class="n">pm</span><span class="p">,</span> <span class="n">ic</span> <span class="o">=</span> <span class="n">mlfm</span><span class="o">.</span><span class="n">_g_cond_prepars</span><span class="p">(</span><span class="n">x</span><span class="p">,</span>
+                                                  <span class="n">bcur</span><span class="p">[</span><span class="n">q</span><span class="p">],</span>
+                                                  <span class="n">mlfm</span><span class="o">.</span><span class="n">mapres</span><span class="o">.</span><span class="n">logphi</span><span class="p">,</span>
+                                                  <span class="n">mlfm</span><span class="o">.</span><span class="n">mapres</span><span class="o">.</span><span class="n">logpsi</span><span class="p">,</span>
+                                                  <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">mlfm</span><span class="o">.</span><span class="n">mapres</span><span class="o">.</span><span class="n">loggamma</span><span class="p">))</span>
+                    <span class="n">premean</span> <span class="o">+=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">pm</span><span class="p">)</span>
+                    <span class="n">invcov</span> <span class="o">+=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">ic</span><span class="p">)</span>
+
+                <span class="c1"># add the contribution from the prior</span>
+                <span class="n">invcov</span> <span class="o">+=</span> <span class="n">Cg_prior_invcov</span>
+
+                <span class="n">Eg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">invcov</span><span class="p">,</span> <span class="n">premean</span><span class="p">)</span>
+                <span class="n">Covg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">invcov</span><span class="p">)</span>
+                <span class="n">gcur</span> <span class="o">=</span> <span class="n">multivariate_normal</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">Eg</span><span class="p">,</span> <span class="n">Covg</span><span class="p">)</span>
+                
+                <span class="k">if</span> <span class="n">nt</span> <span class="o">&gt;</span> <span class="n">burnin</span><span class="p">:</span>
+                    <span class="n">samples</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gcur</span><span class="p">)</span>
+
+            <span class="n">nt</span> <span class="o">+=</span> <span class="mi">1</span>
+            
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">samples</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">samples</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">xcur</span><span class="p">,</span> <span class="n">Eg</span><span class="p">,</span> <span class="n">samples</span>
 
 <span class="k">class</span> <span class="nc">MLFMAdapGradFitResults</span><span class="p">(</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;MLFMAdapGradFitResults&#39;</span><span class="p">,</span>
                                         <span class="p">(</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;beta&#39;</span><span class="p">,</span> <span class="s1">&#39;logpsi&#39;</span><span class="p">,</span> <span class="s1">&#39;logphi&#39;</span><span class="p">,</span>
@@ -322,14 +584,16 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 
-<span class="sd">    struct_mats : list of square ndarray</span>
-<span class="sd">        A set of [A0,...,AR] square numpy array_like</span>
+<span class="sd">    basis_mats : list of square ndarray</span>
+<span class="sd">        A list of [L1,...,LD] square numpy array_like</span>
 
 <span class="sd">    lf_kernels : list of kernel objects, optional</span>
 <span class="sd">        Kernels of the latent force Gaussian process objects. If None</span>
 <span class="sd">        is passed, the kernel \&quot;1.0 * RBF(1.0)\&quot; is used as a defualt.</span>
 
-<span class="sd">    Read more in the :ref:`Tutorial &lt;tutorials-mlfm&gt;`.</span>
+<span class="sd">    Notes </span>
+<span class="sd">    -----</span>
+<span class="sd">    Read more in the :ref:`tutorial &lt;tutorials-mlfm-ag&gt;`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="MLFMAdapGrad.__init__"><a class="viewcode-back" href="../../../_autosummary/_autosummary/pydygp.linlatentforcemodels.MLFMAdapGrad.html#pydygp.linlatentforcemodels.MLFMAdapGrad.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">basis_mats</span><span class="p">,</span>
@@ -520,7 +784,7 @@
                                        <span class="k">if</span> <span class="ow">not</span> <span class="n">b</span><span class="p">])</span>
                 <span class="k">return</span> <span class="o">-</span><span class="p">(</span><span class="n">ll</span> <span class="o">+</span> <span class="n">lp</span><span class="p">),</span> <span class="n">grad</span>
 
-            <span class="k">except</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">LinAlgError</span><span class="p">:</span>
+            <span class="k">except</span><span class="p">:</span><span class="c1"># np.linalg.LinAlgError:</span>
                 <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">arg</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
 
         <span class="n">init</span><span class="p">,</span> <span class="n">free_vars_shape</span><span class="p">,</span> <span class="n">fixed_vars</span> <span class="o">=</span> \
@@ -975,7 +1239,10 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="GibbsMLFMAdapGrad.__init__"><a class="viewcode-back" href="../../../_autosummary/_autosummary/pydygp.linlatentforcemodels.GibbsMLFMAdapGrad.html#pydygp.linlatentforcemodels.GibbsMLFMAdapGrad.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">GibbsMLFMAdapGrad</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-        
+
+    <span class="k">def</span> <span class="nf">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mlfm</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">GibbsMLFMAdapGradCartesianProduct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mlfm</span><span class="p">)</span>
+    
     <span class="k">def</span> <span class="nf">gibbsfit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span>
                  <span class="n">sample</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;g&#39;</span><span class="p">),</span>
                  <span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
@@ -993,6 +1260,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="c1"># get the results from the MAP fit of the model</span>
+            <span class="c1"># convert Y to old style</span>
             <span class="n">mapres</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="n">samples</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">}</span>
@@ -1069,49 +1337,54 @@
             <span class="k">except</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span>
 
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">logphi_shape</span> <span class="o">=</span> <span class="n">_get_gp_theta_shape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latentstates</span><span class="p">)</span>
-            <span class="n">logphi</span> <span class="o">=</span> <span class="n">_unpack_vector</span><span class="p">(</span><span class="n">logphi</span><span class="p">,</span> <span class="n">logphi_shape</span><span class="p">)</span>
+<span class="c1">#        else:</span>
+<span class="c1">#            logphi_shape = _get_gp_theta_shape(self.latentstates)</span>
+<span class="c1">#            logphi = _unpack_vector(logphi, logphi_shape)</span>
 
-        <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="nb">sum</span><span class="p">(</span><span class="n">brd</span><span class="o">*</span><span class="n">Lrd</span> <span class="k">for</span> <span class="n">brd</span><span class="p">,</span> <span class="n">Lrd</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">br</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis_mats</span><span class="p">))</span>
-                        <span class="k">for</span> <span class="n">br</span> <span class="ow">in</span> <span class="n">beta</span><span class="p">])</span>
+<span class="c1">#        A = np.asarray([sum(brd*Lrd for brd, Lrd in zip(br, self.basis_mats))</span>
+<span class="c1">#                        for br in beta])</span>
 
-        <span class="n">invcov</span><span class="p">,</span> <span class="n">premean</span> <span class="o">=</span> <span class="p">([],</span> <span class="p">[])</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        invcov, premean = ([], [])</span>
+<span class="sd">        # sum over each dimension</span>
+<span class="sd">        for k in range(self.dim.K):</span>
 
-        <span class="c1"># sum over each dimension</span>
-        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">K</span><span class="p">):</span>
+<span class="sd">            # Get the covariance matrices which do not depend on</span>
+<span class="sd">            # the values of x_k^{(m)}</span>
+<span class="sd">            if logphi is None:</span>
+<span class="sd">                Lxx, Mdx, Schol = Lxx_list[k], \</span>
+<span class="sd">                                  Mdx_list[k], \</span>
+<span class="sd">                                  Schol_list[k]</span>
+<span class="sd">            else:</span>
+<span class="sd">                _phidep_covs = _ls_covar_k_wgrad(logphi[k],</span>
+<span class="sd">                                                 gamma[k],</span>
+<span class="sd">                                                 self.ttc,</span>
+<span class="sd">                                                 self.latentstates[k])</span>
+<span class="sd">                Lxx, Mdx, Schol = _phidep_covs[0]</span>
 
-            <span class="c1"># Get the covariance matrices which do not depend on</span>
-            <span class="c1"># the values of x_k^{(m)}</span>
-            <span class="k">if</span> <span class="n">logphi</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">Lxx</span><span class="p">,</span> <span class="n">Mdx</span><span class="p">,</span> <span class="n">Schol</span> <span class="o">=</span> <span class="n">Lxx_list</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> \
-                                  <span class="n">Mdx_list</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> \
-                                  <span class="n">Schol_list</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">_phidep_covs</span> <span class="o">=</span> <span class="n">_ls_covar_k_wgrad</span><span class="p">(</span><span class="n">logphi</span><span class="p">[</span><span class="n">k</span><span class="p">],</span>
-                                                 <span class="n">gamma</span><span class="p">[</span><span class="n">k</span><span class="p">],</span>
-                                                 <span class="bp">self</span><span class="o">.</span><span class="n">ttc</span><span class="p">,</span>
-                                                 <span class="bp">self</span><span class="o">.</span><span class="n">latentstates</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
-                <span class="n">Lxx</span><span class="p">,</span> <span class="n">Mdx</span><span class="p">,</span> <span class="n">Schol</span> <span class="o">=</span> <span class="n">_phidep_covs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="sd">            # sum over all of the outputs</span>
+<span class="sd">            for m in range(vecx.shape[1]):</span>
 
-            <span class="c1"># sum over all of the outputs</span>
-            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vecx</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+<span class="sd">                Xm = vecx[:, m].reshape(self.dim.K, self.dim.N)</span>
+<span class="sd">                vk = vk_flow_rep(k,</span>
+<span class="sd">                                 Xm,</span>
+<span class="sd">                                 A)</span>
 
-                <span class="n">Xm</span> <span class="o">=</span> <span class="n">vecx</span><span class="p">[:,</span> <span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">K</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>
-                <span class="n">vk</span> <span class="o">=</span> <span class="n">vk_flow_rep</span><span class="p">(</span><span class="n">k</span><span class="p">,</span>
-                                 <span class="n">Xm</span><span class="p">,</span>
-                                 <span class="n">A</span><span class="p">)</span>
+<span class="sd">                mk = Mdx.dot(Xm[k, :])</span>
+<span class="sd">                SkinvVk = np.column_stack(</span>
+<span class="sd">                    [cho_solve((Schol, True), np.diag(vkr))</span>
+<span class="sd">                     for vkr in vk[1:]])</span>
 
-                <span class="n">mk</span> <span class="o">=</span> <span class="n">Mdx</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Xm</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="p">:])</span>
-                <span class="n">SkinvVk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span>
-                    <span class="p">[</span><span class="n">cho_solve</span><span class="p">((</span><span class="n">Schol</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">vkr</span><span class="p">))</span>
-                     <span class="k">for</span> <span class="n">vkr</span> <span class="ow">in</span> <span class="n">vk</span><span class="p">[</span><span class="mi">1</span><span class="p">:]])</span>
+<span class="sd">                Vk = np.row_stack([np.diag(vkr) for vkr in vk[1:]])</span>
+<span class="sd">                ic = Vk.dot(SkinvVk)</span>
 
-                <span class="n">Vk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">row_stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">vkr</span><span class="p">)</span> <span class="k">for</span> <span class="n">vkr</span> <span class="ow">in</span> <span class="n">vk</span><span class="p">[</span><span class="mi">1</span><span class="p">:]])</span>
-                <span class="n">ic</span> <span class="o">=</span> <span class="n">Vk</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">SkinvVk</span><span class="p">)</span>
-
-                <span class="n">premean</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SkinvVk</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">mk</span><span class="o">-</span><span class="n">vk</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-                <span class="n">invcov</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ic</span><span class="p">)</span>
+<span class="sd">                premean.append(SkinvVk.T.dot(mk-vk[0]))</span>
+<span class="sd">                invcov.append(ic)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">vecx</span><span class="p">[:,</span> <span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">K</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">N</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+                     <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vecx</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])])</span>
+        <span class="n">premean</span><span class="p">,</span> <span class="n">invcov</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_cond_prepars</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">logphi</span><span class="p">,</span> <span class="n">logpsi</span><span class="p">,</span> <span class="n">gamma</span><span class="p">)</span>
+        
 
         <span class="c1"># Add the contribution from the prior</span>
         <span class="n">prior_ic</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1140,6 +1413,42 @@
         <span class="n">mean</span> <span class="o">=</span> <span class="n">cov</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">premean</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">mean</span><span class="p">,</span> <span class="n">cov</span>
+
+    <span class="k">def</span> <span class="nf">_g_cond_prepars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">logphi</span><span class="p">,</span> <span class="n">logpsi</span><span class="p">,</span> <span class="n">gamma</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        X : array, shape (N_outputs, N, K)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">N_outputs</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">K</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+
+        <span class="n">logphi_shape</span> <span class="o">=</span> <span class="n">_get_gp_theta_shape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latentstates</span><span class="p">)</span>
+        <span class="n">logphi</span> <span class="o">=</span> <span class="n">_unpack_vector</span><span class="p">(</span><span class="n">logphi</span><span class="p">,</span> <span class="n">logphi_shape</span><span class="p">)</span>
+
+        <span class="c1"># construct the structure matrices</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="nb">sum</span><span class="p">(</span><span class="n">brd</span><span class="o">*</span><span class="n">Lrd</span> <span class="k">for</span> <span class="n">brd</span><span class="p">,</span> <span class="n">Lrd</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">br</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis_mats</span><span class="p">))</span>
+                        <span class="k">for</span> <span class="n">br</span> <span class="ow">in</span> <span class="n">beta</span><span class="p">])</span>
+
+        <span class="n">invcovs</span><span class="p">,</span> <span class="n">premeans</span> <span class="o">=</span> <span class="p">([],</span> <span class="p">[])</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">K</span><span class="p">):</span>
+            <span class="n">phidep_covs</span> <span class="o">=</span> <span class="n">_ls_covar_k_wgrad</span><span class="p">(</span><span class="n">logphi</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">gamma</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">ttc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">latentstates</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+            <span class="n">Lxx</span><span class="p">,</span> <span class="n">Mdx</span><span class="p">,</span> <span class="n">Schol</span> <span class="o">=</span> <span class="n">phidep_covs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>            
+            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_outputs</span><span class="p">):</span>
+
+                <span class="n">vk</span> <span class="o">=</span> <span class="n">vk_flow_rep</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">X</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>
+                <span class="n">mk</span> <span class="o">=</span> <span class="n">Mdx</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="p">:,</span> <span class="n">k</span><span class="p">])</span>
+                <span class="n">SkinvVk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">cho_solve</span><span class="p">((</span><span class="n">Schol</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">vkr</span><span class="p">))</span>
+                     <span class="k">for</span> <span class="n">vkr</span> <span class="ow">in</span> <span class="n">vk</span><span class="p">[</span><span class="mi">1</span><span class="p">:]])</span>
+
+                <span class="n">Vk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">row_stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">vkr</span><span class="p">)</span> <span class="k">for</span> <span class="n">vkr</span> <span class="ow">in</span> <span class="n">vk</span><span class="p">[</span><span class="mi">1</span><span class="p">:]])</span>
+                <span class="n">ic</span> <span class="o">=</span> <span class="n">Vk</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">SkinvVk</span><span class="p">)</span>
+
+                <span class="n">premeans</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SkinvVk</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">mk</span><span class="o">-</span><span class="n">vk</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                <span class="n">invcovs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ic</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">premeans</span><span class="p">,</span> <span class="n">invcovs</span>
 
 <div class="viewcode-block" id="GibbsMLFMAdapGrad.g_condpdf"><a class="viewcode-back" href="../../../_autosummary/_autosummary/pydygp.linlatentforcemodels.GibbsMLFMAdapGrad.html#pydygp.linlatentforcemodels.GibbsMLFMAdapGrad.g_condpdf">[docs]</a>    <span class="k">def</span> <span class="nf">g_condpdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vecx</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logphi</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logpsi</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1415,13 +1724,53 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">VarMLFMAdapGrad</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">basis_mats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basis_mats</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tt</span><span class="p">,</span> <span class="n">return_std</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="k">pass</span>
+    <span class="k">def</span> <span class="nf">var_predict_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tt</span><span class="p">,</span> <span class="n">return_std</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">K_trans</span> <span class="o">=</span> <span class="n">block_diag</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">gp</span><span class="o">.</span><span class="n">kernel_</span><span class="p">(</span><span class="n">tt</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">ttc</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">])</span>
+                               <span class="k">for</span> <span class="n">gp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">latentstates</span><span class="p">])</span>
+
+
+    <span class="k">def</span> <span class="nf">var_predict_lf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tt</span><span class="p">,</span> <span class="n">return_std</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+        <span class="n">K_trans</span> <span class="o">=</span> <span class="n">block_diag</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">gp</span><span class="o">.</span><span class="n">kernel_</span><span class="p">(</span><span class="n">tt</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">ttc</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">])</span>
+                               <span class="k">for</span> <span class="n">gp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">latentforces</span><span class="p">])</span>
+        <span class="n">lf_mean</span> <span class="o">=</span> <span class="n">K_trans</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha_lf_</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">return_std</span><span class="p">:</span>
+            <span class="n">L_inv</span> <span class="o">=</span> <span class="n">solve_triangular</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">L_lf_</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">L_lf_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+            <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latentforces</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">L_</span>
+            <span class="n">Covg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">L_lf_</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">L_lf_</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+            <span class="n">expr</span> <span class="o">=</span> <span class="n">K_trans</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">cho_solve</span><span class="p">((</span><span class="n">L</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span> <span class="n">Covg</span><span class="p">))</span>
+            <span class="n">expr</span> <span class="o">=</span> <span class="n">K_trans</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">cho_solve</span><span class="p">((</span><span class="n">L</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span> <span class="n">expr</span><span class="o">.</span><span class="n">T</span><span class="p">))</span>
+
+            <span class="n">sd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
+            <span class="n">sd_neg</span> <span class="o">=</span> <span class="n">sd</span> <span class="o">&lt;</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">sd_neg</span><span class="p">):</span>
+                <span class="n">sd</span><span class="p">[</span><span class="n">sd_neg</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">sd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sd</span><span class="p">)</span>
+
+            <span class="n">lf_mean</span><span class="p">,</span> <span class="n">lf_std</span> <span class="o">=</span> <span class="p">([],</span> <span class="p">[])</span>
+            <span class="k">for</span> <span class="n">gp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">latentforces</span><span class="p">:</span>
+                <span class="n">m</span><span class="p">,</span> <span class="n">std</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">tt</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">return_std</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">lf_mean</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+                <span class="n">lf_std</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">std</span><span class="p">)</span>
+            <span class="n">lf_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">lf_std</span><span class="p">))</span>
+            <span class="n">lf_std</span> <span class="o">+=</span> <span class="n">sd</span>
+
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lf_mean</span><span class="p">),</span> <span class="n">lf_std</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">R</span><span class="p">,</span> <span class="n">tt</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+
+
+        <span class="n">lf_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">gp</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">tt</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">])</span> <span class="k">for</span> <span class="n">gp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">latentforces</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">lf_mean</span>
+        
 
     <span class="k">def</span> <span class="nf">varfit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">gtol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
         <span class="c1"># get the results from fitting the MAP model</span>
-        <span class="n">mapres</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">mapres</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;mapres&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">mapres</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1"># initalise the distribution of g at the MAP</span>
         <span class="n">Eg</span> <span class="o">=</span> <span class="n">mapres</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
@@ -1435,17 +1784,23 @@
 
         <span class="n">Deltg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>  <span class="c1"># difference between prev and cur g</span>
 
+        <span class="n">update</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">)</span>
+
         <span class="n">nt</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># Count number of iterations</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="n">Ex</span><span class="p">,</span> <span class="n">Covx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_cond</span><span class="p">(</span><span class="n">Eg</span><span class="p">,</span> <span class="n">Covg</span><span class="p">,</span> <span class="n">Eb</span><span class="p">,</span> <span class="n">Covb</span><span class="p">,</span>
-                                   <span class="n">mapres</span><span class="o">.</span><span class="n">logphi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">mapres</span><span class="o">.</span><span class="n">loggamma</span><span class="p">),</span>
-                                   <span class="n">include_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">Y</span><span class="o">=</span><span class="n">Y</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">mapres</span><span class="o">.</span><span class="n">logtau</span><span class="p">))</span>
-            <span class="n">Eg_</span><span class="p">,</span> <span class="n">Covg_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_cond</span><span class="p">(</span><span class="n">Ex</span><span class="p">,</span> <span class="n">Covx</span><span class="p">,</span> <span class="n">Eb</span><span class="p">,</span> <span class="n">Covb</span><span class="p">,</span>
-                                     <span class="n">mapres</span><span class="o">.</span><span class="n">logphi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">mapres</span><span class="o">.</span><span class="n">loggamma</span><span class="p">),</span>
-                                     <span class="n">mapres</span><span class="o">.</span><span class="n">logpsi</span><span class="p">)</span>
-            <span class="n">Eb</span><span class="p">,</span> <span class="n">Covb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta_cond</span><span class="p">(</span><span class="n">Ex</span><span class="p">,</span> <span class="n">Covx</span><span class="p">,</span> <span class="n">Eg</span><span class="p">,</span> <span class="n">Covg</span><span class="p">,</span>
-                                      <span class="n">mapres</span><span class="o">.</span><span class="n">logphi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">mapres</span><span class="o">.</span><span class="n">loggamma</span><span class="p">),</span>
-                                      <span class="n">prior_scale</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;x&#39;</span> <span class="ow">in</span> <span class="n">update</span><span class="p">:</span>
+                <span class="n">Ex</span><span class="p">,</span> <span class="n">Covx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_cond</span><span class="p">(</span><span class="n">Eg</span><span class="p">,</span> <span class="n">Covg</span><span class="p">,</span> <span class="n">Eb</span><span class="p">,</span> <span class="n">Covb</span><span class="p">,</span>
+                                       <span class="n">mapres</span><span class="o">.</span><span class="n">logphi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">mapres</span><span class="o">.</span><span class="n">loggamma</span><span class="p">),</span>
+                                       <span class="n">include_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">Y</span><span class="o">=</span><span class="n">Y</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">mapres</span><span class="o">.</span><span class="n">logtau</span><span class="p">))</span>
+            <span class="k">if</span> <span class="s1">&#39;g&#39;</span> <span class="ow">in</span> <span class="n">update</span><span class="p">:</span>
+                <span class="n">Eg_</span><span class="p">,</span> <span class="n">Covg_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_cond</span><span class="p">(</span><span class="n">Ex</span><span class="p">,</span> <span class="n">Covx</span><span class="p">,</span> <span class="n">Eb</span><span class="p">,</span> <span class="n">Covb</span><span class="p">,</span>
+                                         <span class="n">mapres</span><span class="o">.</span><span class="n">logphi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">mapres</span><span class="o">.</span><span class="n">loggamma</span><span class="p">),</span>
+                                         <span class="n">mapres</span><span class="o">.</span><span class="n">logpsi</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s1">&#39;beta&#39;</span> <span class="ow">in</span> <span class="n">update</span><span class="p">:</span>
+                <span class="n">Eb</span><span class="p">,</span> <span class="n">Covb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta_cond</span><span class="p">(</span><span class="n">Ex</span><span class="p">,</span> <span class="n">Covx</span><span class="p">,</span> <span class="n">Eg</span><span class="p">,</span> <span class="n">Covg</span><span class="p">,</span>
+                                          <span class="n">mapres</span><span class="o">.</span><span class="n">logphi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">mapres</span><span class="o">.</span><span class="n">loggamma</span><span class="p">),</span>
+                                          <span class="n">prior_scale</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
             
             <span class="c1"># Calculate distance moved</span>
             <span class="n">Deltg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Eg</span> <span class="o">-</span> <span class="n">Eg_</span><span class="p">)</span>
@@ -1464,18 +1819,20 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">Ex_train_</span> <span class="o">=</span> <span class="n">Ex</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Lx_train_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">Covx</span><span class="p">)</span>
         
-        <span class="c1"># return Ex in a more resonable shape</span>
-        <span class="c1">#Ex = Ex.reshape(self.dim.K, self.dim.N, Y.shape[1]).transpose(1, 0, 2)</span>
-
-        <span class="c1">#self.g_L_chol_ = cholesky(Covg, lower=True)</span>
-        <span class="c1">#self.g_alpha_ = cho_solve((self.g_L_chol_, True), Eg)</span>
+        <span class="c1">#Covg[np.diag_indices_from(Covg)] += 1e-5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">L_lf_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">Covg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha_lf_</span> <span class="o">=</span> <span class="n">cho_solve</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">L_lf_</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span> <span class="n">Eg</span><span class="p">)</span>
 
         <span class="c1"># Sensible reshaping</span>
         <span class="n">Eg</span> <span class="o">=</span> <span class="n">Eg</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">R</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">N</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
         <span class="n">Eb</span> <span class="o">=</span> <span class="n">Eb</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">R</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">D</span><span class="p">)</span>
         <span class="n">Covg</span> <span class="o">=</span> <span class="n">Covg</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">R</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">R</span><span class="p">)</span>
         <span class="n">Covg</span> <span class="o">=</span> <span class="n">Covg</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-        
+
+        <span class="k">for</span> <span class="n">Egr</span><span class="p">,</span> <span class="n">gp</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">Eg</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">latentforces</span><span class="p">):</span>
+            <span class="n">gp</span><span class="o">.</span><span class="n">y_train_</span> <span class="o">=</span> <span class="n">Egr</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="n">gp</span><span class="o">.</span><span class="n">alpha_</span> <span class="o">=</span> <span class="n">cho_solve</span><span class="p">((</span><span class="n">gp</span><span class="o">.</span><span class="n">L_</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span> <span class="n">gp</span><span class="o">.</span><span class="n">y_train_</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">mapres</span><span class="p">,</span> <span class="n">Eg</span><span class="p">,</span> <span class="n">Covg</span><span class="p">,</span> <span class="n">Eb</span><span class="p">,</span> <span class="n">Covb</span>
 
         

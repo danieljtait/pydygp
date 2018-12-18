@@ -398,6 +398,19 @@
         <span class="k">return</span> <span class="n">mlfms</span>
 
         
+    <span class="k">def</span> <span class="nf">sim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">tt</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">dt_max</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">latent_forces</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">mlfms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+        <span class="c1"># simulate from the first model</span>
+        <span class="n">Y0</span><span class="p">,</span> <span class="n">lf</span> <span class="o">=</span> <span class="n">mlfms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="n">x0</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">tt</span><span class="p">,</span> <span class="n">beta</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dt_max</span><span class="o">=</span><span class="n">dt_max</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+
+        <span class="n">Data</span> <span class="o">=</span> <span class="p">[</span><span class="n">Y0</span><span class="p">,</span> <span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mlfms</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">yi</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">mlfms</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="n">x0</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">tt</span><span class="p">,</span>
+                                   <span class="n">latent_forces</span><span class="o">=</span><span class="n">lf</span><span class="p">,</span>
+                                   <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">dt_max</span><span class="o">=</span><span class="n">dt_max</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+            <span class="n">Data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Data</span><span class="p">,</span> <span class="n">lf</span>
 </pre></div>
 
            </div>

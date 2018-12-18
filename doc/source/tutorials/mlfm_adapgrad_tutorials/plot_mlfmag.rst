@@ -20,8 +20,6 @@ parameter estimation for the MLFM using the Adaptive Gradient matching
 approximation. This uses the :class:`MLFMAdapGrad` object and so our
 first step is to import this object.
 
-Demonstrates the use of :func:`pydygp.linlatentforcemodels.MLFMAdapGrad.fit`
-
 
 
 
@@ -191,7 +189,7 @@ Latent Force Estimation
 
 
 
-**Total running time of the script:** ( 0 minutes  2.101 seconds)
+**Total running time of the script:** ( 0 minutes  2.091 seconds)
 
 
 .. _sphx_glr_download_tutorials_mlfm_adapgrad_tutorials_plot_mlfmag.py:

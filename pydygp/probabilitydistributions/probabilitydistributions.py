@@ -179,7 +179,22 @@ class Normal(UnivariateProbabilityDistribution):
             return lpdf, -(x-self.loc)/self.scale**2
         else:
             return lpdf
-        
+
+class Laplace(UnivariateProbabilityDistribution):
+    def __init__(self, loc=0., scale=1.):
+        super(Laplace, self).__init__()
+        self.loc = loc
+        self.scale = scale
+
+    def logpdf(self, x ,eval_gradient=False):
+        lpdf = -abs(x-self.loc)/self.scale
+        lpdf -= np.log(2*self.scale)
+        if eval_gradient:
+            dx = -np.sign(x-self.loc)/self.scale
+            return lpdf, -np.sign(x-self.loc)/self.scale
+        else:
+            return lpdf
+    
 class InverseGamma(UnivariateProbabilityDistribution):
 
     def __init__(self, a=1, b=1):

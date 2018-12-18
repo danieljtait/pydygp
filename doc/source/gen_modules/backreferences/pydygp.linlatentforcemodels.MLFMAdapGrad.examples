@@ -23,24 +23,6 @@ Examples using ``pydygp.linlatentforcemodels.MLFMAdapGrad``
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This note demonstrates the use of the :py:obj:`*` operator to construct the Cartesian product o...">
-
-.. only:: html
-
-    .. figure:: /tutorials/mlfm_adapgrad_tutorials/images/thumb/sphx_glr_plot_mlfm_product_thumb.png
-
-        :ref:`sphx_glr_tutorials_mlfm_adapgrad_tutorials_plot_mlfm_product.py`
-
-.. raw:: html
-
-    </div>
-
-.. only:: not html
-
-    * :ref:`sphx_glr_tutorials_mlfm_adapgrad_tutorials_plot_mlfm_product.py`
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="This note descibes how to carry out the process of carrying out MAP parameter estimation for th...">
 
 .. only:: html

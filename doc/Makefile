@@ -27,12 +27,14 @@ clean:
 	rm -rf ./source/tutorials/lfm_tutorials/
 	rm -rf ./source/tutorials/llfm_tutorials/
 	rm -rf ./source/tutorials/mlfm_adapgrad/
-	rm -rf ./tutorials/mlfm_adapgrad_tutorials
-	rm -rf ./tutorials/mlfm_adapgrad
+	rm -rf ./source/tutorials/mlfm_adapgrad_tutorials
+	rm -rf ./source/tutorials/mlfm_adapgrad
+	rm -rf ./source/tutorials/mlfm_sa_tutorials
 	rm -rf ./tutorials/mlfm_sa_tutorials
 	rm -rf ./source/generated/
 	rm -rf ../tutorials/lfm_tutorials/.#*
 	rm -rf ../tutorials/llfm_tutorials/.#*
+	rm -rf ../tutorials/mlfm_adapgrad_tutorials/.#*
 	rm -rf ./source/*.*~
 
 html-noplot:

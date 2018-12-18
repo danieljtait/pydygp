@@ -1,8 +1,40 @@
 :orphan:
 
 
+.. _tutorials-mlfm-ag:
+
 Adaptive Gradient Matching Methods
 ==================================
+
+These methods have been introduced in [1]_ to handle parameter inference in the very
+general class of nonlinear ODE models
+
+.. math::
+
+   \dot{\mathbf{X}}(t) = f(\mathbf{X}; \boldsymbol{\theta}).
+
+The idea is to combine both the explicit relationship given by the function $f$, and
+a Gaussian process prior on the state variables. This leads to a pair of densities
+
+.. math::
+
+   p(\dot{\mathbf{X}}\mid \mathbf{X}) = \prod_{k=1}^{K}
+   p(\dot{\mathbf{x}}_k \mid \mathbf{x}_k)
+
+and
+
+.. math::
+
+   p(\dot{\mathbf{x}}_k \mid \mathbf{x}_k ) = \prod_{k=1}^{K}
+   \mathcal{N}(\dot{\mathbf{x}}_k \mid \mathbf{f}_k, \gamma_k^2 \mathbf{I})
+
+.. figure:: ../figures/prodexperts.png
+   :align: center
+
+   **Figure**
+   Conceptual diagram of the product of experts approximation. The
+   ODE model and the GP prior are combined by identifying the variables
+   connected with the \"--\" line by way of the product of experts assumption
 
 For the MLFM AdapGrad model the likelihood of a set of state variables may be written
 
@@ -38,10 +70,10 @@ All of the adative gradient matching methods proceed from this conditional densi
 Model Parameters
 ~~~~~~~~~~~~~~~~
 
-The following table gives the complete collection of variables that appear in the adaptive gradient
-matching method for the MLFM, along with a brief description of this variables, how this variable
-is referred to when using the package, along with transformation that is applied to this variable
-to give it a more natural support.
+The following table gives the complete collection of variables that appear in the adaptive
+gradient matching method for the MLFM, along with a brief description of this variables,
+how this variable is referred to when using the package, along with transformation that i
+s applied to this variable to give it a more natural support.
 
 +-----------------------------+-----------------------------+------------------+---------------------+---------------+ 
 | Parameter name              | Description                 | Variable name    | Transform           | Is Fixed      |
@@ -58,7 +90,22 @@ to give it a more natural support.
 +-----------------------------+-----------------------------+------------------+---------------------+---------------+
 
 MAP Estimation
-~~~~~~~~~~~~~~
+--------------
+
+The following list of notebooks give an introduction to fitting these models using
+the adaptive gradient matching approximation, as well as a discussion of some of
+the more general features of the MLFM model
+
+.. toctree::
+   :maxdepth: 1
+
+   plot_mlfmag
+   plot_mlfmaggibbs
+
+
+
+All Examples
+------------
 
     .. include:: ../../doc/source/gen_modules/backreferences/pydygp.linlatentforcemodels.MLFMAdapGrad.examples
     .. raw:: html
@@ -66,26 +113,14 @@ MAP Estimation
         <div style='clear:both'></div>
 
 
+References
+----------
 
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="This note demonstrates the use of the :py:obj:`*` operator to construct the Cartesian product o...">
-
-.. only:: html
-
-    .. figure:: /tutorials/mlfm_adapgrad_tutorials/images/thumb/sphx_glr_plot_mlfm_product_thumb.png
-
-        :ref:`sphx_glr_tutorials_mlfm_adapgrad_tutorials_plot_mlfm_product.py`
-
-.. raw:: html
-
-    </div>
+.. [1] Calderhead, Ben and Girolami, Mark and Neil D. Lawrence, "Accelerating
+   Bayesian Inference over Nonlinear Differential Equations with Gaussian
+   Processess", NIPS, 2009
 
 
-.. toctree::
-   :hidden:
-
-   /tutorials/mlfm_adapgrad_tutorials/plot_mlfm_product
 
 .. raw:: html
 
@@ -109,26 +144,6 @@ MAP Estimation
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Variational Inference">
-
-.. only:: html
-
-    .. figure:: /tutorials/mlfm_adapgrad_tutorials/images/thumb/sphx_glr_plot_mlfmagvar2_thumb.png
-
-        :ref:`sphx_glr_tutorials_mlfm_adapgrad_tutorials_plot_mlfmagvar2.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /tutorials/mlfm_adapgrad_tutorials/plot_mlfmagvar2
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="This example presents an illustration of the MLFM to learn the model">
 
 .. only:: html
@@ -146,26 +161,6 @@ MAP Estimation
    :hidden:
 
    /tutorials/mlfm_adapgrad_tutorials/plot_mlfmaggibbs
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="This example presents an illustration of using the MLFM to learn the model">
-
-.. only:: html
-
-    .. figure:: /tutorials/mlfm_adapgrad_tutorials/images/thumb/sphx_glr_plot_mlfmagvar_thumb.png
-
-        :ref:`sphx_glr_tutorials_mlfm_adapgrad_tutorials_plot_mlfmagvar.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /tutorials/mlfm_adapgrad_tutorials/plot_mlfmagvar
 .. raw:: html
 
     <div style='clear:both'></div>

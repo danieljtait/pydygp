@@ -12,8 +12,6 @@ parameter estimation for the MLFM using the Adaptive Gradient matching
 approximation. This uses the :class:`MLFMAdapGrad` object and so our
 first step is to import this object.
 
-Demonstrates the use of :func:`pydygp.linlatentforcemodels.MLFMAdapGrad.fit`
-
 """
 import numpy as np
 import matplotlib.pyplot as plt
