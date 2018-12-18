@@ -34,7 +34,7 @@ and
    **Figure**
    Conceptual diagram of the product of experts approximation. The
    ODE model and the GP prior are combined by identifying the variables
-   connected with the \"--\" line by way of the product of experts assumption
+   connected with the \"- - - \" line by way of the product of experts assumption
 
 For the MLFM AdapGrad model the likelihood of a set of state variables may be written
 
