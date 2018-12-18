@@ -94,23 +94,6 @@ The following list of notebooks give an introduction to fitting these models usi
 the adaptive gradient matching approximation, as well as a discussion of some of
 the more general features of the MLFM model
 
-.. toctree::
-   :maxdepth: 1
-
-   plot_mlfmag
-   plot_mlfmaggibbs
-
-
-
-All Examples
-------------
-
-    .. include:: ../../doc/source/gen_modules/backreferences/pydygp.linlatentforcemodels.MLFMAdapGrad.examples
-    .. raw:: html
-
-        <div style='clear:both'></div>
-
-
 References
 ----------
 
