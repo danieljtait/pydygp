@@ -94,8 +94,4 @@ for nt, (ind, symb) in enumerate(zip(inds, symbs)):
     ax.set_ylim((-.7, .7))
     ax.legend()
 
-for i in range(gibbsRV['beta'].shape[-1]):
-    fig, ax = plt.subplots()
-    ax.hist(gibbsRV['beta'][:, i], density=True)
-
 plt.show()

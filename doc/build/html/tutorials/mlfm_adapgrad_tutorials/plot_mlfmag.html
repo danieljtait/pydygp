@@ -176,13 +176,12 @@
 </div>
 <div class="sphx-glr-example-title section" id="basic-map-estimation">
 <span id="tutorials-mlfm-ag"></span><span id="sphx-glr-tutorials-mlfm-adapgrad-tutorials-plot-mlfmag-py"></span><h1>Basic MAP Estimation<a class="headerlink" href="#basic-map-estimation" title="Permalink to this headline">¶</a></h1>
-<p>This note descibes how to carry out the process of carrying out MAP
-parameter estimation for the MLFM using the Adaptive Gradient matching
-approximation. This uses the <a class="reference internal" href="../../_autosummary/_autosummary/pydygp.linlatentforcemodels.MLFMAdapGrad.html#pydygp.linlatentforcemodels.MLFMAdapGrad" title="pydygp.linlatentforcemodels.MLFMAdapGrad"><code class="xref py py-class docutils literal notranslate"><span class="pre">MLFMAdapGrad</span></code></a> object and so our
-first step is to import this object.</p>
+<p>This note descibes how to simulate observations from the MLFM model, as
+well as the process of carrying out MAP parameter estimation for the MLFM
+using the Adaptive Gradient matching approximation. This uses the
+<a class="reference internal" href="../../_autosummary/_autosummary/pydygp.linlatentforcemodels.MLFMAdapGrad.html#pydygp.linlatentforcemodels.MLFMAdapGrad" title="pydygp.linlatentforcemodels.MLFMAdapGrad"><code class="xref py py-class docutils literal notranslate"><span class="pre">MLFMAdapGrad</span></code></a> object and so our first step is to import this object.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">odeint</span>
 <span class="kn">from</span> <span class="nn">pydygp.linlatentforcemodels</span> <span class="kn">import</span> <span class="n">MLFMAdapGrad</span>
 <span class="kn">from</span> <span class="nn">sklearn.gaussian_process.kernels</span> <span class="kn">import</span> <span class="n">RBF</span>
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">17</span><span class="p">)</span>
@@ -190,22 +189,29 @@ first step is to import this object.</p>
 </div>
 <div class="section" id="model-setup">
 <h2>Model Setup<a class="headerlink" href="#model-setup" title="Permalink to this headline">¶</a></h2>
-<p>To begin we are going to demonstate the model with an ODE on the unit sphere</p>
+<p>To begin we are going to demonstate the MLFM by simulating an ODE on the unit
+sphere</p>
 <div class="math notranslate nohighlight">
-\[S^{2} = \{ x \in \mathbb{R}^3 \; : \; \| x \| = 1 \},\]</div>
-<p>which is given by the initial value problem</p>
+\[S^{2} = \{ x \in \mathbb{R}^3 \; : \; \| x \| = 1 \}.\]</div>
+<p>The model will be given by the initial value problem</p>
 <div class="math notranslate nohighlight">
 \[\dot{\mathbf{x}}(t) = \mathbf{A}(t) \mathbf{x}(t),
 \qquad \mathbf{x}_0 \in S^2,\]</div>
 <p>where the coefficient matrix, <span class="math notranslate nohighlight">\(\mathbf{A}(t)\)</span>, is supported on the Lie
-algebra <span class="math notranslate nohighlight">\(\mathfrak{so}(3)\)</span>. We do this by representing the</p>
+algebra <span class="math notranslate nohighlight">\(\mathfrak{so}(3)\)</span>. We do this by chosing a basis for the Lie
+algebra and then representing each of the structure matrices as a linear combination
+of these basis matrices using the coefficients <span class="math notranslate nohighlight">\(\beta_{rd}\)</span> leading to a
+representation of the coefficient matrix</p>
 <div class="math notranslate nohighlight">
 \[\mathbf{A}(t) = \sum_{d=0}^3 \beta_{0d}\mathbf{L}_d +
 \sum_{r=1}^R g_r(t) \sum_{d=1}^3 \beta_{rd}\mathbf{L}_d,\]</div>
 <p>where <span class="math notranslate nohighlight">\(\{\mathbf{L}_d \}\)</span> is a basis of the Lie algebra
-<span class="math notranslate nohighlight">\(\mathfrak{so}(3)\)</span>. The <code class="xref py py-class docutils literal notranslate"><span class="pre">so</span></code> object returns a tuple
-of basis elements for the Lie algebra, so for our example we will
-be interested in <code class="code docutils literal notranslate"><span class="pre">so(3)</span></code></p>
+<span class="math notranslate nohighlight">\(\mathfrak{so}(3)\)</span>. And the collection <span class="math notranslate nohighlight">\(\{ g_r(t) \}_{r=1}^{R}\)</span>
+are a set of smooth Gaussian processes. To construct this model in the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">pydygp</span></code> package we provide the <code class="xref py py-class docutils literal notranslate"><span class="pre">pydygp.liealgebras.so</span></code> class
+which can be used to return basis elements of the Lie algebras of the special
+orthogonal group <span class="math notranslate nohighlight">\(SO(n)\)</span>. For example if we import and call
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">so(3)</span></code> we get the following output</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydygp.liealgebras</span> <span class="kn">import</span> <span class="n">so</span>
 <span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">so</span><span class="p">(</span><span class="mi">3</span><span class="p">)):</span>
     <span class="k">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;L{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d</span><span class="o">+</span><span class="mi">1</span><span class="p">))))</span>
@@ -229,40 +235,79 @@ L3
  [ 0.  0.  0.]]
 </pre></div>
 </div>
+<p>Having imported the basis matrices for the Lie algebra we also need to
+choose how many latent forces we want the model to have, for this example
+we are going to consider a single latent forces with RBF kernel. We can
+then construct the <a class="reference internal" href="../../_autosummary/_autosummary/pydygp.linlatentforcemodels.MLFMAdapGrad.html#pydygp.linlatentforcemodels.MLFMAdapGrad" title="pydygp.linlatentforcemodels.MLFMAdapGrad"><code class="xref py py-class docutils literal notranslate"><span class="pre">MLFMAdapGrad</span></code></a> object</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Tuple of kernel objects for the latent forces, for r=1,..., R</span>
+<span class="n">lf_kernels</span> <span class="o">=</span> <span class="p">(</span><span class="n">RBF</span><span class="p">(),</span> <span class="p">)</span>
+
+<span class="c1"># construct the MLFM object</span>
+<span class="n">mlfm</span> <span class="o">=</span> <span class="n">MLFMAdapGrad</span><span class="p">(</span><span class="n">so</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">R</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">lf_kernels</span><span class="o">=</span><span class="n">lf_kernels</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="simulation">
 <h2>Simulation<a class="headerlink" href="#simulation" title="Permalink to this headline">¶</a></h2>
 <p>To simulate from the model we need to chose the set of coefficients
 <span class="math notranslate nohighlight">\(\beta_{r, d}\)</span>. We will consider the model with a single latent
-forcing function, and randomly generate the variables <span class="math notranslate nohighlight">\(beta\)</span></p>
-<p><a class="reference internal" href="../../_autosummary/_autosummary/pydygp.linlatentforcemodels.MLFMAdapGrad.html#pydygp.linlatentforcemodels.MLFMAdapGrad.sim" title="pydygp.linlatentforcemodels.MLFMAdapGrad.sim"><code class="xref py py-func docutils literal notranslate"><span class="pre">pydygp.linlatentforcemodels.MLFMAdapGrad.sim()</span></code></a></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">t</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>  <span class="c1"># single latent force</span>
+forcing function, and randomly generate the variables <span class="math notranslate nohighlight">\(beta\)</span>.</p>
+<p>For this example we are going to consider the case with a known latent
+force function given by</p>
+<div class="math notranslate nohighlight">
+\[g_1(t) = \cos(t) e^{-(t-2)^2}\]</div>
+<p>which is the modulation of a cosine signal by a RBF. To simulate we
+must pass the initial conditions <code class="xref py py-obj docutils literal notranslate"><span class="pre">x0</span></code>, the time points
+:py:obj`tt` and the parameters <code class="xref py py-obj docutils literal notranslate"><span class="pre">beta</span></code> to the
+<a class="reference internal" href="../../_autosummary/_autosummary/pydygp.linlatentforcemodels.MLFMAdapGrad.html#pydygp.linlatentforcemodels.MLFMAdapGrad.sim" title="pydygp.linlatentforcemodels.MLFMAdapGrad.sim"><code class="xref py py-func docutils literal notranslate"><span class="pre">MLFMAdapGrad.sim()</span></code></a> method. We can
+also optionally supply our known latent forces through the
+<code class="code docutils literal notranslate"><span class="pre">latent_forces</span></code> key word argument which accepts a list, or tuple,
+of length R.</p>
+<p>The method uses the <code class="xref py py-class docutils literal notranslate"><span class="pre">odeint</span></code> class in scipy to perform the
+numerical simulation of the model, and so we can demonstrate they
+give equivalent results by also getting the solution using scipy</p>
+<p>We also draw attention to the return type of <a class="reference internal" href="../../_autosummary/_autosummary/pydygp.linlatentforcemodels.MLFMAdapGrad.html#pydygp.linlatentforcemodels.MLFMAdapGrad.sim" title="pydygp.linlatentforcemodels.MLFMAdapGrad.sim"><code class="xref py py-func docutils literal notranslate"><span class="pre">MLFMAdapGrad.sim()</span></code></a>
+which when the key word is supplied as <code class="code docutils literal notranslate"><span class="pre">size</span> <span class="pre">=</span> <span class="pre">M</span></code>
+with <code class="code docutils literal notranslate"><span class="pre">M</span> <span class="pre">&gt;</span> <span class="pre">2</span></code> will result in the simulated observations being
+returned as a tuple <span class="math notranslate nohighlight">\((Y^{(1)},\ldots,Y^{(M)})\)</span> where
+each <span class="math notranslate nohighlight">\(Y^{(i)}\)</span> is an <span class="math notranslate nohighlight">\(N \times K\)</span> array.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Construct the known latent force</span>
+<span class="n">g</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">t</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>  <span class="c1"># single latent force</span>
+
+<span class="c1"># Simulate the R x D matrix beta</span>
 <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 
+<span class="c1"># Initial conditions are given by :math:`\mathbf{e}_i` for</span>
+<span class="c1"># :math:`i=1, 2, 3`.</span>
+<span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="c1"># The structure matrices as linear combinations of the basis matrices</span>
 <span class="n">A</span> <span class="o">=</span> <span class="p">[</span><span class="nb">sum</span><span class="p">(</span><span class="n">brd</span><span class="o">*</span><span class="n">Ld</span> <span class="k">for</span> <span class="n">brd</span><span class="p">,</span> <span class="n">Ld</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">br</span><span class="p">,</span> <span class="n">so</span><span class="p">(</span><span class="mi">3</span><span class="p">)))</span>
      <span class="k">for</span> <span class="n">br</span> <span class="ow">in</span> <span class="n">beta</span><span class="p">]</span>
 
+<span class="c1"># dense time vector</span>
 <span class="n">ttd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">5.</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
-<span class="n">x0</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
-<span class="n">sol</span> <span class="o">=</span> <span class="n">odeint</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">g</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
-             <span class="n">x0</span><span class="p">,</span>
-             <span class="n">ttd</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="the-mlfm-class">
-<h2>The MLFM Class<a class="headerlink" href="#the-mlfm-class" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mlfm</span> <span class="o">=</span> <span class="n">MLFMAdapGrad</span><span class="p">(</span><span class="n">so</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">R</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">lf_kernels</span><span class="o">=</span><span class="p">(</span><span class="n">RBF</span><span class="p">(),</span> <span class="p">))</span>
 
-<span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="c1"># solution using Scipy odeint</span>
+<span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">odeint</span>
+<span class="n">scipy_sol</span> <span class="o">=</span> <span class="n">odeint</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">g</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
+                   <span class="n">x0</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span>
+                   <span class="n">ttd</span><span class="p">)</span>
 
-<span class="c1"># downsample the dense time vector</span>
+<span class="c1"># solution using MLFMAdapGrad.sim</span>
+
+<span class="c1"># downsample</span>
 <span class="n">tt</span> <span class="o">=</span> <span class="n">ttd</span><span class="p">[::</span><span class="mi">10</span><span class="p">]</span>
 <span class="n">Data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">mlfm</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">tt</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span> <span class="n">latent_forces</span><span class="o">=</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ttd</span><span class="p">,</span> <span class="n">sol</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">Data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;o&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">xk</span><span class="p">,</span> <span class="n">yk</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">scipy_sol</span><span class="o">.</span><span class="n">T</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">Data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ttd</span><span class="p">,</span> <span class="n">xk</span><span class="p">,</span> <span class="s1">&#39;k-&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">yk</span><span class="p">,</span> <span class="s1">&#39;C0o&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ttd</span><span class="p">,</span> <span class="n">scipy_sol</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;k-&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;scipy odeint&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">Data</span><span class="p">[</span><span class="mi">0</span><span class="p">][:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;C0o&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;MLFMAdapGrad.sim&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 </pre></div>
 </div>
 <img alt="../../_images/sphx_glr_plot_mlfmag_001.png" class="sphx-glr-single-img" src="../../_images/sphx_glr_plot_mlfmag_001.png" />
@@ -288,7 +333,7 @@ forcing function, and randomly generate the variables <span class="math notransl
 </pre></div>
 </div>
 <img alt="../../_images/sphx_glr_plot_mlfmag_002.png" class="sphx-glr-single-img" src="../../_images/sphx_glr_plot_mlfmag_002.png" />
-<p><strong>Total running time of the script:</strong> ( 0 minutes  2.091 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  2.112 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-mlfm-adapgrad-tutorials-plot-mlfmag-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" href="../../_downloads/plot_mlfmag.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_mlfmag.py</span></code></a></div>

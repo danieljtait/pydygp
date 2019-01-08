@@ -23,7 +23,7 @@ Examples using ``pydygp.linlatentforcemodels.MLFMAdapGrad``
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This note descibes how to carry out the process of carrying out MAP parameter estimation for th...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This note descibes how to simulate observations from the MLFM model, as well as the process of ...">
 
 .. only:: html
 

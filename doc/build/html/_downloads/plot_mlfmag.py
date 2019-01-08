@@ -7,15 +7,14 @@ Basic MAP Estimation
 
 .. currentmodule:: pydygp.linlatentforcemodels
 
-This note descibes how to carry out the process of carrying out MAP
-parameter estimation for the MLFM using the Adaptive Gradient matching
-approximation. This uses the :class:`MLFMAdapGrad` object and so our
-first step is to import this object.
+This note descibes how to simulate observations from the MLFM model, as
+well as the process of carrying out MAP parameter estimation for the MLFM
+using the Adaptive Gradient matching approximation. This uses the
+:class:`MLFMAdapGrad` object and so our first step is to import this object.
 
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.integrate import odeint
 from pydygp.linlatentforcemodels import MLFMAdapGrad
 from sklearn.gaussian_process.kernels import RBF
 np.random.seed(17)
@@ -24,13 +23,14 @@ np.random.seed(17)
 # Model Setup
 # ~~~~~~~~~~~
 #
-# To begin we are going to demonstate the model with an ODE on the unit sphere
+# To begin we are going to demonstate the MLFM by simulating an ODE on the unit
+# sphere
 #
 # .. math::
 #
-#     S^{2} = \{ x \in \mathbb{R}^3 \; : \; \| x \| = 1 \},
+#     S^{2} = \{ x \in \mathbb{R}^3 \; : \; \| x \| = 1 \}.
 #
-# which is given by the initial value problem
+# The model will be given by the initial value problem
 #
 # .. math::
 #
@@ -38,7 +38,10 @@ np.random.seed(17)
 #     \qquad \mathbf{x}_0 \in S^2,
 #
 # where the coefficient matrix, :math:`\mathbf{A}(t)`, is supported on the Lie
-# algebra :math:`\mathfrak{so}(3)`. We do this by representing the
+# algebra :math:`\mathfrak{so}(3)`. We do this by chosing a basis for the Lie
+# algebra and then representing each of the structure matrices as a linear combination
+# of these basis matrices using the coefficients :math:`\beta_{rd}` leading to a
+# representation of the coefficient matrix
 #
 # .. math::
 #
@@ -46,49 +49,98 @@ np.random.seed(17)
 #     \sum_{r=1}^R g_r(t) \sum_{d=1}^3 \beta_{rd}\mathbf{L}_d,
 #
 # where :math:`\{\mathbf{L}_d \}` is a basis of the Lie algebra
-# :math:`\mathfrak{so}(3)`. The :class:`so` object returns a tuple
-# of basis elements for the Lie algebra, so for our example we will
-# be interested in :code:`so(3)`
+# :math:`\mathfrak{so}(3)`. And the collection :math:`\{ g_r(t) \}_{r=1}^{R}`
+# are a set of smooth Gaussian processes. To construct this model in the
+# :py:obj:`pydygp` package we provide the :class:`pydygp.liealgebras.so` class
+# which can be used to return basis elements of the Lie algebras of the special
+# orthogonal group :math:`SO(n)`. For example if we import and call
+# :py:obj:`so(3)` we get the following output
 from pydygp.liealgebras import so
 for d, item in enumerate(so(3)):
     print(''.join(('\n', 'L{}'.format(d+1))))
     print(item)
+##############################################################################
+# Having imported the basis matrices for the Lie algebra we also need to
+# choose how many latent forces we want the model to have, for this example
+# we are going to consider a single latent forces with RBF kernel. We can
+# then construct the :class:`MLFMAdapGrad` object
+
+# Tuple of kernel objects for the latent forces, for r=1,..., R
+lf_kernels = (RBF(), )
+
+# construct the MLFM object
+mlfm = MLFMAdapGrad(so(3), R=1, lf_kernels=lf_kernels)
 ##############################################################################
 # 
 # Simulation
 # ~~~~~~~~~~
 # To simulate from the model we need to chose the set of coefficients
 # :math:`\beta_{r, d}`. We will consider the model with a single latent
-# forcing function, and randomly generate the variables :math:`beta`
+# forcing function, and randomly generate the variables :math:`beta`.
 #
-# :func:`pydygp.linlatentforcemodels.MLFMAdapGrad.sim`
+# For this example we are going to consider the case with a known latent
+# force function given by
+#
+# .. math::
+#
+#     g_1(t) = \cos(t) e^{-(t-2)^2}
+#
+# which is the modulation of a cosine signal by a RBF. To simulate we
+# must pass the initial conditions :py:obj:`x0`, the time points
+# :py:obj`tt` and the parameters :py:obj:`beta` to the
+# :func:`MLFMAdapGrad.sim` method. We can
+# also optionally supply our known latent forces through the
+# :code:`latent_forces` key word argument which accepts a list, or tuple,
+# of length R.
+#
+# The method uses the :class:`odeint` class in scipy to perform the
+# numerical simulation of the model, and so we can demonstrate they
+# give equivalent results by also getting the solution using scipy
+#
+# We also draw attention to the return type of :func:`MLFMAdapGrad.sim`
+# which when the key word is supplied as :code:`size = M`
+# with :code:`M > 2` will result in the simulated observations being
+# returned as a tuple :math:`(Y^{(1)},\ldots,Y^{(M)})` where
+# each :math:`Y^{(i)}` is an :math:`N \times K` array.
+
+
+# Construct the known latent force 
 g = lambda t: np.exp(-(t-2)**2) * np.cos(t)  # single latent force
+
+# Simulate the R x D matrix beta
 beta = np.random.randn(2, 3)  
 
+# Initial conditions are given by :math:`\mathbf{e}_i` for
+# :math:`i=1, 2, 3`.
+x0 = np.eye(3)
+
+# The structure matrices as linear combinations of the basis matrices
 A = [sum(brd*Ld for brd, Ld in zip(br, so(3)))
      for br in beta]
 
+# dense time vector 
 ttd = np.linspace(0., 5., 100)
-x0 = [1., 0., 0.]
-sol = odeint(lambda x, t: (A[0] + g(t)*A[1]).dot(x),
-             x0,
-             ttd)
 
-##############################################################################
-#
-# The MLFM Class
-# ~~~~~~~~~~~~~~
-mlfm = MLFMAdapGrad(so(3), R=1, lf_kernels=(RBF(), ))
+# solution using Scipy odeint
+from scipy.integrate import odeint
+scipy_sol = odeint(lambda x, t: (A[0] + g(t)*A[1]).dot(x),
+                   x0[0, :],
+                   ttd)
 
-x0 = np.eye(3)
+# solution using MLFMAdapGrad.sim 
 
-# downsample the dense time vector
+# downsample
 tt = ttd[::10]
 Data, _ = mlfm.sim(x0, tt, beta=beta, latent_forces=(g, ), size=3)
 
 fig, ax = plt.subplots()
-ax.plot(ttd, sol, '-', alpha=0.3)
-ax.plot(tt, Data[0], 'o')
+for xk, yk in zip(scipy_sol.T[:-1], Data[0].T[:-1]):
+    ax.plot(ttd, xk, 'k-', alpha=0.3)
+    ax.plot(tt, yk, 'C0o')
+ax.plot(ttd, scipy_sol[:, -1], 'k-', alpha=0.3, label='scipy odeint')
+ax.plot(tt, Data[0][:, -1], 'C0o', label='MLFMAdapGrad.sim')
+ax.set_xlabel('Time')
+ax.legend()
 ##############################################################################
 #
 # Latent Force Estimation

@@ -1,0 +1,403 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Variational Inference &mdash; pydygp  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Successive Approximations" href="../mlfm_sa_tutorials/index.html" />
+    <link rel="prev" title="Gibbs Sampling" href="plot_mlfmaggibbs.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydygp
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installing PydyGP</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">PydyGP Tutorial</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../mlfm.html">Multiplicative Latent Force Models Tutorial</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../mlfm.html#model-description">Model Description</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../mlfm.html#model-fitting">Model Fitting</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="index.html">Adaptive Gradient Matching Methods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mlfm_sa_tutorials/index.html">Successive Approximations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../mlfm.html#adaptive-gradient-matching">Adaptive Gradient Matching</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Gallery of Examples</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/pydygp.linlatentforcemodels.html">pydygp.linlatentforcemodels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/pydygp.probabilitydistributions.html">pydygp.probabilitydistributions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydygp</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">PydyGP Tutorial</a> &raquo;</li>
+        
+          <li><a href="../mlfm.html">Multiplicative Latent Force Models Tutorial</a> &raquo;</li>
+        
+          <li><a href="index.html">Adaptive Gradient Matching Methods</a> &raquo;</li>
+        
+      <li>Variational Inference</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/tutorials/mlfm_adapgrad_tutorials/plot_mlfmagvar.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Click <a class="reference internal" href="#sphx-glr-download-tutorials-mlfm-adapgrad-tutorials-plot-mlfmagvar-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="variational-inference">
+<span id="sphx-glr-tutorials-mlfm-adapgrad-tutorials-plot-mlfmagvar-py"></span><h1>Variational Inference<a class="headerlink" href="#variational-inference" title="Permalink to this headline">¶</a></h1>
+<p>This example presents an illustration of using the MLFM to
+learn the model</p>
+<div class="math notranslate nohighlight">
+\[\dot{\mathbf{x}}(t) = \mathbf{A}(t)\mathbf{x}(t)\]</div>
+<p>where <span class="math notranslate nohighlight">\(A(t) \in \mathfrak{so}(3)\)</span> and <span class="math notranslate nohighlight">\(\| x_0 \| = 1\)</span>.</p>
+<p>This note will also demonstrate the process of holding certain variables
+fixed as well as defining priors</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pydygp.probabilitydistributions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">GeneralisedInverseGaussian</span><span class="p">,</span>
+                                             <span class="n">InverseGamma</span><span class="p">,</span>
+                                             <span class="n">Normal</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">sklearn.gaussian_process.kernels</span> <span class="kn">import</span> <span class="n">RBF</span>
+<span class="kn">from</span> <span class="nn">pydygp.liealgebras</span> <span class="kn">import</span> <span class="n">so</span>
+<span class="kn">from</span> <span class="nn">pydygp.linlatentforcemodels</span> <span class="kn">import</span> <span class="p">(</span><span class="n">MLFMAdapGrad</span><span class="p">,</span>
+                                         <span class="n">GibbsMLFMAdapGrad</span><span class="p">,</span>
+                                         <span class="n">VarMLFMAdapGrad</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Our first step is to initialise the models and then simulate some data.</p>
+<p>Make the model</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">vmlfm</span> <span class="o">=</span> <span class="n">VarMLFMAdapGrad</span><span class="p">(</span><span class="n">so</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">R</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">lf_kernels</span><span class="o">=</span><span class="p">[</span><span class="n">RBF</span><span class="p">(),])</span>
+<span class="n">gmlfm</span> <span class="o">=</span> <span class="n">GibbsMLFMAdapGrad</span><span class="p">(</span><span class="n">so</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">R</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">lf_kernels</span><span class="o">=</span><span class="p">[</span><span class="n">RBF</span><span class="p">(),])</span>
+
+<span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">row_stack</span><span class="p">(([</span><span class="mf">0.</span><span class="p">]</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span>
+                     <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">)))</span>
+
+<span class="c1"># simulate some initial conditions</span>
+<span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">x0</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="bp">None</span><span class="p">]</span>
+
+<span class="c1"># Time points to solve the model at</span>
+<span class="n">tt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+
+<span class="c1"># Data and true forces</span>
+<span class="n">Data</span><span class="p">,</span> <span class="n">g0</span> <span class="o">=</span> <span class="n">vmlfm</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">tt</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="c1"># vectorised and stack the data</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">y</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">Data</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="section" id="specifying-priors">
+<h2>Specifying priors<a class="headerlink" href="#specifying-priors" title="Permalink to this headline">¶</a></h2>
+<p>The prior should have a loglikelihood(x, eval_gradient=False) method
+which returns the loglikelihood of the prior variable at x and
+and optionally its gradient.</p>
+<p>Preexisting priors are contained in <a class="reference internal" href="../../modules/probabilitydistributions.html#module-pydygp.probabilitydistributions" title="pydygp.probabilitydistributions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pydygp.probabilitydistributions</span></code></a></p>
+<p>for example there is the class <span class="xref std std-ref">ProbabilityDistribution</span></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">logpsi_prior</span> <span class="o">=</span> <span class="n">GeneralisedInverseGaussian</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">p</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">logtransform</span><span class="p">()</span>
+<span class="n">loggamma_prior</span> <span class="o">=</span> <span class="n">InverseGamma</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span><span class="o">.</span><span class="n">logtransform</span><span class="p">()</span><span class="o">*</span><span class="n">vmlfm</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">K</span>
+
+<span class="n">beta_prior</span> <span class="o">=</span> <span class="n">Normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mf">1.</span><span class="p">)</span> <span class="o">*</span> <span class="n">beta</span><span class="o">.</span><span class="n">size</span>
+
+<span class="n">fitopts</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;logpsi_is_fixed&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> <span class="s1">&#39;logpsi_prior&#39;</span><span class="p">:</span> <span class="n">logpsi_prior</span><span class="p">,</span>
+           <span class="s1">&#39;loggamma_is_fixed&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> <span class="s1">&#39;loggamma_prior&#39;</span><span class="p">:</span> <span class="n">loggamma_prior</span><span class="p">,</span>
+           <span class="s1">&#39;beta_is_fixed&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> <span class="s1">&#39;beta_prior&#39;</span><span class="p">:</span> <span class="n">beta_prior</span><span class="p">,</span>
+           <span class="s1">&#39;beta0&#39;</span><span class="p">:</span> <span class="n">beta</span><span class="p">,</span>
+           <span class="p">}</span>
+
+<span class="c1"># Fit the model</span>
+<span class="n">res</span><span class="p">,</span> <span class="n">Eg</span><span class="p">,</span> <span class="n">Covg</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">vmlfm</span><span class="o">.</span><span class="n">varfit</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="o">**</span><span class="n">fitopts</span><span class="p">)</span>
+
+
+<span class="n">Grv</span> <span class="o">=</span> <span class="n">gmlfm</span><span class="o">.</span><span class="n">gibbsfit</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="o">**</span><span class="n">fitopts</span><span class="p">,</span> <span class="n">mapres</span><span class="o">=</span><span class="n">res</span><span class="p">)</span>
+
+<span class="n">mg</span><span class="p">,</span> <span class="n">cg</span> <span class="o">=</span> <span class="n">gmlfm</span><span class="o">.</span><span class="n">g_condpdf_mo</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span>
+                            <span class="n">logphi</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">logphi</span><span class="p">,</span>
+                            <span class="n">logpsi</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">logpsi</span><span class="p">,</span>
+                            <span class="n">gamma</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">loggamma</span><span class="p">))</span>
+
+<span class="n">Lapcov</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">optimres</span><span class="o">.</span><span class="n">hess_inv</span><span class="p">[:</span><span class="n">vmlfm</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">N</span><span class="o">*</span><span class="n">vmlfm</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">R</span><span class="p">,</span>
+                               <span class="p">:</span><span class="n">vmlfm</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">N</span><span class="o">*</span><span class="n">vmlfm</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">R</span><span class="p">]</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="c1">#ax.plot(tt, res.g.T, &#39;+&#39;)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">Grv</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="s1">&#39;k+&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="c1">#ax.plot(tt, Eg, &#39;o&#39;)</span>
+<span class="c1">#ax.errorbar(tt, res.g.T, yerr = 2*np.sqrt(np.diag(Lapcov)), fmt=&#39;s&#39;)</span>
+<span class="c1">#ax.errorbar(tt, Eg, yerr = 2*np.sqrt(np.diag(Covg[..., 0, 0])), fmt=&#39;o&#39;)</span>
+
+<span class="n">ttdense</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="n">tt</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ttdense</span><span class="p">,</span> <span class="n">g0</span><span class="p">[</span><span class="mi">0</span><span class="p">](</span><span class="n">ttdense</span><span class="p">),</span> <span class="s1">&#39;k-&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="n">fpred</span><span class="p">,</span> <span class="n">fstd</span> <span class="o">=</span> <span class="n">vmlfm</span><span class="o">.</span><span class="n">predict_lf</span><span class="p">(</span><span class="n">ttdense</span><span class="p">,</span> <span class="n">return_std</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">vfpred</span><span class="p">,</span> <span class="n">fstd2</span> <span class="o">=</span> <span class="n">vmlfm</span><span class="o">.</span><span class="n">var_predict_lf</span><span class="p">(</span><span class="n">ttdense</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+<span class="n">vfpred</span><span class="p">,</span> <span class="n">fstd3</span> <span class="o">=</span> <span class="n">vmlfm</span><span class="o">.</span><span class="n">var_predict_lf</span><span class="p">(</span><span class="n">ttdense</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ttdense</span><span class="p">,</span> <span class="n">vfpred</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="s1">&#39;r--&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">ttdense</span><span class="p">,</span>
+                <span class="n">fpred</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">fstd</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span>
+                <span class="n">fpred</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">fstd</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="c1">#gp = vmlfm.latentforces[0]</span>
+<span class="c1">#M = gp.kernel_(ttdense[:, None], vmlfm.ttc[:, None])</span>
+<span class="c1">#M = M.dot(np.linalg.inv(gp.kernel_(vmlfm.ttc[:, None])))</span>
+<span class="c1">#C = M.dot(Covg[..., 0, 0].dot(M.T))</span>
+<span class="c1">#sd = np.sqrt(np.diag(C))</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">ttdense</span><span class="p">,</span>
+                <span class="n">vfpred</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">fstd3</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span>
+                <span class="n">vfpred</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">fstd3</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span>
+                <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">cg</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">mg</span><span class="p">,</span> <span class="n">yerr</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">cg</span><span class="p">)),</span> <span class="n">xerr</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">capsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ttdense</span><span class="p">,</span> <span class="n">g0</span><span class="p">[</span><span class="mi">0</span><span class="p">](</span><span class="n">ttdense</span><span class="p">),</span> <span class="s1">&#39;k-&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ttdense</span><span class="p">,</span> <span class="n">vfpred</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="s1">&#39;r-&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">ttdense</span><span class="p">,</span>
+                <span class="n">vfpred</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">fstd3</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span>
+                <span class="n">vfpred</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">fstd3</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span>
+                <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">ttdense = np.linspace(tt[0], tt[-1], 50)</span>
+<span class="sd">Cff_ = vmlfm.latentforces[0].kernel_(ttdense[:, None], tt[:, None])</span>
+<span class="sd">Cf_f_ = vmlfm.latentforces[0].kernel_(tt[:, None])</span>
+<span class="sd">Cf_f_[np.diag_indices_from(Cf_f_)] += 1e-5</span>
+<span class="sd">Lf_f_ = np.linalg.cholesky(Cf_f_)</span>
+
+<span class="sd">from scipy.linalg import cho_solve</span>
+<span class="sd">gpred = Cff_.dot(cho_solve((Lf_f_, True), Eg))</span>
+<span class="sd">print(np.sqrt(np.diag(Covg[..., 0, 0])))</span>
+<span class="sd">ax.plot(ttdense, gpred, &#39;r-.&#39;)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<ul class="sphx-glr-horizontal">
+<li><img alt="../../_images/sphx_glr_plot_mlfmagvar_001.png" class="sphx-glr-multi-img first" src="../../_images/sphx_glr_plot_mlfmagvar_001.png" />
+</li>
+<li><img alt="../../_images/sphx_glr_plot_mlfmagvar_002.png" class="sphx-glr-multi-img first" src="../../_images/sphx_glr_plot_mlfmagvar_002.png" />
+</li>
+</ul>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(7, 7)
+</pre></div>
+</div>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  4.764 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-mlfm-adapgrad-tutorials-plot-mlfmagvar-py">
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../../_downloads/plot_mlfmagvar.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_mlfmagvar.py</span></code></a></div>
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../../_downloads/plot_mlfmagvar.ipynb" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_mlfmagvar.ipynb</span></code></a></div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../mlfm_sa_tutorials/index.html" class="btn btn-neutral float-right" title="Successive Approximations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="plot_mlfmaggibbs.html" class="btn btn-neutral" title="Gibbs Sampling" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Daniel Tait.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -65,6 +65,9 @@ invariant.
 
 All of the adative gradient matching methods proceed from this conditional density
 
+
+.. _mlfm-ag-tutorials-partab:
+
 Model Parameters
 ~~~~~~~~~~~~~~~~
 
@@ -73,19 +76,22 @@ gradient matching method for the MLFM, along with a brief description of this va
 how this variable is referred to when using the package, along with transformation that i
 s applied to this variable to give it a more natural support.
 
-+-----------------------------+-----------------------------+------------------+---------------------+---------------+ 
-| Parameter name              | Description                 | Variable name    | Transform           | Is Fixed      |
-+-----------------------------+-----------------------------+------------------+---------------------+---------------+
-| :math:`\mathbf{g}`          | The (vectorised) latent GPs | :code:`g`        | :math:`\mathrm{Id}` | :code:`False` |
-+-----------------------------+-----------------------------+------------------+---------------------+---------------+
-| :math:`\boldsymbol{\psi}`   | latent GP hyperparameters   | :code:`logpsi`   | :math:`\log`        | :code:`False` |
-+-----------------------------+-----------------------------+------------------+---------------------+---------------+
-| :math:`\boldsymbol{\beta}`  | Basis coefficients          | :code:`beta`     | :math:`\mathrm{Id}` | :code:`False` |
-+-----------------------------+-----------------------------+------------------+---------------------+---------------+
-| :math:`\boldsymbol{\tau}`   | Observation precisions      | :code:`logtau`   | :math:`\log`        | :code:`False` |
-+-----------------------------+-----------------------------+------------------+---------------------+---------------+
-| :math:`\boldsymbol{\gamma}` | ODE model regularisation    | :code:`loggamma` | :math:`\log`        | :code:`True`  |
-+-----------------------------+-----------------------------+------------------+---------------------+---------------+
+.. table:: Parameters of the MLFM-AG model
+   :widths: auto
+
+   +-----------------------------+-----------------------------+------------------+---------------------+---------------+ 
+   | Parameter name              | Description                 | Variable name    | Transform           | Is Fixed      |
+   +-----------------------------+-----------------------------+------------------+---------------------+---------------+
+   | :math:`\mathbf{g}`          | The (vectorised) latent GPs | :code:`g`        | :math:`\mathrm{Id}` | :code:`False` |
+   +-----------------------------+-----------------------------+------------------+---------------------+---------------+
+   | :math:`\boldsymbol{\psi}`   | latent GP hyperparameters   | :code:`logpsi`   | :math:`\log`        | :code:`False` |
+   +-----------------------------+-----------------------------+------------------+---------------------+---------------+
+   | :math:`\boldsymbol{\beta}`  | Basis coefficients          | :code:`beta`     | :math:`\mathrm{Id}` | :code:`False` |
+   +-----------------------------+-----------------------------+------------------+---------------------+---------------+
+   | :math:`\boldsymbol{\tau}`   | Observation precisions      | :code:`logtau`   | :math:`\log`        | :code:`False` |
+   +-----------------------------+-----------------------------+------------------+---------------------+---------------+
+   | :math:`\boldsymbol{\gamma}` | ODE model regularisation    | :code:`loggamma` | :math:`\log`        | :code:`True`  |
+   +-----------------------------+-----------------------------+------------------+---------------------+---------------+
 
 MAP Estimation
 --------------

@@ -155,6 +155,7 @@ def _filter(transition_matrices, observation_matrices, transition_covariance,
 
     for t in range(n_timesteps):
         if t == 0:
+
             predicted_state_means[t] = initial_state_mean
             predicted_state_covariances[t] = initial_state_covariance
 

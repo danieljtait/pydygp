@@ -67,6 +67,9 @@ invariant.
 
 All of the adative gradient matching methods proceed from this conditional density
 
+
+.. _mlfm-ag-tutorials-partab:
+
 Model Parameters
 ~~~~~~~~~~~~~~~~
 
@@ -75,19 +78,22 @@ gradient matching method for the MLFM, along with a brief description of this va
 how this variable is referred to when using the package, along with transformation that i
 s applied to this variable to give it a more natural support.
 
-+-----------------------------+-----------------------------+------------------+---------------------+---------------+ 
-| Parameter name              | Description                 | Variable name    | Transform           | Is Fixed      |
-+-----------------------------+-----------------------------+------------------+---------------------+---------------+
-| :math:`\mathbf{g}`          | The (vectorised) latent GPs | :code:`g`        | :math:`\mathrm{Id}` | :code:`False` |
-+-----------------------------+-----------------------------+------------------+---------------------+---------------+
-| :math:`\boldsymbol{\psi}`   | latent GP hyperparameters   | :code:`logpsi`   | :math:`\log`        | :code:`False` |
-+-----------------------------+-----------------------------+------------------+---------------------+---------------+
-| :math:`\boldsymbol{\beta}`  | Basis coefficients          | :code:`beta`     | :math:`\mathrm{Id}` | :code:`False` |
-+-----------------------------+-----------------------------+------------------+---------------------+---------------+
-| :math:`\boldsymbol{\tau}`   | Observation precisions      | :code:`logtau`   | :math:`\log`        | :code:`False` |
-+-----------------------------+-----------------------------+------------------+---------------------+---------------+
-| :math:`\boldsymbol{\gamma}` | ODE model regularisation    | :code:`loggamma` | :math:`\log`        | :code:`True`  |
-+-----------------------------+-----------------------------+------------------+---------------------+---------------+
+.. table:: Parameters of the MLFM-AG model
+   :widths: auto
+
+   +-----------------------------+-----------------------------+------------------+---------------------+---------------+ 
+   | Parameter name              | Description                 | Variable name    | Transform           | Is Fixed      |
+   +-----------------------------+-----------------------------+------------------+---------------------+---------------+
+   | :math:`\mathbf{g}`          | The (vectorised) latent GPs | :code:`g`        | :math:`\mathrm{Id}` | :code:`False` |
+   +-----------------------------+-----------------------------+------------------+---------------------+---------------+
+   | :math:`\boldsymbol{\psi}`   | latent GP hyperparameters   | :code:`logpsi`   | :math:`\log`        | :code:`False` |
+   +-----------------------------+-----------------------------+------------------+---------------------+---------------+
+   | :math:`\boldsymbol{\beta}`  | Basis coefficients          | :code:`beta`     | :math:`\mathrm{Id}` | :code:`False` |
+   +-----------------------------+-----------------------------+------------------+---------------------+---------------+
+   | :math:`\boldsymbol{\tau}`   | Observation precisions      | :code:`logtau`   | :math:`\log`        | :code:`False` |
+   +-----------------------------+-----------------------------+------------------+---------------------+---------------+
+   | :math:`\boldsymbol{\gamma}` | ODE model regularisation    | :code:`loggamma` | :math:`\log`        | :code:`True`  |
+   +-----------------------------+-----------------------------+------------------+---------------------+---------------+
 
 MAP Estimation
 --------------
@@ -107,7 +113,7 @@ References
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This note descibes how to carry out the process of carrying out MAP parameter estimation for th...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This note descibes how to simulate observations from the MLFM model, as well as the process of ...">
 
 .. only:: html
 
@@ -144,6 +150,26 @@ References
    :hidden:
 
    /tutorials/mlfm_adapgrad_tutorials/plot_mlfmaggibbs
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example presents an illustration of using the MLFM to learn the model">
+
+.. only:: html
+
+    .. figure:: /tutorials/mlfm_adapgrad_tutorials/images/thumb/sphx_glr_plot_mlfmagvar_thumb.png
+
+        :ref:`sphx_glr_tutorials_mlfm_adapgrad_tutorials_plot_mlfmagvar.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /tutorials/mlfm_adapgrad_tutorials/plot_mlfmagvar
 .. raw:: html
 
     <div style='clear:both'></div>
