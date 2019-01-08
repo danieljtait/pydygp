@@ -1623,6 +1623,21 @@ class VarMLFMAdapGrad(MLFMAdapGrad):
         # get the results from fitting the MAP model
         try:
             mapres = kwargs['mapres']
+
+            # if fit has not been called we need to make sure
+            # all of the GP regressors are set up for fitting
+            logpsi = mapres.logpsi
+            g_ = mapres.g
+
+            _logpsi_shape = _get_gp_theta_shape(self.latentforces)
+            reshape_logpsi = _unpack_vector(logpsi_, _logpsi_shape)
+
+            for r, gr in enumerate(g_.reshape(self.dim.R, self.dim.N)):
+                gp = self.latentforces[r]
+                gp.kernel_ = gp.kernel.clone_with_theta(reshape_logpsi[r])
+                kern = gp.kernel.clone_with_theta(reshape_logpsi[r])
+                _sklearn_gp_falsefit(gp, gr, self.ttc[:, None], kern)
+
         except KeyError:
             mapres = self.fit(times, Y, **kwargs)
 
