@@ -424,6 +424,9 @@ def _sklearn_gp_falsefit(gp, y_train, X_train, kernel):
     gp.alpha_ = cho_solve((gp.L_, True), gp.y_train_)
     gp._y_train_mean = np.zeros(1)
 
+    L_inv = solve_triangular(gp.L_.T,
+                             np.eye(gp.L_.shape[0]))
+    gp._K_inv = L_inv.dot(L_inv.T)
 
 class MLFMAdapGrad(BaseMLFM):
     """
@@ -1681,8 +1684,12 @@ class VarMLFMAdapGrad(MLFMAdapGrad):
         Covg = Covg.transpose(1, 0, 3, 2)
 
         for Egr, gp in zip(Eg.T, self.latentforces):
+
+            # False fit the gp kernels
             gp.y_train_ = Egr.ravel()
             gp.alpha_ = cho_solve((gp.L_, True), gp.y_train_)
+
+            
 
         return mapres, Eg, Covg, Eb, Covb
 
