@@ -43,4 +43,4 @@ def g_em_fit(g, beta, ifx, mlfmsa):
 mlfm.X_train_ = [t1, t2]
 mlfm.Y_train_ = [Y1, Y2]
 
-mu_ivp = mlfm.mu_ivp_init([0, 5, 9])
+#mu_ivp = mlfm.mu_ivp_init([0, 5, 9])
