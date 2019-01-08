@@ -8,6 +8,8 @@
 
 
 
+.. _tutorials-mlfmsa-motiv-part1:
+
 Approximate Density
 ===================
 
@@ -128,7 +130,7 @@ More sensible place to start -- the Kalman Filter performs the numerical integra
 
     from pydygp.linlatentforcemodels import KalmanFilter
 
-    mlfm._setup_times(tt, h=.25)
+    mlfm._setup_times(tt, h=None)
     #ifx = mlfm.ttc // 2 # index left fixed by the Picard iteration
 
     ifx = 0
@@ -187,7 +189,7 @@ More sensible place to start -- the Kalman Filter performs the numerical integra
 
 
 So the linear model seems to be performing the forward iteration in a
-reasonable way. The next challenge is to iry and invert this for the
+reasonable way. The next challenge is to try and invert this for the
 conditional distribution.
 
 The relevant objective function is
@@ -307,7 +309,7 @@ to an iterative EM setting to discover the force.
 
 
 
-**Total running time of the script:** ( 0 minutes  0.675 seconds)
+**Total running time of the script:** ( 0 minutes  0.127 seconds)
 
 
 .. _sphx_glr_download_tutorials_mlfm_sa_tutorials_plot_mlfmsa_kf.py:

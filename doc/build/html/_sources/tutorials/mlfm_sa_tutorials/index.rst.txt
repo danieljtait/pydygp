@@ -15,6 +15,26 @@ Successive Approximations
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="The :ref:`previous note &lt;tutorials-mlfmsa-motiv-part1&gt;` demonstrated that it is possible to rec...">
+
+.. only:: html
+
+    .. figure:: /tutorials/mlfm_sa_tutorials/images/thumb/sphx_glr_plot_mlfmsa_kf_part2_thumb.png
+
+        :ref:`sphx_glr_tutorials_mlfm_sa_tutorials_plot_mlfmsa_kf_part2.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /tutorials/mlfm_sa_tutorials/plot_mlfmsa_kf_part2
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="When using the method of successive approximation we construct a regression model ">
 
 .. only:: html

@@ -1,5 +1,7 @@
 """
 
+.. _tutorials-mlfmsa-motiv-part1:
+
 Approximate Density
 ===================
 
@@ -107,7 +109,7 @@ Data, g = mlfm.sim(x0, tt, beta=beta, size=3)
 #
 from pydygp.linlatentforcemodels import KalmanFilter
 
-mlfm._setup_times(tt, h=.25)
+mlfm._setup_times(tt, h=None)
 #ifx = mlfm.ttc // 2 # index left fixed by the Picard iteration
 
 ifx = 0
@@ -159,7 +161,7 @@ ax.plot(tt, Data[0], 'ks')
 ############################################################################
 #
 # So the linear model seems to be performing the forward iteration in a
-# reasonable way. The next challenge is to iry and invert this for the
+# reasonable way. The next challenge is to try and invert this for the
 # conditional distribution.
 #
 # The relevant objective function is

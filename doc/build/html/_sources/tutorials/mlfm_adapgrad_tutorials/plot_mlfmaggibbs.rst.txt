@@ -116,56 +116,17 @@ state variables.
         ax.set_ylim((-.7, .7))
         ax.legend()
 
-    for i in range(gibbsRV['beta'].shape[-1]):
-        fig, ax = plt.subplots()
-        ax.hist(gibbsRV['beta'][:, i], density=True)
-
     plt.show()
 
 
 
-.. rst-class:: sphx-glr-horizontal
-
-
-    *
-
-      .. image:: /tutorials/mlfm_adapgrad_tutorials/images/sphx_glr_plot_mlfmaggibbs_001.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /tutorials/mlfm_adapgrad_tutorials/images/sphx_glr_plot_mlfmaggibbs_002.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /tutorials/mlfm_adapgrad_tutorials/images/sphx_glr_plot_mlfmaggibbs_003.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /tutorials/mlfm_adapgrad_tutorials/images/sphx_glr_plot_mlfmaggibbs_004.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /tutorials/mlfm_adapgrad_tutorials/images/sphx_glr_plot_mlfmaggibbs_005.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /tutorials/mlfm_adapgrad_tutorials/images/sphx_glr_plot_mlfmaggibbs_006.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /tutorials/mlfm_adapgrad_tutorials/images/sphx_glr_plot_mlfmaggibbs_007.png
-            :class: sphx-glr-multi-img
+.. image:: /tutorials/mlfm_adapgrad_tutorials/images/sphx_glr_plot_mlfmaggibbs_001.png
+    :class: sphx-glr-single-img
 
 
 
 
-**Total running time of the script:** ( 0 minutes  9.494 seconds)
+**Total running time of the script:** ( 0 minutes  10.424 seconds)
 
 
 .. _sphx_glr_download_tutorials_mlfm_adapgrad_tutorials_plot_mlfmaggibbs.py:

@@ -875,6 +875,8 @@ class MLFMAdapGrad(BaseMLFM):
         log transform of these values (and consequently returns the
         gradient wth respect to the log transformed parameters) to
         ensure a natural positivity constraints.
+
+        See the :ref:`Table <mlfm-ag-tutorials-partab>`
         """
         if eval_gradient:
             # ODE model inv. covariance matrix            

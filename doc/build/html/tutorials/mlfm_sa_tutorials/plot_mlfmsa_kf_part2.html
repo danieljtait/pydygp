@@ -1,0 +1,293 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Recovering the Latent Force &mdash; pydygp  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Approximate Density" href="plot_mlfmsa_kf.html" />
+    <link rel="prev" title="Successive Approximations" href="index.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydygp
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installing PydyGP</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">PydyGP Tutorial</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../mlfm.html">Multiplicative Latent Force Models Tutorial</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../mlfm.html#model-description">Model Description</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../mlfm.html#model-fitting">Model Fitting</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../mlfm_adapgrad_tutorials/index.html">Adaptive Gradient Matching Methods</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="index.html">Successive Approximations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../mlfm.html#adaptive-gradient-matching">Adaptive Gradient Matching</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Gallery of Examples</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/pydygp.linlatentforcemodels.html">pydygp.linlatentforcemodels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/pydygp.probabilitydistributions.html">pydygp.probabilitydistributions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydygp</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">PydyGP Tutorial</a> &raquo;</li>
+        
+          <li><a href="../mlfm.html">Multiplicative Latent Force Models Tutorial</a> &raquo;</li>
+        
+          <li><a href="index.html">Successive Approximations</a> &raquo;</li>
+        
+      <li>Recovering the Latent Force</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/tutorials/mlfm_sa_tutorials/plot_mlfmsa_kf_part2.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Click <a class="reference internal" href="#sphx-glr-download-tutorials-mlfm-sa-tutorials-plot-mlfmsa-kf-part2-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="recovering-the-latent-force">
+<span id="sphx-glr-tutorials-mlfm-sa-tutorials-plot-mlfmsa-kf-part2-py"></span><h1>Recovering the Latent Force<a class="headerlink" href="#recovering-the-latent-force" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="plot_mlfmsa_kf.html#tutorials-mlfmsa-motiv-part1"><span class="std std-ref">previous note</span></a> demonstrated that it
+is possible to recover the latent by inverting the trajectories formed by
+the operator evaluated at the known true values. This is obviously of
+limited use and so in this note we will expand this construction to an
+iterative procedure for estimating the unknown forces.</p>
+<p>We set up the model and simulate the data exactly as was done previously</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pydygp.liealgebras</span> <span class="kn">import</span> <span class="n">so</span>
+<span class="kn">from</span> <span class="nn">sklearn.gaussian_process.kernels</span> <span class="kn">import</span> <span class="n">RBF</span>
+<span class="kn">from</span> <span class="nn">pydygp.linlatentforcemodels</span> <span class="kn">import</span> <span class="n">MLFMSA</span>
+
+<span class="n">mlfm</span> <span class="o">=</span> <span class="n">MLFMSA</span><span class="p">(</span><span class="n">so</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">R</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">lf_kernels</span><span class="o">=</span><span class="p">[</span><span class="n">RBF</span><span class="p">(),</span> <span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+                 <span class="p">[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.31</span><span class="p">,</span> <span class="mf">0.11</span><span class="p">]])</span>
+<span class="n">t1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+<span class="n">t2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>
+<span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">Y1</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">mlfm</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="n">x0</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">t1</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">)</span>
+<span class="n">Y2</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">mlfm</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="n">x0</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">t2</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span> <span class="n">latent_forces</span><span class="o">=</span><span class="n">g</span><span class="p">)</span>
+
+<span class="n">mlfm</span><span class="o">.</span><span class="n">_setup_times</span><span class="p">([</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">],</span> <span class="n">h</span><span class="o">=.</span><span class="mi">25</span><span class="p">,</span> <span class="n">multi_output</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We now consider the iterative process for constructing an
+estimate of the latent force</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">g_em_fit</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">ifx</span><span class="p">,</span> <span class="n">mlfmsa</span><span class="p">):</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">mlfmsa</span><span class="o">.</span><span class="n">_K</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">ifix</span><span class="p">)</span>
+
+    <span class="c1"># get the data</span>
+
+<span class="c1"># data preprocessing</span>
+
+<span class="n">mlfm</span><span class="o">.</span><span class="n">X_train_</span> <span class="o">=</span> <span class="p">[</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">]</span>
+<span class="n">mlfm</span><span class="o">.</span><span class="n">Y_train_</span> <span class="o">=</span> <span class="p">[</span><span class="n">Y1</span><span class="p">,</span> <span class="n">Y2</span><span class="p">]</span>
+
+<span class="n">mu_ivp</span> <span class="o">=</span> <span class="n">mlfm</span><span class="o">.</span><span class="n">mu_ivp_init</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">9</span><span class="p">])</span>
+</pre></div>
+</div>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  0.030 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-mlfm-sa-tutorials-plot-mlfmsa-kf-part2-py">
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../../_downloads/plot_mlfmsa_kf_part2.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_mlfmsa_kf_part2.py</span></code></a></div>
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" href="../../_downloads/plot_mlfmsa_kf_part2.ipynb" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_mlfmsa_kf_part2.ipynb</span></code></a></div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="plot_mlfmsa_kf.html" class="btn btn-neutral float-right" title="Approximate Density" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Successive Approximations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Daniel Tait.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

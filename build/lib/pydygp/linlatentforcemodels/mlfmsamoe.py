@@ -772,6 +772,37 @@ class BaseMLFMSA(BaseMLFM):
 
         return W
 
+    def data_kf_form(self):
+        pass
+
+    def mu_ivp_init(self, ifixed):
+        """
+        Returns
+        -------
+
+        mu_ivp : array, shape (N_mixtures, N_exper, K)
+        """
+        from scipy.interpolate import interp1d
+        mu_ivp = np.zeros((len(ifixed),
+                           len(self.Y_train_),
+                           self.dim.K))
+        for nmix, ifx in enumerate(ifixed):
+            tfx = self.ttc[ifx]
+            for m, (tm, Ym) in enumerate(zip(self.X_train_,
+                                             self.Y_train_)):
+                tfx_in_tm = np.where(tm == tfx)[0]
+                if len(tfx_in_tm) > 0:
+                    mu_ivp[nmix, m, :] = Ym[tfx_in_tm[0]]
+                else:
+                    for k in range(self.dim.K):
+                        u = interp1d(tm, Ym[:, k], kind='cubic',
+                                     fill_value='extrapolate')
+                        mu_ivp[nmix, m, k] = u(tfx)
+        return mu_ivp
+
+
+
+
     def _K(self, g, beta, ifix, eval_gradient=False, eval_b_gradient=False):
         """
         Return the discretisation of the integral opearator in Picard iteration.
@@ -1277,11 +1308,6 @@ class MLFMSA(EMFitMixin, BaseMLFMSA):
                           kwargs.pop('h', None),
                           multi_output=multi_output)
 
-
-        
-        
-
-
     def _fit_init(self, is_fixed_vars, **kwargs):
         """
         Handles initalisation of the optimisation
@@ -1309,3 +1335,22 @@ class MLFMSA(EMFitMixin, BaseMLFMSA):
 
         return np.concatenate(free_vars), free_vars_shape, fixed_vars
 
+    def discrete_Picard(self, ifx):
+        """
+        """
+        W = self._get_weight_matrix(self.ttc, ifx)
+        g = g.reshape((self.dim.R, self.dim.N)).T
+        g = np.column_stack((np.ones(self.dim.N, g)))
+
+        # For computational efficiency we would like to do
+        # as much of the scale multiplication before the Kronecker
+        # products
+
+        # multiples each row gn = [1, g1(tn), ..., gR(tn)]
+        # by the N-vectors W[:, n]
+        #
+        #  (R+1, 1) x (1, N) -> (R+1, N) 
+        # 
+        # resulting shape (N, R+1, N)
+        GW = np.stack((gn[:, None] * W[:, n][None, :]
+                       for n, gn in enumerate(g)))

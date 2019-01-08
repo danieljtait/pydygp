@@ -30,7 +30,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Gallery of Examples" href="../../auto_examples/index.html" />
-    <link rel="prev" title="Successive Approximations" href="index.html" /> 
+    <link rel="prev" title="Recovering the Latent Force" href="plot_mlfmsa_kf_part2.html" /> 
 
   
   <script src="../../_static/js/modernizr.min.js"></script>
@@ -175,7 +175,7 @@
 <p class="last">Click <a class="reference internal" href="#sphx-glr-download-tutorials-mlfm-sa-tutorials-plot-mlfmsa-kf-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="approximate-density">
-<span id="sphx-glr-tutorials-mlfm-sa-tutorials-plot-mlfmsa-kf-py"></span><h1>Approximate Density<a class="headerlink" href="#approximate-density" title="Permalink to this headline">¶</a></h1>
+<span id="tutorials-mlfmsa-motiv-part1"></span><span id="sphx-glr-tutorials-mlfm-sa-tutorials-plot-mlfmsa-kf-py"></span><h1>Approximate Density<a class="headerlink" href="#approximate-density" title="Permalink to this headline">¶</a></h1>
 <p>When using the method of successive approximation we construct
 a regression model</p>
 <div class="math notranslate nohighlight">
@@ -257,7 +257,7 @@ so we need to integrate them out. If we define the statistics</p>
 <p>More sensible place to start – the Kalman Filter performs the numerical integration</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydygp.linlatentforcemodels</span> <span class="kn">import</span> <span class="n">KalmanFilter</span>
 
-<span class="n">mlfm</span><span class="o">.</span><span class="n">_setup_times</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">h</span><span class="o">=.</span><span class="mi">25</span><span class="p">)</span>
+<span class="n">mlfm</span><span class="o">.</span><span class="n">_setup_times</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
 <span class="c1">#ifx = mlfm.ttc // 2 # index left fixed by the Picard iteration</span>
 
 <span class="n">ifx</span> <span class="o">=</span> <span class="mi">0</span>
@@ -309,7 +309,7 @@ so we need to integrate them out. If we define the statistics</p>
 </div>
 <img alt="../../_images/sphx_glr_plot_mlfmsa_kf_001.png" class="sphx-glr-single-img" src="../../_images/sphx_glr_plot_mlfmsa_kf_001.png" />
 <p>So the linear model seems to be performing the forward iteration in a
-reasonable way. The next challenge is to iry and invert this for the
+reasonable way. The next challenge is to try and invert this for the
 conditional distribution.</p>
 <p>The relevant objective function is</p>
 <div class="math notranslate nohighlight">
@@ -391,7 +391,7 @@ to an iterative EM setting to discover the force.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  0.675 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  0.127 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-mlfm-sa-tutorials-plot-mlfmsa-kf-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" href="../../_downloads/plot_mlfmsa_kf.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_mlfmsa_kf.py</span></code></a></div>
@@ -413,7 +413,7 @@ to an iterative EM setting to discover the force.</p>
         <a href="../../auto_examples/index.html" class="btn btn-neutral float-right" title="Gallery of Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral" title="Successive Approximations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="plot_mlfmsa_kf_part2.html" class="btn btn-neutral" title="Recovering the Latent Force" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

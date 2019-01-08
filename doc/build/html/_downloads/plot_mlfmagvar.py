@@ -55,13 +55,47 @@ Y = np.column_stack((y.T.ravel() for y in Data))
 # -----------------
 # .. currentmodule:: pydygp.probabilitydistributions
 #
-# The prior should have a loglikelihood(x, eval_gradient=False) method
-# which returns the loglikelihood of the prior variable at x and
-# and optionally its gradient.
+# To work with the pydygp all we require is that the :py:obj:`Prior`
+# object should have a method :py:meth:`~Prior.loglikelihood`, which
+# should have two arguments, the value of the parameter and an optional
+# boolean to return the gradient. For example the following would be
+# a valid way of defining your own prior using a simple class constructed
+# from a :py:class:`collections.namedtuple` object
 #
-# Preexisting priors are contained in :py:mod:`pydygp.probabilitydistributions`
+from collections import namedtuple
+
+# simple class with a 'loglikelihood' attribute
+MyPrior = namedtuple('MyPrior', 'loglikelihood')
+
+# improper uniform prior
+def unif_loglik(x, eval_gradient=False):
+    if eval_gradient:
+        x = np.atleast_1d(x)
+        return 0, np.zeros(x.size)
+    else:
+        return 0.
+
+uniform_prior = MyPrior(unif_loglik)
+
+###########################################################################
+# .... [clean up]
+# specifying if the gradient 
+#  which returns the value of prior loglikelihood
+# at :code:`x` and optionally it's gradient.
+# To work correctly the specified prior should also respect the
+# transformations described in the :ref:`Table <mlfm-ag-tutorials-partab>`.
+# 
+# Some pre-existing priors are contained in
+# :py:mod:`pydygp.probabilitydistributions`, and also include simple
+# options to get the prior for simple transformations of the random
+# variables including scale transforms and log transforms.
 #
-# for example there is the class :ref:`ProbabilityDistribution`
+# Here we take the prior of the latent forces, which for the RBF kernel
+# correspond to the length scale parameter of the kernel to have a
+# generalised inverse Gaussian distribution. But because we are working
+# with the log transform of the length scale we use the
+# :py:meth:`pydygp.probabilitydistributions.GeneralisedInverseGaussian.logtransform`
+
 logpsi_prior = GeneralisedInverseGaussian(a=5, b=5, p=-1).logtransform()
 loggamma_prior = InverseGamma(a=0.001, b=0.001).logtransform()*vmlfm.dim.K
 

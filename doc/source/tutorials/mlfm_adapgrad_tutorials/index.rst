@@ -113,6 +113,26 @@ References
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="This note continues on from the :ref:`basic MAP tutorial&lt;tutorials-mlfm-ag&gt;` examining the Adap...">
+
+.. only:: html
+
+    .. figure:: /tutorials/mlfm_adapgrad_tutorials/images/thumb/sphx_glr_plot_mlfmag_kubo_thumb.png
+
+        :ref:`sphx_glr_tutorials_mlfm_adapgrad_tutorials_plot_mlfmag_kubo.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /tutorials/mlfm_adapgrad_tutorials/plot_mlfmag_kubo
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="This note descibes how to simulate observations from the MLFM model, as well as the process of ...">
 
 .. only:: html

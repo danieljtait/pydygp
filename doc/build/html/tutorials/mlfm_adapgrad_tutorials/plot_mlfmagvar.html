@@ -220,11 +220,44 @@ fixed as well as defining priors</p>
 </div>
 <div class="section" id="specifying-priors">
 <h2>Specifying priors<a class="headerlink" href="#specifying-priors" title="Permalink to this headline">¶</a></h2>
-<p>The prior should have a loglikelihood(x, eval_gradient=False) method
-which returns the loglikelihood of the prior variable at x and
-and optionally its gradient.</p>
-<p>Preexisting priors are contained in <a class="reference internal" href="../../modules/probabilitydistributions.html#module-pydygp.probabilitydistributions" title="pydygp.probabilitydistributions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pydygp.probabilitydistributions</span></code></a></p>
-<p>for example there is the class <span class="xref std std-ref">ProbabilityDistribution</span></p>
+<p>To work with the pydygp all we require is that the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Prior</span></code>
+object should have a method <code class="xref py py-meth docutils literal notranslate"><span class="pre">loglikelihood()</span></code>, which
+should have two arguments, the value of the parameter and an optional
+boolean to return the gradient. For example the following would be
+a valid way of defining your own prior using a simple class constructed
+from a <code class="xref py py-class docutils literal notranslate"><span class="pre">collections.namedtuple</span></code> object</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+
+<span class="c1"># simple class with a &#39;loglikelihood&#39; attribute</span>
+<span class="n">MyPrior</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;MyPrior&#39;</span><span class="p">,</span> <span class="s1">&#39;loglikelihood&#39;</span><span class="p">)</span>
+
+<span class="c1"># improper uniform prior</span>
+<span class="k">def</span> <span class="nf">unif_loglik</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">eval_gradient</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">eval_gradient</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.</span>
+
+<span class="n">uniform_prior</span> <span class="o">=</span> <span class="n">MyPrior</span><span class="p">(</span><span class="n">unif_loglik</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>…. [clean up]
+specifying if the gradient</p>
+<blockquote>
+<div>which returns the value of prior loglikelihood</div></blockquote>
+<p>at <code class="code docutils literal notranslate"><span class="pre">x</span></code> and optionally it’s gradient.
+To work correctly the specified prior should also respect the
+transformations described in the <a class="reference internal" href="index.html#mlfm-ag-tutorials-partab"><span class="std std-ref">Table</span></a>.</p>
+<p>Some pre-existing priors are contained in
+<a class="reference internal" href="../../modules/probabilitydistributions.html#module-pydygp.probabilitydistributions" title="pydygp.probabilitydistributions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pydygp.probabilitydistributions</span></code></a>, and also include simple
+options to get the prior for simple transformations of the random
+variables including scale transforms and log transforms.</p>
+<p>Here we take the prior of the latent forces, which for the RBF kernel
+correspond to the length scale parameter of the kernel to have a
+generalised inverse Gaussian distribution. But because we are working
+with the log transform of the length scale we use the
+<a class="reference internal" href="../../_autosummary/generated/pydygp.probabilitydistributions.GeneralisedInverseGaussian.html#pydygp.probabilitydistributions.GeneralisedInverseGaussian.logtransform" title="pydygp.probabilitydistributions.GeneralisedInverseGaussian.logtransform"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pydygp.probabilitydistributions.GeneralisedInverseGaussian.logtransform()</span></code></a></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">logpsi_prior</span> <span class="o">=</span> <span class="n">GeneralisedInverseGaussian</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">p</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">logtransform</span><span class="p">()</span>
 <span class="n">loggamma_prior</span> <span class="o">=</span> <span class="n">InverseGamma</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span><span class="o">.</span><span class="n">logtransform</span><span class="p">()</span><span class="o">*</span><span class="n">vmlfm</span><span class="o">.</span><span class="n">dim</span><span class="o">.</span><span class="n">K</span>
 
@@ -323,7 +356,7 @@ and optionally its gradient.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(7, 7)
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  4.764 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  4.996 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-mlfm-adapgrad-tutorials-plot-mlfmagvar-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" href="../../_downloads/plot_mlfmagvar.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_mlfmagvar.py</span></code></a></div>
